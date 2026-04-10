@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Client - Atizay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #f9f9f9;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+            --radius-pill: 50px;
+            --radius-card: 12px;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-main); 
+            background: var(--white); 
+            line-height: 1.5; 
+            -webkit-font-smoothing: antialiased; 
+        }
+
+        /* ── NAVIGATION ── */
+        nav {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; height: 72px; border-bottom: 1px solid var(--border);
+            background: var(--white); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+        .logo { 
+            font-size: 22px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; 
+            text-decoration: none; color: var(--black); 
+        }
+        .nav-links { display: flex; gap: 32px; font-size: 14px; font-weight: 500; }
+        .nav-links a { text-decoration: none; color: var(--black); transition: opacity .2s; }
+        .nav-links a:hover { opacity: 0.6; }
+        
+        .nav-right { display: flex; gap: 16px; align-items: center; }
+        .btn-outline {
+            padding: 10px 18px; font-size: 13px; font-weight: 600;
+            background: transparent; color: var(--black); border: 1px solid var(--black); 
+            border-radius: 6px; cursor: pointer; transition: all .2s;
+            text-decoration: none;
+        }
+        .btn-outline:hover { background: var(--black); color: var(--white); }
+
+        .btn-solid {
+            background: var(--black); color: var(--white); padding: 10px 18px;
+            font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer;
+            text-decoration: none; transition: background .2s;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            position: relative; height: 550px; display: flex; align-items: center; justify-content: center;
+            background: url('https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+        }
+        .hero::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 1;
+        }
+        .hero-content { position: relative; z-index: 2; text-align: center; width: 100%; max-width: 850px; padding: 0 20px; }
+        .hero h1 { font-size: 48px; font-weight: 700; color: var(--white); margin-bottom: 40px; }
+        
+        /* ── SEARCH BAR ── */
+        .search-bar {
+            display: flex; align-items: center; background: var(--white);
+            border-radius: 12px; padding: 10px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .search-field { flex: 1; display: flex; flex-direction: column; text-align: left; padding: 8px 24px; }
+        .search-field label { font-size: 11px; font-weight: 700; color: var(--black); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;}
+        .search-field input { border: none; outline: none; font-size: 15px; width: 100%; }
+        .search-bar .divider { width: 1px; height: 40px; background: var(--border); }
+        .search-btn {
+            background: var(--black); border: none; color: var(--white);
+            height: 54px; padding: 0 35px; border-radius: 8px;
+            cursor: pointer; font-size: 15px; font-weight: 600;
+        }
+
+        /* ── SALONS GRID ── */
+        .salons-section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+        .salons-section h2 { font-size: 32px; font-weight: 700; margin-bottom: 60px; text-align: center; }
+        .salons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+        
+        .salon-card {
+            background: var(--white);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform .2s, box-shadow .2s;
+        }
+        .salon-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+        .salon-card img { width: 100%; height: 220px; object-fit: cover; }
+        .salon-card-content { padding: 24px; }
+        .salon-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .salon-card .type { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .salon-card .address { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .salon-card .rating { font-size: 14px; color: #ffc107; margin-bottom: 16px; }
+        .salon-card a {
+            display: inline-block; padding: 10px 20px;
+            background: var(--black); color: var(--white);
+            text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 600;
+            transition: background .2s;
+        }
+        .salon-card a:hover { background: #333; }
+
+        /* ── PRESTATIONS MODAL ── */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            align-items: center; justify-content: center;
+        }
+        .modal.open { display: flex; }
+        .modal-content {
+            background: var(--white); border-radius: var(--radius-card);
+            max-width: 800px; width: 90%; max-height: 80vh;
+            overflow-y: auto; padding: 40px;
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+        }
+        .modal-header h2 { font-size: 24px; font-weight: 700; }
+        .modal-close {
+            background: none; border: none; font-size: 28px; cursor: pointer;
+            color: var(--text-muted); transition: color .2s;
+        }
+        .modal-close:hover { color: var(--black); }
+        
+        .prestations-list { display: flex; flex-direction: column; gap: 16px; }
+        .prestation-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; border: 1px solid var(--border);
+            border-radius: var(--radius-card); transition: border-color .2s;
+        }
+        .prestation-item:hover { border-color: var(--black); }
+        .prestation-info h4 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .prestation-info p { font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
+        .prestation-info .price { font-size: 18px; font-weight: 700; color: var(--black); }
+        .prestation-book-btn {
+            padding: 10px 20px; background: var(--black); color: var(--white);
+            border: none; border-radius: 6px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: background .2s;
+        }
+        .prestation-book-btn:hover { background: #333; }
+
+        @media (max-width: 900px) {
+            .salons-grid { grid-template-columns: 1fr 1fr; }
+            .search-bar { flex-direction: column; }
+            .search-bar .divider { display: none; }
+            .search-btn { width: 100%; margin-top: 10px; }
+        }
+        @media (max-width: 600px) {
+            .salons-grid { grid-template-columns: 1fr; }
+            nav { padding: 0 20px; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/client/dashboard" class="logo">Atizay</a>
+    <div class="nav-links">
+        <a href="/client/dashboard">Accueil</a>
+        <a href="/client/reservations">Mes Réservations</a>
+        <a href="/client/favoris">Favoris</a>
+    </div>
+    <div class="nav-right">
+        <span th:text="${client?.prenom}" style="font-size: 14px; font-weight: 500; margin-right: 16px;"></span>
+        <a href="/auth/deconnexion" class="btn-solid">Déconnexion</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>Bonjour, <span th:text="${client?.prenom}">Client</span></h1>
+        <div class="search-bar">
+            <form th:action="@{/client/recherche}" method="get" style="display: flex; align-items: center; width: 100%;">
+                <div class="search-field">
+                    <label>Quoi ?</label>
+                    <input type="text" name="prestation" placeholder="Prestation, service..." list="prestations-suggestions" autocomplete="off">
+                    <datalist id="prestations-suggestions">
+                        <option value="Coiffure">
+                        <option value="Coupe">
+                        <option value="Coupe homme">
+                        <option value="Coupe femme">
+                        <option value="Barbe">
+                        <option value="Rasage">
+                        <option value="Coloration">
+                        <option value="Teinture">
+                        <option value="Mèche">
+                        <option value="Soins">
+                        <option value="Soin cheveux">
+                        <option value="Soin visage">
+                        <option value="Massage">
+                        <option value="Manucure">
+                        <option value="Pédicure">
+                        <option value="Ongles">
+                        <option value="Épilation">
+                        <option value="Maquillage">
+                        <option value="Brushing">
+                        <option value="Lissage">
+                        <option value="Permanente">
+                    </datalist>
+                </div>
+                <div class="divider"></div>
+                <div class="search-field">
+                    <label>Où ?</label>
+                    <input type="text" name="lieu" placeholder="Adresse, ville..." list="villes-suggestions" autocomplete="off">
+                    <datalist id="villes-suggestions">
+                        <option value="Port-au-Prince">
+                        <option value="Pétion-Ville">
+                        <option value="Delmas">
+                        <option value="Carrefour">
+                        <option value="Tabarre">
+                        <option value="Croix-des-Bouquets">
+                        <option value="Gressier">
+                        <option value="Cap-Haïtien">
+                        <option value="Gonaïves">
+                        <option value="Saint-Marc">
+                        <option value="Jacmel">
+                        <option value="Les Cayes">
+                        <option value="Jérémie">
+                        <option value="Hinche">
+                        <option value="Miragoâne">
+                        <option value="Petit-Goâve">
+                        <option value="Grande-Rivière-du-Nord">
+                        <option value="Ouanaminthe">
+                    </datalist>
+                </div>
+                <button type="submit" class="search-btn">Rechercher</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="salons-section">
+    <h2>Salons Recommandés</h2>
+    <div class="salons-grid">
+        <div class="salon-card" th:each="salon : ${salons}">
+            <img th:if="${salon.listeMedias != null and !salon.listeMedias.isEmpty()}"
+                 th:src="${salon.listeMedias[0].urlMedia.startsWith('/uploads/salons/') ? salon.listeMedias[0].urlMedia : '/uploads/salons/' + salon.listeMedias[0].urlMedia}"
+                 th:alt="${salon.nomSalon}"
+                 onerror="this.src='https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop'; console.error('Image failed to load:', this.src);">
+            <img th:if="${salon.listeMedias == null or salon.listeMedias.isEmpty()}"
+                 src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop"
+                 th:alt="${salon.nomSalon}">
+            <div class="salon-card-content">
+                <h3 th:text="${salon.nomSalon}">Nom du salon</h3>
+                <div class="type" th:text="${salon.typeSalon}">Type</div>
+                <div class="address">
+                    <span>📍</span>
+                    <span th:text="${salon.adresseSalon + ', ' + salon.villeSalon}">Adresse</span>
+                </div>
+                <div class="rating">⭐ 4.5</div>
+                <a href="#" th:onclick="'showPrestations(' + ${salon.idSalon} + ')'" class="btn-solid">Voir les prestations</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal Prestations -->
+<div class="modal" id="prestationsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalSalonName">Prestations du salon</h2>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="prestations-list" id="prestationsList">
+            <!-- Les prestations seront chargées dynamiquement -->
+        </div>
+    </div>
+</div>
+
+<script>
+    function showPrestations(salonId) {
+        const modal = document.getElementById('prestationsModal');
+        const prestationsList = document.getElementById('prestationsList');
+        
+        // Charger les prestations via AJAX
+        fetch(`/client/salon/${salonId}/prestations`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('modalSalonName').textContent = data.salonName;
+                prestationsList.innerHTML = data.prestations.map(p => `
+                    <div class="prestation-item">
+                        <div class="prestation-info">
+                            <h4>${p.nom}</h4>
+                            <p>${p.description || ''}</p>
+                            <div class="price">${p.prix} HTG</div>
+                        </div>
+                        <button class="prestation-book-btn" onclick="bookPrestation(${p.id}, ${salonId})">Réserver</button>
+                    </div>
+                `).join('');
+                modal.classList.add('open');
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                prestationsList.innerHTML = '<p>Erreur lors du chargement des prestations.</p>';
+                modal.classList.add('open');
+            });
+    }
+    
+    function closeModal() {
+        document.getElementById('prestationsModal').classList.remove('open');
+    }
+    
+    function bookPrestation(prestationId, salonId) {
+        // Rediriger vers la page de réservation
+        window.location.href = `/client/reservation/nouvelle?salon=${salonId}&prestation=${prestationId}`;
+    }
+    
+    // Fermer le modal en cliquant à l'extérieur
+    document.getElementById('prestationsModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+</script>
+
+</body>
+</html>

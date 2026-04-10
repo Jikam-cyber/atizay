@@ -56,21 +56,23 @@ public class ProprietaireController {
     @Autowired
     private HoraireSalonRepository horaireSalonRepository;
 
-    private static final String UPLOAD_DIR = "uploads/salons/";
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/salons/";
 
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
-        String type = (String) session.getAttribute("type");
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
 
-        if ("proprietaire".equals(type)) {
-            Proprietaire proprietaire = (Proprietaire) session.getAttribute("proprietaire");
+        if ("proprietaire".equals(userType) && proprietaire != null) {
             List<Salon> salons = salonRepository.findByProprietaire(proprietaire);
 
+            model.addAttribute("proprietaire", proprietaire);
             model.addAttribute("salons", salons);
-            model.addAttribute("user", proprietaire);
-            model.addAttribute("type", "proprietaire");
-            model.addAttribute("pageTitle", "Tableau de bord");
-            model.addAttribute("pageSubtitle", "Vue générale de votre activité");
+            model.addAttribute("salonsCount", salons.size());
+            model.addAttribute("employesCount", 0);
+            model.addAttribute("rdvCount", 0);
+            model.addAttribute("revenus", "0 HTG");
+            
             return "proprietaire/dashboard-proprietaire";
         }
 
@@ -144,6 +146,81 @@ public class ProprietaireController {
                     .replaceAll("-+", "-")
                     .replaceAll("^-", "")
                     .replaceAll("-$", "");
+    }
+
+    @GetMapping("/creer-salon")
+    public String creerSalonPage(HttpSession session, Model model) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+        
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            model.addAttribute("proprietaire", proprietaire);
+            model.addAttribute("salon", new Salon());
+            return "proprietaire/creer-salon";
+        }
+        return "redirect:/auth/connexion";
+    }
+
+    @PostMapping("/creer-salon")
+    public String creerSalonSubmit(HttpSession session,
+                                   @RequestParam("typeSalon") String typeSalon,
+                                   @RequestParam("nomSalon") String nomSalon,
+                                   @RequestParam("descriptionSalon") String descriptionSalon,
+                                   @RequestParam("telephone") String telephone,
+                                   @RequestParam("departement") String departement,
+                                   @RequestParam("ville") String ville,
+                                   @RequestParam("adresseSalon") String adresseSalon,
+                                   @RequestParam("heureOuverture") String heureOuverture,
+                                   @RequestParam("heureFermeture") String heureFermeture,
+                                   @RequestParam(value = "joursOuverture", required = false) String[] joursOuverture,
+                                   RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            try {
+                Salon salon = new Salon();
+                salon.setTypeSalon(typeSalon);
+                salon.setNomSalon(nomSalon);
+                salon.setDescriptionSalon(descriptionSalon);
+                salon.setTelephoneSalon(telephone);
+                salon.setDepartement(departement);
+                salon.setVilleSalon(ville);
+                salon.setAdresseSalon(adresseSalon);
+                salon.setProprietaire(proprietaire);
+                salon.setSlug(slugify(nomSalon));
+
+                salonRepository.save(salon);
+
+                redirectAttributes.addFlashAttribute("successMessage", "Salon créé avec succès !");
+                return "redirect:/proprietaire/dashboard";
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la création du salon: " + e.getMessage());
+                return "redirect:/proprietaire/creer-salon";
+            }
+        }
+        return "redirect:/auth/connexion";
+    }
+
+    @GetMapping("/salon/{id}/gestion")
+    public String gestionSalon(@PathVariable("id") Long id, HttpSession session, Model model) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(id).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                // Charger les médias du salon
+                List<MediaSalon> medias = mediaSalonRepository.findBySalon(salon);
+                salon.setListeMedias(medias);
+
+                model.addAttribute("proprietaire", proprietaire);
+                model.addAttribute("salon", salon);
+                System.out.println("Salon chargé: " + salon.getNomSalon() + " avec " + medias.size() + " photos");
+                return "proprietaire/salon/gestion-salon";
+            }
+        }
+        return "redirect:/auth/connexion";
     }
 
     @GetMapping("/salons/creer")
@@ -372,7 +449,7 @@ public class ProprietaireController {
 
                             // Create MediaSalon record
                             MediaSalon media = new MediaSalon();
-                            media.setUrlMedia("/uploads/salons/" + fileName);
+                            media.setUrlMedia(salon.getIdSalon() + "/" + fileName);
                             media.setTypeMedia("Photo");
                             media.setSalon(salon);
                             mediaSalonRepository.save(media);
@@ -405,8 +482,7 @@ public class ProprietaireController {
                 // Remove physical file
                 try {
                     String url = media.getUrlMedia();
-                    String fileName = url.substring(url.lastIndexOf("/") + 1);
-                    Path filePath = Paths.get(UPLOAD_DIR).resolve(fileName);
+                    Path filePath = Paths.get(UPLOAD_DIR + url);
                     Files.deleteIfExists(filePath);
                 } catch (IOException e) {
                     System.err.println("Impossible de supprimer le fichier physique : " + e.getMessage());
@@ -500,7 +576,346 @@ public class ProprietaireController {
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Salon non trouvé ou accès refusé.");
         }
-        
+
         return "redirect:/proprietaire/dashboard";
+    }
+
+    // ========== GESTION DU PROFIL DU SALON ==========
+
+    @PostMapping("/salon/{id}/profil/modifier")
+    public String modifierProfilSalon(@PathVariable("id") Long id,
+                                      @RequestParam("descriptionSalon") String description,
+                                      @RequestParam(value = "photos", required = false) MultipartFile[] photos,
+                                      HttpSession session,
+                                      RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(id).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                try {
+                    // Modifier uniquement la description (nom et adresse non modifiables)
+                    salon.setDescriptionSalon(description);
+                    salonRepository.save(salon);
+
+                    // Gérer les photos (max 15)
+                    if (photos != null && photos.length > 0) {
+                        int currentPhotos = salon.getListeMedias() != null ? salon.getListeMedias().size() : 0;
+                        int photosToAdd = Math.min(photos.length, 15 - currentPhotos);
+                        int photosSaved = 0;
+
+                        for (int i = 0; i < photosToAdd; i++) {
+                            try {
+                                MultipartFile photo = photos[i];
+                                if (!photo.isEmpty()) {
+                                    String fileName = UUID.randomUUID().toString() + "_" + photo.getOriginalFilename();
+                                    Path filePath = Paths.get(UPLOAD_DIR + salon.getIdSalon() + "/" + fileName);
+                                    Files.createDirectories(filePath.getParent());
+                                    photo.transferTo(filePath.toFile());
+
+                                    MediaSalon media = new MediaSalon();
+                                    media.setUrlMedia(salon.getIdSalon() + "/" + fileName);
+                                    media.setTypeMedia("image");
+                                    media.setSalon(salon);
+                                    mediaSalonRepository.save(media);
+                                    photosSaved++;
+
+                                    System.out.println("Photo sauvegardée: " + fileName + " dans " + filePath);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de l'upload de la photo " + (i + 1) + ": " + e.getMessage());
+                            }
+                        }
+
+                        if (photosSaved > 0) {
+                            redirectAttributes.addFlashAttribute("successMessage", "Profil mis à jour avec succès ! " + photosSaved + " photo(s) ajoutée(s).");
+                        } else {
+                            redirectAttributes.addFlashAttribute("successMessage", "Description mise à jour avec succès !");
+                        }
+                    } else {
+                        redirectAttributes.addFlashAttribute("successMessage", "Description mise à jour avec succès !");
+                    }
+
+                    return "redirect:/proprietaire/salon/" + id + "/gestion";
+                } catch (Exception e) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la mise à jour: " + e.getMessage());
+                    return "redirect:/proprietaire/salon/" + id + "/gestion";
+                }
+            }
+        }
+        redirectAttributes.addFlashAttribute("errorMessage", "Accès non autorisé");
+        return "redirect:/auth/connexion";
+    }
+
+    @GetMapping("/salon/{id}/photo/supprimer/{idMedia}")
+    public String supprimerPhoto(@PathVariable("id") Long idSalon,
+                                  @PathVariable("idMedia") Long idMedia,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(idSalon).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                MediaSalon media = mediaSalonRepository.findById(idMedia).orElse(null);
+                if (media != null && media.getSalon().getIdSalon().equals(idSalon)) {
+                    // Supprimer le fichier physique
+                    try {
+                        Path filePath = Paths.get(UPLOAD_DIR + salon.getIdSalon() + "/" + media.getUrlMedia());
+                        Files.deleteIfExists(filePath);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    // Supprimer l'enregistrement en base de données
+                    mediaSalonRepository.delete(media);
+                    redirectAttributes.addFlashAttribute("successMessage", "Photo supprimée avec succès !");
+                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion";
+                }
+            }
+        }
+        redirectAttributes.addFlashAttribute("errorMessage", "Accès non autorisé");
+        return "redirect:/auth/connexion";
+    }
+
+    // ========== GESTION DES HORAIRES ==========
+
+    @PostMapping("/salon/{id}/horaire/modifier")
+    public String modifierHoraireSalon(@PathVariable("id") Long id,
+                                       @RequestParam("heureOuverture") String heureOuverture,
+                                       @RequestParam("heureFermeture") String heureFermeture,
+                                       @RequestParam(value = "joursOuverture", required = false) String[] joursOuverture,
+                                       HttpSession session,
+                                       RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(id).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                // Supprimer les anciens horaires
+                horaireSalonRepository.deleteBySalon(salon);
+
+                // Créer les nouveaux horaires
+                String[] tousJours = {"Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"};
+                LocalTime ouverture = LocalTime.parse(heureOuverture);
+                LocalTime fermeture = LocalTime.parse(heureFermeture);
+
+                for (String jour : tousJours) {
+                    boolean estOuvert = joursOuverture != null && java.util.Arrays.asList(joursOuverture).contains(jour);
+                    HoraireSalon horaire = new HoraireSalon(jour, ouverture, fermeture, estOuvert, salon);
+                    horaireSalonRepository.save(horaire);
+                }
+
+                redirectAttributes.addFlashAttribute("successMessage", "Horaires mis à jour avec succès !");
+                return "redirect:/proprietaire/salon/" + id + "/gestion";
+            }
+        }
+        return "redirect:/auth/connexion";
+    }
+
+    // ========== CRUD PRESTATIONS ==========
+
+    @PostMapping("/salon/{id}/prestation/ajouter")
+    public String ajouterPrestation(@PathVariable("id") Long id,
+                                     @RequestParam("nomPrestation") String nom,
+                                     @RequestParam("descriptionPrestation") String description,
+                                     @RequestParam("categorie") String categorie,
+                                     @RequestParam("dureeMinutes") Integer duree,
+                                     @RequestParam("prix") Double prix,
+                                     HttpSession session,
+                                     RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(id).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                Prestation prestation = new Prestation();
+                prestation.setNomPrestation(nom);
+                prestation.setDescriptionPrestation(description);
+                prestation.setCategorie(categorie);
+                prestation.setDureeMinutes(duree);
+                prestation.setPrix(prix);
+                prestation.setSalon(salon);
+                prestation.setActif(true);
+                prestationRepository.save(prestation);
+
+                redirectAttributes.addFlashAttribute("successMessage", "Prestation ajoutée avec succès !");
+                return "redirect:/proprietaire/salon/" + id + "/gestion";
+            }
+        }
+        return "redirect:/auth/connexion";
+    }
+
+    @PostMapping("/salon/{id}/prestation/modifier")
+    public String modifierPrestation(@PathVariable("id") Long idSalon,
+                                     @RequestParam("idPrestation") Long idPrestation,
+                                     @RequestParam("nomPrestation") String nom,
+                                     @RequestParam("descriptionPrestation") String description,
+                                     @RequestParam("categorie") String categorie,
+                                     @RequestParam("dureeMinutes") Integer duree,
+                                     @RequestParam("prix") Double prix,
+                                     HttpSession session,
+                                     RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(idSalon).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                Prestation prestation = prestationRepository.findById(idPrestation).orElse(null);
+                if (prestation != null && prestation.getSalon().getIdSalon().equals(idSalon)) {
+                    prestation.setNomPrestation(nom);
+                    prestation.setDescriptionPrestation(description);
+                    prestation.setCategorie(categorie);
+                    prestation.setDureeMinutes(duree);
+                    prestation.setPrix(prix);
+                    prestationRepository.save(prestation);
+
+                    redirectAttributes.addFlashAttribute("successMessage", "Prestation modifiée avec succès !");
+                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion";
+                }
+            }
+        }
+        return "redirect:/auth/connexion";
+    }
+
+    @GetMapping("/salon/{id}/prestation/supprimer/{idPrestation}")
+    public String supprimerPrestation(@PathVariable("id") Long idSalon,
+                                       @PathVariable("idPrestation") Long idPrestation,
+                                       HttpSession session,
+                                       RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(idSalon).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                Prestation prestation = prestationRepository.findById(idPrestation).orElse(null);
+                if (prestation != null && prestation.getSalon().getIdSalon().equals(idSalon)) {
+                    prestationRepository.delete(prestation);
+                    redirectAttributes.addFlashAttribute("successMessage", "Prestation supprimée avec succès !");
+                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion";
+                }
+            }
+        }
+        return "redirect:/auth/connexion";
+    }
+
+    // ========== CRUD SERVICES (similaire à prestations) ==========
+
+    @PostMapping("/salon/{id}/service/ajouter")
+    public String ajouterService(@PathVariable("id") Long id,
+                                  @RequestParam("nomService") String nom,
+                                  @RequestParam("descriptionService") String description,
+                                  @RequestParam("dureeMinutes") Integer duree,
+                                  @RequestParam("prix") Double prix,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(id).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                Prestation service = new Prestation();
+                service.setNomPrestation(nom);
+                service.setDescriptionPrestation(description);
+                service.setCategorie("Service");
+                service.setDureeMinutes(duree);
+                service.setPrix(prix);
+                service.setSalon(salon);
+                service.setActif(true);
+                prestationRepository.save(service);
+
+                redirectAttributes.addFlashAttribute("successMessage", "Service ajouté avec succès !");
+                return "redirect:/proprietaire/salon/" + id + "/gestion";
+            }
+        }
+        return "redirect:/auth/connexion";
+    }
+
+    // ========== RENDEZ-VOUS AVEC FILTRES ==========
+
+    @GetMapping("/salon/{id}/rendez-vous")
+    public String voirRendezVous(@PathVariable("id") Long id,
+                                  @RequestParam(value = "filtre", defaultValue = "mois") String filtre,
+                                  HttpSession session,
+                                  Model model) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(id).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                List<atizay.model.RendezVous> rendezVous = rendezVousRepository.findBySalon(salon);
+                model.addAttribute("proprietaire", proprietaire);
+                model.addAttribute("salon", salon);
+                model.addAttribute("rendezVous", rendezVous);
+                model.addAttribute("filtre", filtre);
+                return "proprietaire/salon/gestion-salon";
+            }
+        }
+        return "redirect:/auth/connexion";
+    }
+
+    // ========== CRUD EMPLOYÉS ==========
+
+    @PostMapping("/salon/{id}/employe/ajouter")
+    public String ajouterEmploye(@PathVariable("id") Long id,
+                                  @RequestParam("nom") String nom,
+                                  @RequestParam("prenom") String prenom,
+                                  @RequestParam("email") String email,
+                                  @RequestParam("password") String password,
+                                  @RequestParam("specialite") String specialite,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(id).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                Employe employe = new Employe();
+                employe.setNom(nom);
+                employe.setPrenom(prenom);
+                employe.setEmail(email);
+                employe.setPassword(password);
+                employe.setSpecialite(specialite);
+                employe.setSalon(salon);
+                employe.setActifEmploye(true);
+                employeRepository.save(employe);
+
+                redirectAttributes.addFlashAttribute("successMessage", "Employé ajouté avec succès !");
+                return "redirect:/proprietaire/salon/" + id + "/gestion";
+            }
+        }
+        return "redirect:/auth/connexion";
+    }
+
+    @GetMapping("/salon/{id}/employe/supprimer/{idEmploye}")
+    public String supprimerEmploye(@PathVariable("id") Long idSalon,
+                                    @PathVariable("idEmploye") Long idEmploye,
+                                    HttpSession session,
+                                    RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+
+        if ("proprietaire".equals(userType) && proprietaire != null) {
+            Salon salon = salonRepository.findById(idSalon).orElse(null);
+            if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                Employe employe = employeRepository.findById(idEmploye).orElse(null);
+                if (employe != null && employe.getSalon().getIdSalon().equals(idSalon)) {
+                    employeRepository.delete(employe);
+                    redirectAttributes.addFlashAttribute("successMessage", "Employé supprimé avec succès !");
+                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion";
+                }
+            }
+        }
+        return "redirect:/auth/connexion";
     }
 }

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord Propriétaire - Atizay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-sidebar: #f5f5f5;
+            --bg-main: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #888888;
+            --border-color: #eeeeee;
+            --radius-card: 16px;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main);
+            display: flex;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        /* Barre Latérale (Sidebar) */
+        aside {
+            width: 280px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            padding: 40px 24px;
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+        }
+
+        .brand { margin-bottom: 40px; }
+        .brand h1 { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; }
+        .brand p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+        .nav-group { margin-bottom: 32px; }
+        .nav-label { 
+            font-size: 11px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            color: var(--text-muted); 
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 12px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .nav-link.active {
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            font-weight: 600;
+        }
+
+        .nav-link .badge {
+            background: black;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .logout-link {
+            margin-top: auto;
+            color: #e74c3c;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-left: 16px;
+        }
+
+        /* Contenu Principal */
+        main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px 60px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h2 { font-size: 24px; font-weight: 700; }
+        .page-title p { font-size: 14px; color: var(--text-muted); }
+
+        .btn-new-salon {
+            padding: 10px 24px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+            transition: all 0.2s;
+        }
+        .btn-new-salon:hover { background: #f9f9f9; border-color: #ccc; }
+
+        /* Grille de Cartes (Stats) */
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 32px;
+        }
+
+        .card-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        .card-value {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .card-link {
+            font-size: 13px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* Liste des Établissements */
+        .list-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 32px;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .list-header h3 { font-size: 16px; font-weight: 700; }
+        .btn-add { text-decoration: none; color: black; font-size: 13px; font-weight: 700; }
+
+        .salon-name {
+            font-size: 15px;
+            font-weight: 600;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Section Abonnement */
+        .subscription-card {
+            background: linear-gradient(135deg, #111 0%, #333 100%);
+            border-radius: var(--radius-card);
+            padding: 32px;
+            color: white;
+            margin-bottom: 32px;
+        }
+        .subscription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .subscription-header h3 { font-size: 18px; font-weight: 700; }
+        .subscription-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .subscription-plan {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .subscription-period {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 24px;
+        }
+        .subscription-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        .feature-item i { color: #4ade80; }
+        .btn-upgrade {
+            background: white;
+            color: black;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-upgrade:hover { opacity: 0.9; }
+
+        /* Sections */
+        .content-section {
+            margin-bottom: 60px;
+            scroll-margin-top: 40px;
+        }
+
+        /* Salon Items */
+        .salon-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+        }
+        .salon-item:first-child {
+            border-top: none;
+        }
+        .salon-info {
+            flex: 1;
+        }
+        .salon-address {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .salon-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .btn-action {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+            transition: all 0.2s;
+        }
+        .btn-action:hover {
+            background: #f9f9f9;
+            border-color: #ccc;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state p {
+            margin-bottom: 16px;
+        }
+
+        /* Salon Subscription Items */
+        .salon-subscription-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+        }
+        .salon-subscription-item:first-child {
+            border-top: none;
+        }
+        .salon-subscription-info {
+            flex: 1;
+        }
+        .subscription-status {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .status-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            width: fit-content;
+        }
+        .status-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .btn-upgrade-small {
+            padding: 8px 16px;
+            background: white;
+            color: black;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-upgrade-small:hover {
+            background: #f9f9f9;
+            border-color: #ccc;
+        }
+
+        /* Gestion Grid */
+        .gestion-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        .gestion-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .gestion-icon {
+            width: 48px;
+            height: 48px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: black;
+        }
+        .gestion-info h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .gestion-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .gestion-card .btn-action {
+            margin-top: auto;
+            width: fit-content;
+        }
+
+        @media (max-width: 1024px) {
+            aside { width: 80px; padding: 20px 10px; }
+            .brand span, .nav-label, .nav-link span, .logout-link span { display: none; }
+            main { margin-left: 80px; }
+            .gestion-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Sections visibility */
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="brand">
+            <h1>ATIZAY</h1>
+            <p>Salut, <span th:text="${proprietaire.prenom}">qwerty</span></p>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Principal</div>
+            <a href="#" onclick="showSection('mes-salons')" class="nav-link active" id="nav-mes-salons">
+                <i class="fa-solid fa-house-chimney"></i> <span>Mes Salons</span>
+            </a>
+            <a href="#" onclick="showSection('abonnement')" class="nav-link" id="nav-abonnement">
+                <i class="fa-solid fa-credit-card"></i> <span>Abonnement</span>
+            </a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Gestion</div>
+            <a href="#" onclick="showSection('creer-salon')" class="nav-link" id="nav-creer-salon">
+                <i class="fa-solid fa-circle-plus"></i> <span>Créer un Salon</span>
+            </a>
+        </div>
+
+        <a href="/auth/deconnexion" class="logout-link">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Se déconnecter</span>
+        </a>
+    </aside>
+
+    <main>
+        <!-- Section Mes Salons -->
+        <section id="mes-salons" class="content-section active">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h2>Mes Salons</h2>
+                    <p>Gérez tous vos établissements</p>
+                </div>
+                <a href="/proprietaire/creer-salon" class="btn-new-salon">+ Nouveau Salon</a>
+            </div>
+
+            <div class="list-card">
+                <div class="list-header">
+                    <h3>Mes établissements</h3>
+                </div>
+                
+                <div th:if="${salons}">
+                    <div th:each="salon : ${salons}" class="salon-item">
+                        <div class="salon-info">
+                            <div class="salon-name" th:text="${salon.nomSalon}">Nom du salon</div>
+                            <div class="salon-address" th:text="${salon.adresseSalon} + ', ' + ${salon.villeSalon}">Adresse</div>
+                        </div>
+                        <div class="salon-actions">
+                            <a th:href="'/proprietaire/salon/' + ${salon.idSalon} + '/gestion'" class="btn-action">Gérer</a>
+                        </div>
+                    </div>
+                </div>
+                <div th:unless="${salons}" class="empty-state">
+                    <p>Vous n'avez pas encore de salon</p>
+                    <a href="/proprietaire/creer-salon" class="btn-add">+ Créer votre premier salon</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Abonnement -->
+        <section id="abonnement" class="content-section">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h2>Abonnement</h2>
+                    <p>Gérez vos abonnements par salon</p>
+                </div>
+            </div>
+
+            <div class="subscription-card">
+                <div class="subscription-header">
+                    <h3>Abonnement actuel</h3>
+                    <span class="subscription-badge">Gratuit</span>
+                </div>
+                <div class="subscription-plan">Plan Starter</div>
+                <div class="subscription-period">0 HTG / mois</div>
+                <div class="subscription-features">
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>1 Salon inclus</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Prise de RDV en ligne</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Gestion des employés</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Notifications SMS</span>
+                    </div>
+                </div>
+                <button class="btn-upgrade">Passer au plan Pro</button>
+            </div>
+
+            <div class="list-card">
+                <div class="list-header">
+                    <h3>Abonnements par salon</h3>
+                </div>
+                
+                <div th:if="${salons}">
+                    <div th:each="salon : ${salons}" class="salon-subscription-item">
+                        <div class="salon-subscription-info">
+                            <div class="salon-name" th:text="${salon.nomSalon}">Nom du salon</div>
+                            <div class="subscription-status">
+                                <span class="status-badge">Plan Starter</span>
+                                <span class="status-date">Actif depuis le 01/01/2026</span>
+                            </div>
+                        </div>
+                        <div class="salon-subscription-actions">
+                            <button class="btn-upgrade-small">Changer de plan</button>
+                        </div>
+                    </div>
+                </div>
+                <div th:unless="${salons}" class="empty-state">
+                    <p>Aucun salon avec abonnement</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Créer un Salon -->
+        <section id="creer-salon" class="content-section">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h2>Créer un Salon</h2>
+                    <p>Ajoutez un nouvel établissement à votre compte</p>
+                </div>
+            </div>
+
+            <div class="gestion-grid">
+                <div class="gestion-card">
+                    <div class="gestion-icon">
+                        <i class="fa-solid fa-circle-plus"></i>
+                    </div>
+                    <div class="gestion-info">
+                        <h3>Nouveau Salon</h3>
+                        <p>Commencez par créer votre premier établissement</p>
+                    </div>
+                    <a href="/proprietaire/creer-salon" class="btn-action">Créer</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function showSection(sectionId) {
+            // Masquer toutes les sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Afficher la section sélectionnée
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active');
+            }
+
+            // Mettre à jour les liens actifs dans la sidebar
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+
+            const activeNav = document.getElementById('nav-' + sectionId);
+            if (activeNav) {
+                activeNav.classList.add('active');
+            }
+
+            // Empêcher le comportement par défaut du lien
+            event.preventDefault();
+        }
+    </script>
+
+</body>
+</html>

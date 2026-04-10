@@ -1,394 +1,300 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atizay – Réservez en beauté</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atizay – Réservez en beauté</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --black: #111111;
-    --white: #ffffff;
-    --bg-light: #f9f9f9;
-    --text-main: #1a1a1a;
-    --text-muted: #666666;
-    --border: #e0e0e0;
-    --radius-pill: 50px;
-    --radius-card: 12px;
-  }
+        :root {
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #f9f9f9;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+            --radius-pill: 50px;
+            --radius-card: 12px;
+        }
 
-  body { font-family: 'Inter', sans-serif; color: var(--text-main); background: var(--white); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-main); 
+            background: var(--white); 
+            line-height: 1.5; 
+            -webkit-font-smoothing: antialiased; 
+        }
 
-  /* ── NAV ── */
-  nav {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 40px; height: 72px; border-bottom: 1px solid rgba(255,255,255,0.2);
-    position: absolute; top: 0; left: 0; right: 0; z-index: 100;
-    background: transparent; color: var(--white);
-  }
-  .logo { font-size: 22px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-  .nav-links { display: flex; gap: 32px; font-size: 14px; font-weight: 500; }
-  .nav-links a { text-decoration: none; color: var(--white); transition: opacity .2s; }
-  .nav-links a:hover { opacity: 0.7; }
-  .nav-right { display: flex; gap: 16px; align-items: center; }
-  
-  .btn-outline {
-    border: 1px solid var(--white); padding: 8px 16px; font-size: 13px; font-weight: 600;
-    background: transparent; color: var(--white); border-radius: 4px; cursor: pointer; transition: all .2s;
-  }
-  .btn-outline:hover { background: var(--white); color: var(--black); }
-  .btn-solid {
-    background: var(--white); color: var(--black); padding: 8px 16px;
-    font-size: 13px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer;
-  }
+        /* ── NAVIGATION ── */
+        nav {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; height: 72px; border-bottom: 1px solid var(--border);
+            background: var(--white); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+        .logo { 
+            font-size: 22px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; 
+            text-decoration: none; color: var(--black); 
+        }
+        .nav-links { display: flex; gap: 32px; font-size: 14px; font-weight: 500; }
+        .nav-links a { text-decoration: none; color: var(--black); transition: opacity .2s; }
+        .nav-links a:hover { opacity: 0.6; }
+        
+        .nav-right { display: flex; gap: 16px; align-items: center; }
+        .btn-outline {
+            padding: 10px 18px; font-size: 13px; font-weight: 600;
+            background: transparent; color: var(--black); border: 1px solid var(--black); 
+            border-radius: 6px; cursor: pointer; transition: all .2s;
+            text-decoration: none;
+        }
+        .btn-outline:hover { background: var(--black); color: var(--white); }
 
-  /* ── HERO ── */
-  .hero {
-    position: relative; height: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: url('https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=2069&auto=format&fit=crop') center/cover no-repeat;
-  }
-  .hero::after {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4); z-index: 1;
-  }
-  .hero-content { position: relative; z-index: 2; text-align: center; width: 100%; max-width: 900px; }
-  .hero h1 { font-size: 46px; font-weight: 600; color: var(--white); margin-bottom: 32px; }
-  
-  /* ── SEARCH BAR ── */
-  .search-bar {
-    display: flex; align-items: center; background: var(--white);
-    border-radius: 8px; padding: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    margin: 0 auto;
-  }
-  .search-field { flex: 1; display: flex; flex-direction: column; text-align: left; padding: 8px 24px; }
-  .search-field label { font-size: 12px; font-weight: 600; color: var(--black); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
-  .search-field input {
-    border: none; outline: none; font-family: 'Inter', sans-serif; 
-    font-size: 15px; color: var(--text-main); width: 100%;
-  }
-  .search-field input::placeholder { color: #999; }
-  .search-bar .divider { width: 1px; height: 40px; background: var(--border); }
-  
-  .search-btn {
-    background: var(--black); border: none; color: var(--white);
-    height: 56px; padding: 0 40px; border-radius: 6px;
-    cursor: pointer; font-size: 15px; font-weight: 600; transition: background .2s;
-  }
-  .search-btn:hover { background: #333; }
+        .btn-solid {
+            background: var(--black); color: var(--white); padding: 10px 18px;
+            font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer;
+            text-decoration: none; transition: background .2s;
+        }
 
-  /* ── CATEGORIES ── */
-  .categories { 
-    display: flex; justify-content: center; gap: 12px; padding: 32px 20px; 
-    background: var(--white); border-bottom: 1px solid var(--border);
-  }
-  .cat-card {
-    background: var(--white); padding: 12px 24px; border-radius: var(--radius-pill);
-    border: 1px solid var(--border); font-size: 14px; font-weight: 500; cursor: pointer;
-    transition: all .2s; color: var(--text-main);
-  }
-  .cat-card:hover { border-color: var(--black); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        /* ── HERO ── */
+        .hero {
+            position: relative; height: 550px; display: flex; align-items: center; justify-content: center;
+            background: url('https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+        }
+        .hero::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 1;
+        }
+        .hero-content { position: relative; z-index: 2; text-align: center; width: 100%; max-width: 850px; padding: 0 20px; }
+        .hero h1 { font-size: 48px; font-weight: 700; color: var(--white); margin-bottom: 40px; }
+        
+        /* ── SEARCH BAR ── */
+        .search-bar {
+            display: flex; align-items: center; background: var(--white);
+            border-radius: 12px; padding: 10px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .search-field { flex: 1; display: flex; flex-direction: column; text-align: left; padding: 8px 24px; }
+        .search-field label { font-size: 11px; font-weight: 700; color: var(--black); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;}
+        .search-field input { border: none; outline: none; font-size: 15px; width: 100%; }
+        .search-bar .divider { width: 1px; height: 40px; background: var(--border); }
+        .search-btn {
+            background: var(--black); border: none; color: var(--white);
+            height: 54px; padding: 0 35px; border-radius: 8px;
+            cursor: pointer; font-size: 15px; font-weight: 600;
+        }
 
-  /* ── PROFESSIONNELS ── */
-  .pros-section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; text-align: center; }
-  .pros-section h2 { font-size: 32px; font-weight: 600; margin-bottom: 60px; }
-  .pros-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; text-align: left; }
-  .pro-item img { width: 100%; height: 300px; object-fit: cover; border-radius: var(--radius-card); margin-bottom: 24px; }
-  .pro-item h3 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
-  .pro-item p { font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
-  .pro-item a { font-size: 14px; font-weight: 600; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--black); padding-bottom: 2px; }
+        /* ── PROFESSIONNELS ── */
+        .pros-section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+        .pros-section h2 { font-size: 32px; font-weight: 700; margin-bottom: 60px; text-align: center; }
+        .pros-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+        .pro-item img { width: 100%; height: 320px; object-fit: cover; border-radius: var(--radius-card); margin-bottom: 24px; }
+        .pro-item h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+        .pro-item p { font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+        .pro-item a { font-size: 14px; font-weight: 700; color: var(--black); text-decoration: none; border-bottom: 2px solid var(--black); }
 
-  /* ── PRESSE ── */
-  .presse { background: var(--black); padding: 60px 40px; text-align: center; color: var(--white); }
-  .presse p { font-size: 13px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px; color: #888; }
-  .logos { display: flex; justify-content: center; gap: 80px; align-items: center; flex-wrap: wrap; }
-  .logos span { font-size: 24px; font-weight: 300; letter-spacing: 3px; }
-  .logos .vogue { font-family: serif; font-weight: 700; }
-  .logos .elle { font-family: serif; font-style: italic; font-weight: 600; }
+        /* ── STATS ── */
+        .stats { padding: 100px 40px; max-width: 1200px; margin: 0 auto; background: #fff; }
+        .stats-header h2 { font-size: 30px; font-weight: 700; max-width: 700px; margin-bottom: 60px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px 40px; }
+        .stat-item h4 { font-size: 36px; font-weight: 300; margin-bottom: 10px; }
+        .stat-item p { font-size: 14px; color: var(--text-muted); }
 
-  /* ── STATS ── */
-  .stats { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
-  .stats-header { margin-bottom: 60px; }
-  .stats-header h2 { font-size: 28px; font-weight: 600; max-width: 600px; line-height: 1.3; }
-  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-  .stat-item h4 { font-size: 32px; font-weight: 300; margin-bottom: 12px; }
-  .stat-item p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+        /* ── FAQ ── */
+        .faq { padding: 100px 20px; max-width: 800px; margin: 0 auto; }
+        .faq h2 { text-align: center; font-size: 30px; font-weight: 700; margin-bottom: 50px; }
+        .faq-item { border-bottom: 1px solid var(--border); }
+        .faq-q {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 25px 0; cursor: pointer; font-size: 16px; font-weight: 600;
+        }
+        .faq-q::after { content: '+'; font-size: 22px; color: #888; transition: transform 0.3s; }
+        .faq-q.open::after { content: '−'; }
+        .faq-a { 
+            max-height: 0; overflow: hidden; transition: all 0.3s ease; 
+            color: var(--text-muted); font-size: 15px; line-height: 1.6; 
+        }
+        .faq-a.open { max-height: 200px; padding-bottom: 25px; }
 
-  /* ── CEO BANNER ── */
-  .ceo-banner { background: var(--bg-light); padding: 80px 40px; text-align: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .ceo-banner h2 { font-size: 28px; font-weight: 600; max-width: 700px; margin: 0 auto 24px auto; line-height: 1.4; }
-  .ceo-banner .author { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
-  .btn-dark { background: var(--black); color: var(--white); border: none; padding: 14px 32px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; }
+        /* ── FOOTER ── */
+        footer { background: #111; color: var(--white); padding: 80px 40px 30px; }
+        .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 50px; }
+        .footer-logo { font-size: 24px; font-weight: 800; margin-bottom: 20px; }
+        .footer-col h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 25px; color: #777; letter-spacing: 1px; }
+        .footer-col a { font-size: 14px; color: #aaa; text-decoration: none; display: block; margin-bottom: 12px; }
+        .footer-col a:hover { color: #fff; }
+        .footer-bottom { 
+            max-width: 1200px; margin: 60px auto 0; padding-top: 30px; 
+            border-top: 1px solid #222; text-align: center; font-size: 13px; color: #555; 
+        }
 
-  /* ── ANNUAIRE ── */
-  .annuaire { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
-  .annuaire h2 { font-size: 24px; font-weight: 600; margin-bottom: 48px; }
-  .annuaire-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
-  .annuaire-col h4 { font-size: 14px; font-weight: 600; margin-bottom: 20px; text-transform: uppercase; }
-  .annuaire-col ul { list-style: none; }
-  .annuaire-col ul li { margin-bottom: 12px; }
-  .annuaire-col ul li a { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color .2s; }
-  .annuaire-col ul li a:hover { color: var(--black); text-decoration: underline; }
-
-  /* ── FAQ ── */
-  .faq { padding: 80px 40px; max-width: 800px; margin: 0 auto; background: var(--bg-light); border-radius: 16px; margin-bottom: 100px; }
-  .faq h2 { font-size: 28px; font-weight: 600; text-align: center; margin-bottom: 48px; }
-  .faq-item { border-bottom: 1px solid var(--border); }
-  .faq-q {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 24px 0; cursor: pointer; font-size: 15px; font-weight: 500;
-  }
-  .faq-q::after { content: '+'; font-size: 20px; font-weight: 300; }
-  .faq-q.open::after { content: '−'; }
-  .faq-a { font-size: 14px; color: var(--text-muted); line-height: 1.6; padding-bottom: 24px; display: none; }
-  .faq-a.open { display: block; }
-
-  /* ── FOOTER ── */
-  footer { background: #1a1a1a; color: var(--white); padding: 80px 40px 32px; }
-  .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; margin-bottom: 60px; }
-  .footer-logo { font-size: 20px; font-weight: 700; letter-spacing: 1px; margin-bottom: 24px; }
-  .footer-col h4 { font-size: 13px; font-weight: 600; margin-bottom: 24px; text-transform: uppercase; color: #aaa; }
-  .footer-col a {
-    font-size: 13px; color: #ccc; text-decoration: none; display: block;
-    margin-bottom: 12px; transition: color .2s;
-  }
-  .footer-col a:hover { color: var(--white); }
-  .footer-bottom { max-width: 1200px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 32px; font-size: 12px; color: #888; }
-</style>
+        @media (max-width: 900px) {
+            .pros-grid, .stats-grid, .footer-grid { grid-template-columns: 1fr 1fr; }
+            .search-bar { flex-direction: column; }
+            .search-bar .divider { display: none; }
+            .search-btn { width: 100%; margin-top: 10px; }
+        }
+    </style>
 </head>
 <body>
 
 <nav>
-  <div class="logo">Atizay</div>
-  <div class="nav-links">
-    <a href="#">Coiffeur</a>
-    <a href="#">Institut de beauté</a>
-    <a href="#">Barbier</a>
-    <a href="#">Manucure</a>
-  </div>
-  <div class="nav-right">
-    <button class="btn-outline">Vous êtes un professionnel ?</button>
-    <button class="btn-solid">Se connecter</button>
-  </div>
+    <a href="/" class="logo">Atizay</a>
+    <div class="nav-links">
+        <a href="#">Coiffeur</a>
+        <a href="#">Institut de beauté</a>
+        <a href="#">Barbier</a>
+        <a href="#">Manucure</a>
+    </div>
+    <div class="nav-right">
+        <a href="/auth/inscription?type=proprietaire" class="btn-outline">Vous êtes un professionnel ?</a>
+        <a href="/auth/connexion" class="btn-solid">Se connecter</a>
+    </div>
 </nav>
 
 <section class="hero">
-  <div class="hero-content">
-    <h1>Réservez en beauté</h1>
-    <div class="search-bar">
-      <div class="search-field">
-        <label>Quoi ?</label>
-        <input type="text" placeholder="Salon, prestation..." list="prestations-list">
-        <datalist id="prestations-list">
-          <option value="Coiffeur">
-          <option value="Tresses">
-          <option value="Institut de beauté">
-          <option value="Barbier">
-          <option value="Manucure">
-          <option value="Massage">
-        </datalist>
-      </div>
-      <div class="divider"></div>
-      <div class="search-field">
-        <label>Où ?</label>
-        <input type="text" placeholder="Adresse, ville..." list="villes-list">
-        <datalist id="villes-list">
-          <option value="Port-au-Prince">
-          <option value="Pétion-Ville">
-          <option value="Delmas">
-          <option value="Cap-Haïtien">
-          <option value="Jacmel">
-          <option value="Les Cayes">
-        </datalist>
-      </div>
-      <button class="search-btn">Rechercher</button>
+    <div class="hero-content">
+        <h1>Réservez en beauté</h1>
+        <div class="search-bar">
+            <div class="search-field">
+                <label>Quoi ?</label>
+                <input type="text" placeholder="Salon, prestation...">
+            </div>
+            <div class="divider"></div>
+            <div class="search-field">
+                <label>Où ?</label>
+                <input type="text" placeholder="Adresse, ville...">
+            </div>
+            <button class="search-btn">Rechercher</button>
+        </div>
     </div>
-  </div>
 </section>
-
 
 <section class="pros-section">
-  <h2>Découvrez nos Professionnels</h2>
-  <div class="pros-grid">
-    <div class="pro-item">
-      <img src="https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=1000&auto=format&fit=crop" alt="Coiffeur">
-      <h3>Coiffeur</h3>
-      <p>Profitez du savoir-faire de nos coiffeurs experts pour rafraîchir votre coupe ou oser un nouveau style.</p>
-      <a href="#">Voir</a>
+    <h2>Découvrez nos Professionnels</h2>
+    <div class="pros-grid">
+        <div class="pro-item">
+            <img src="https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?q=80&w=1000&auto=format&fit=crop" alt="Coiffeur">
+            <h3>Coiffeur</h3>
+            <p>Profitez du savoir-faire de nos coiffeurs experts pour rafraîchir votre coupe ou oser un nouveau style.</p>
+            <a href="#">Voir les salons</a>
+        </div>
+        <div class="pro-item">
+            <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1000&auto=format&fit=crop" alt="Institut de beauté">
+            <h3>Institut de beauté</h3>
+            <p>Prenez un moment pour vous. Nos instituts partenaires offrent des soins adaptés à vos besoins.</p>
+            <a href="#">Voir les instituts</a>
+        </div>
+        <div class="pro-item">
+            <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1000&auto=format&fit=crop" alt="Barbier">
+            <h3>Barbier</h3>
+            <p>Entretien de la barbe, rasage traditionnel ou taille précise. Découvrez les meilleurs barbiers.</p>
+            <a href="#">Voir les barbiers</a>
+        </div>
     </div>
-    <div class="pro-item">
-      <img src="https://images.unsplash.com/photo-1516975080661-46b0a1d4bce2?q=80&w=1000&auto=format&fit=crop" alt="Institut de beauté">
-      <h3>Institut de beauté</h3>
-      <p>Prenez un moment pour vous. Nos instituts partenaires offrent des soins adaptés à vos besoins.</p>
-      <a href="#">Voir</a>
-    </div>
-    <div class="pro-item">
-      <img src="https://images.unsplash.com/photo-1621607512214-68297480165e?q=80&w=1000&auto=format&fit=crop" alt="Barbier">
-      <h3>Barbier</h3>
-      <p>Entretien de la barbe, rasage traditionnel ou taille précise. Découvrez les meilleurs barbiers.</p>
-      <a href="#">Voir</a>
-    </div>
-  </div>
 </section>
-
 
 <section class="stats">
-  <div class="stats-header">
-    <p style="font-size: 13px; text-transform: uppercase; color: #888; margin-bottom: 16px;">Professionnels de la beauté</p>
-    <h2>Vous êtes un professionnel de la beauté ? Découvrez la prise de RDV en ligne !</h2>
-  </div>
-  <div class="stats-grid">
-    <div class="stat-item">
-      <h4>+ 50%</h4>
-      <p>de fréquence sur les rdv pris en ligne</p>
+    <div class="stats-header">
+        <p style="font-size: 13px; text-transform: uppercase; color: #888; margin-bottom: 15px; font-weight: 700;">Partenaire Atizay</p>
+        <h2>Vous êtes un professionnel de la beauté ? Découvrez la prise de RDV en ligne !</h2>
     </div>
-    <div class="stat-item">
-      <h4>4x</h4>
-      <p>moins d'oublis avec les rappels sms des rendez-vous</p>
+    <div class="stats-grid">
+        <div class="stat-item">
+            <h4>+ 50%</h4>
+            <p>de fréquence sur les rdv pris en ligne</p>
+        </div>
+        <div class="stat-item">
+            <h4>4x</h4>
+            <p>moins d'oublis avec les rappels SMS</p>
+        </div>
+        <div class="stat-item">
+            <h4>50%</h4>
+            <p>des rdv pris en dehors des horaires</p>
+        </div>
+        <div class="stat-item">
+            <h4>+100</h4>
+            <p>Salons & Instituts en Haïti</p>
+        </div>
+        <div class="stat-item">
+            <h4>5 RDV</h4>
+            <p>Pris toutes les secondes</p>
+        </div>
+        <div class="stat-item">
+            <h4>100%</h4>
+            <p>Digital et adapté à votre gestion</p>
+        </div>
     </div>
-    <div class="stat-item">
-      <h4>50%</h4>
-      <p>des rdv en ligne pris en dehors des horaires d'ouverture</p>
-    </div>
-    <div class="stat-item">
-      <h4>+</h4>
-      <p>Salons & Instituts en Haïti</p>
-    </div>
-    <div class="stat-item">
-      <h4>5 RDV</h4>
-      <p>Pris toutes les secondes</p>
-    </div>
-    <div class="stat-item">
-      <h4>100%</h4>
-      <p>Digital et adapté à votre gestion</p>
-    </div>
-  </div>
-</section>
-
-<section class="ceo-banner">
-  <h2>Atizay recherche des profils dans tout le pays pour digitaliser le secteur de la beauté en Haïti.</h2>
-  <p class="author">L'équipe Atizay</p>
-  <button class="btn-dark">Découvrir l'offre</button>
-</section>
-
-<section class="annuaire">
-  <h2>Trouvez votre établissement beauté partout en Haïti</h2>
-  <div class="annuaire-grid">
-    <div class="annuaire-col">
-      <h4>Coiffeur</h4>
-      <ul>
-        <li><a href="#">Port-au-Prince</a></li>
-        <li><a href="#">Pétion-Ville</a></li>
-        <li><a href="#">Delmas</a></li>
-        <li><a href="#">Cap-Haïtien</a></li>
-        <li><a href="#">Jacmel</a></li>
-      </ul>
-    </div>
-    <div class="annuaire-col">
-      <h4>Barbier</h4>
-      <ul>
-        <li><a href="#">Port-au-Prince</a></li>
-        <li><a href="#">Pétion-Ville</a></li>
-        <li><a href="#">Delmas</a></li>
-        <li><a href="#">Cap-Haïtien</a></li>
-        <li><a href="#">Les Cayes</a></li>
-      </ul>
-    </div>
-    <div class="annuaire-col">
-      <h4>Manucure</h4>
-      <ul>
-        <li><a href="#">Port-au-Prince</a></li>
-        <li><a href="#">Pétion-Ville</a></li>
-        <li><a href="#">Delmas</a></li>
-        <li><a href="#">Jacmel</a></li>
-        <li><a href="#">Gonaïves</a></li>
-      </ul>
-    </div>
-    <div class="annuaire-col">
-      <h4>Institut</h4>
-      <ul>
-        <li><a href="#">Port-au-Prince</a></li>
-        <li><a href="#">Pétion-Ville</a></li>
-        <li><a href="#">Tabarre</a></li>
-        <li><a href="#">Cap-Haïtien</a></li>
-        <li><a href="#">Jérémie</a></li>
-      </ul>
-    </div>
-    <div class="annuaire-col">
-      <h4>Massage</h4>
-      <ul>
-        <li><a href="#">Port-au-Prince</a></li>
-        <li><a href="#">Pétion-Ville</a></li>
-        <li><a href="#">Kenscoff</a></li>
-        <li><a href="#">Cap-Haïtien</a></li>
-        <li><a href="#">Jacmel</a></li>
-      </ul>
-    </div>
-  </div>
 </section>
 
 <section class="faq">
-  <h2>Les questions fréquentes</h2>
-  <div class="faq-item">
-    <div class="faq-q" onclick="toggleFaq(this)">Qu'est-ce que Atizay ?</div>
-    <div class="faq-a">Atizay est la plateforme de réservation en ligne dédiée aux professionnels de la beauté en Haïti. Elle vous permet de trouver et réserver facilement un salon.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q" onclick="toggleFaq(this)">Comment prendre rendez-vous sur Atizay ?</div>
-    <div class="faq-a">Entrez votre prestation et votre ville (ex: Port-au-Prince) dans la barre de recherche. Choisissez votre salon, sélectionnez un créneau horaire et validez.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q" onclick="toggleFaq(this)">Est-ce que je dois payer en ligne ?</div>
-    <div class="faq-a">Non, la réservation est gratuite. Le paiement de la prestation s'effectue directement au salon après votre rendez-vous.</div>
-  </div>
+    <h2>Les questions fréquentes</h2>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Qu'est-ce que Atizay ?</div>
+        <div class="faq-a">Atizay est la plateforme de réservation en ligne dédiée aux professionnels de la beauté en Haïti.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Est-ce que je dois payer en ligne ?</div>
+        <div class="faq-a">Non, le paiement s'effectue directement au salon lors de votre prestation.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Comment modifier un rendez-vous ?</div>
+        <div class="faq-a">Vous pouvez modifier ou annuler votre rendez-vous via votre espace client ou le lien dans votre SMS de confirmation.</div>
+    </div>
 </section>
 
 <footer>
-  <div class="footer-grid">
-    <div class="footer-col">
-      <div class="footer-logo">ATIZAY</div>
-      <p style="font-size: 13px; color: #888; line-height: 1.6;">La plateforme numéro 1 pour la réservation de soins de beauté en Haïti.</p>
+    <div class="footer-grid">
+        <div class="footer-col">
+            <div class="footer-logo">ATIZAY</div>
+            <p style="font-size: 13px; color: #888; line-height: 1.6; max-width: 250px;">
+                La plateforme numéro 1 pour la réservation de soins de beauté en Haïti.
+            </p>
+        </div>
+        <div class="footer-col">
+            <h4>À propos</h4>
+            <a href="#">Concept</a>
+            <a href="#">FAQ</a>
+            <a href="#">Contact</a>
+            <a href="#">Mentions légales</a>
+        </div>
+        <div class="footer-col">
+            <h4>Prestations</h4>
+            <a href="#">Coiffeur</a>
+            <a href="#">Barbier</a>
+            <a href="#">Manucure</a>
+            <a href="#">Massage</a>
+        </div>
+        <div class="footer-col">
+            <h4>Villes</h4>
+            <a href="#">Port-au-Prince</a>
+            <a href="#">Pétion-Ville</a>
+            <a href="#">Delmas</a>
+            <a href="#">Cap-Haïtien</a>
+        </div>
     </div>
-    <div class="footer-col">
-      <h4>À propos d'Atizay</h4>
-      <a href="#">Le métier de professionnel</a>
-      <a href="#">Blog</a>
-      <a href="#">FAQ</a>
-      <a href="#">Devenir partenaire</a>
-      <a href="#">Contact</a>
-    </div>
-    <div class="footer-col">
-      <h4>Trouvez votre prestation</h4>
-      <a href="#">Coiffeur</a>
-      <a href="#">Institut de Beauté</a>
-      <a href="#">Manucure</a>
-      <a href="#">Spa</a>
-      <a href="#">Barbier</a>
-    </div>
-    <div class="footer-col">
-      <h4>Recherches fréquentes</h4>
-      <a href="#">Coiffeur Port-au-Prince</a>
-      <a href="#">Coiffeur Pétion-Ville</a>
-      <a href="#">Institut Delmas</a>
-    </div>
-  </div>
-  <div class="footer-bottom">© Copyright Atizay 2026. Tous droits réservés.</div>
+    <div class="footer-bottom">© Copyright Atizay 2026. Tous droits réservés.</div>
 </footer>
 
 <script>
-  function toggleFaq(el) {
-    const ans = el.nextElementSibling;
-    const isOpen = el.classList.contains('open');
-    document.querySelectorAll('.faq-q').forEach(q => {
-      q.classList.remove('open');
-      q.nextElementSibling.classList.remove('open');
-    });
-    if (!isOpen) {
-      el.classList.add('open');
-      ans.classList.add('open');
+    function toggleFaq(el) {
+        const ans = el.nextElementSibling;
+        const isOpen = el.classList.contains('open');
+        
+        // Fermer tous les autres
+        document.querySelectorAll('.faq-q').forEach(q => {
+            q.classList.remove('open');
+            q.nextElementSibling.classList.remove('open');
+        });
+
+        // Ouvrir celui cliqué
+        if (!isOpen) {
+            el.classList.add('open');
+            ans.classList.add('open');
+        }
     }
-  }
 </script>
 </body>
 </html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Employé - Atizay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #f9f9f9;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+            --radius-pill: 50px;
+            --radius-card: 12px;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-main); 
+            background: var(--white); 
+            line-height: 1.5; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; height: 72px; border-bottom: 1px solid rgba(255,255,255,0.2);
+            position: absolute; top: 0; left: 0; right: 0; z-index: 100;
+            background: transparent; color: var(--white);
+        }
+        .logo { 
+            font-size: 22px; font-weight: 700; letter-spacing: 1px; 
+            text-transform: uppercase;
+        }
+        .nav-links { display: flex; gap: 32px; font-size: 14px; font-weight: 500; }
+        .nav-links a { text-decoration: none; color: var(--white); transition: opacity .2s; }
+        .nav-links a:hover { opacity: 0.7; }
+        .nav-right { display: flex; gap: 16px; align-items: center; }
+        
+        .btn-outline {
+            border: 1px solid var(--white); padding: 8px 16px; font-size: 13px; font-weight: 600;
+            background: transparent; color: var(--white); border-radius: 4px; cursor: pointer; transition: all .2s;
+            text-decoration: none;
+        }
+        .btn-outline:hover { background: var(--white); color: var(--black); }
+        .btn-solid {
+            background: var(--white); color: var(--black); padding: 8px 16px;
+            font-size: 13px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* Hero Background */
+        .auth-hero {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: url('https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=2069&auto=format&fit=crop') center/cover no-repeat;
+            z-index: -1;
+        }
+        .auth-hero::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            min-height: 100vh; display: flex; flex-direction: column;
+            padding: 120px 40px 40px;
+            position: relative; z-index: 2;
+        }
+        .dashboard-card {
+            background: var(--white); border-radius: var(--radius-card);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 48px; max-width: 1000px; margin: 0 auto;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            margin-bottom: 48px;
+        }
+        .dashboard-header h1 {
+            font-size: 32px; font-weight: 700; margin-bottom: 12px;
+            color: var(--text-main);
+        }
+        .dashboard-header p {
+            color: var(--text-muted); font-size: 15px;
+        }
+
+        /* User Info */
+        .user-info {
+            display: flex; align-items: center; gap: 24px;
+            padding: 24px; background: var(--bg-light);
+            border-radius: var(--radius-card); margin-bottom: 32px;
+        }
+        .user-avatar {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; font-weight: 700; color: var(--white);
+        }
+        .user-details h2 {
+            font-size: 20px; font-weight: 600; margin-bottom: 8px;
+        }
+        .user-details p {
+            color: var(--text-muted); font-size: 14px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: var(--white); padding: 24px; border-radius: var(--radius-card);
+            border: 1px solid var(--border); text-align: center;
+        }
+        .stat-number {
+            font-size: 36px; font-weight: 700; color: var(--text-main);
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 14px; color: var(--text-muted);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+        }
+        .action-btn {
+            padding: 20px; border: 2px solid var(--border);
+            border-radius: var(--radius-card); background: var(--white);
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            transition: all .2s; text-decoration: none;
+            color: var(--text-main); text-align: center;
+        }
+        .action-btn:hover {
+            border-color: var(--black); transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Today's Appointments */
+        .appointments-section {
+            margin-top: 32px;
+        }
+        .appointments-section h3 {
+            font-size: 18px; font-weight: 600; margin-bottom: 16px;
+        }
+        .appointment-item {
+            padding: 16px; background: var(--bg-light);
+            border-radius: 8px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .appointment-time {
+            font-weight: 600; color: var(--text-main);
+        }
+        .appointment-client {
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: 1fr; }
+            .dashboard-card { padding: 32px 24px; }
+            nav { padding: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Background -->
+    <div class="auth-hero"></div>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">Atizay</div>
+        <div class="nav-links">
+            <a href="/">Accueil</a>
+            <a href="/employe/dashboard">Dashboard</a>
+            <a href="/employe/rendez-vous">Rendez-vous</a>
+            <a href="/employe/clients">Clients</a>
+        </div>
+        <div class="nav-right">
+            <a href="/employe/profil" class="btn-outline">Mon Profil</a>
+            <a href="/auth/deconnexion" class="btn-solid">Déconnexion</a>
+        </div>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <h1>Bienvenue sur votre Dashboard</h1>
+                <p>Gérez vos rendez-vous et clients</p>
+            </div>
+
+            <!-- User Info -->
+            <div class="user-info">
+                <div class="user-avatar" th:text="${#strings.substring(employe.prenom, 0, 1)}">U</div>
+                <div class="user-details">
+                    <h2 th:text="${employe.prenom + ' ' + employe.nom}">Employé</h2>
+                    <p th:text="${employe.email}">email@example.com</p>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${rdvCount ?: 0}">0</div>
+                    <div class="stat-label">Rendez-vous Aujourd'hui</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${clientsCount ?: 0}">0</div>
+                    <div class="stat-label">Clients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${prestationsCount ?: 0}">0</div>
+                    <div class="stat-label">Prestations</div>
+                </div>
+            </div>
+
+            <!-- Today's Appointments -->
+            <div class="appointments-section">
+                <h3>Rendez-vous d'aujourd'hui</h3>
+                <div th:if="${todayAppointments}">
+                    <div class="appointment-item" th:each="rdv : ${todayAppointments}">
+                        <div class="appointment-time" th:text="${rdv.heure}">10:00</div>
+                        <div class="appointment-client" th:text="${rdv.client.prenom + ' ' + rdv.client.nom}">Client</div>
+                    </div>
+                </div>
+                <div th:unless="${todayAppointments}" style="color: var(--text-muted); padding: 16px;">
+                    Aucun rendez-vous aujourd'hui
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <h3 style="margin-top: 32px; margin-bottom: 16px; font-size: 18px; font-weight: 600;">Actions Rapides</h3>
+            <div class="quick-actions">
+                <a href="/employe/rendez-vous" class="action-btn">Voir tous les RDV</a>
+                <a href="/employe/clients" class="action-btn">Gérer les Clients</a>
+                <a href="/employe/profil" class="action-btn">Modifier mon Profil</a>
+                <a href="/employe/disponibilites" class="action-btn">Mes Disponibilités</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -2,8 +2,10 @@ package atizay.controller;
 
 import atizay.model.Client;
 import atizay.model.Proprietaire;
+import atizay.model.Employe;
 import atizay.service.ClientService;
 import atizay.service.ProprietaireService;
+import atizay.repository.EmployeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +22,9 @@ public class AuthController {
 
     @Autowired
     private ProprietaireService proprietaireService;
+
+    @Autowired
+    private EmployeRepository employeRepository;
 
     @GetMapping("/connexion")
     public String showConnexion(Model model) {
@@ -90,6 +95,49 @@ public class AuthController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur lors de l'inscription: " + e.getMessage());
             return "redirect:/auth/inscription";
+        }
+    }
+
+    @PostMapping("/connexion")
+    public String handleConnexion(@RequestParam String email,
+                                   @RequestParam String password,
+                                   HttpSession session,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            // Vérifier si c'est un propriétaire (d'abord car Proprietaire hérite de Client)
+            Proprietaire proprietaire = proprietaireService.authenticateProprietaire(email, password);
+            if (proprietaire != null) {
+                session.setAttribute("userType", "proprietaire");
+                session.setAttribute("userId", proprietaire.getId());
+                session.setAttribute("user", proprietaire);
+                return "redirect:/proprietaire/dashboard";
+            }
+
+            // Vérifier si c'est un client
+            Client client = clientService.authenticateClient(email, password);
+            if (client != null) {
+                session.setAttribute("userType", "client");
+                session.setAttribute("userId", client.getId());
+                session.setAttribute("user", client);
+                return "redirect:/client/dashboard";
+            }
+
+            // Vérifier si c'est un employé
+            Employe employe = employeRepository.findByEmail(email);
+            if (employe != null && employe.getPassword().equals(password)) {
+                session.setAttribute("userType", "employe");
+                session.setAttribute("userId", employe.getId());
+                session.setAttribute("user", employe);
+                return "redirect:/employe/dashboard";
+            }
+
+            // Identifiants invalides
+            redirectAttributes.addFlashAttribute("error", "Email ou mot de passe incorrect");
+            return "redirect:/auth/connexion";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur lors de la connexion: " + e.getMessage());
+            return "redirect:/auth/connexion";
         }
     }
 

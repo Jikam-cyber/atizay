@@ -23,4 +23,9 @@ public interface SalonRepository extends JpaRepository<Salon, Long> {
      * Récupère les salons d'un propriétaire
      */
     List<Salon> findByProprietaire(Proprietaire proprietaire);
+
+    /**
+     * Récupère les salons par nom ou ville
+     */
+    List<Salon> findByNomSalonContainingIgnoreCaseOrVilleSalonContainingIgnoreCase(String nomSalon, String villeSalon);
 }

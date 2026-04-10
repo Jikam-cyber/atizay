@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - Atizay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #f4f7f9;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+            --radius-card: 12px;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--white);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .page-wrapper {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Section Image (Gauche) - Image avec des personnes */
+        .image-section {
+            flex: 1;
+            position: relative;
+            background: url('https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1974&auto=format&fit=crop') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 60px;
+            color: var(--white);
+        }
+
+        .image-section::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7));
+        }
+
+        .image-content {
+            position: relative;
+            z-index: 2;
+            max-width: 500px;
+        }
+
+        .image-content h2 {
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        /* Section Formulaire (Droite) */
+        .form-section {
+            width: 580px;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 60px;
+            overflow-y: auto;
+            background: var(--white);
+        }
+
+        .logo-container { margin-bottom: 30px; }
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--black);
+            text-decoration: none;
+        }
+
+        .auth-header { margin-bottom: 30px; }
+        .auth-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .auth-header p { color: var(--text-muted); font-size: 15px; }
+
+        /* Type Selection */
+        .type-selection {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .type-option {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .type-option.active {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+        .type-option input { display: none; }
+
+        /* Formulaire */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-group { margin-bottom: 18px; }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg-light);
+            transition: all 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--black);
+            background: var(--white);
+        }
+
+        .terms-group {
+            margin: 20px 0;
+            font-size: 13px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            color: var(--text-muted);
+        }
+        .terms-group a { color: var(--black); font-weight: 600; text-decoration: none; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        /* Social */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+        .divider span { padding: 0 10px; }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .btn-social {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--white);
+            font-size: 13px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .auth-footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .auth-footer a { color: var(--black); font-weight: 700; text-decoration: none; }
+
+        @media (max-width: 1024px) {
+            .image-section { display: none; }
+            .form-section { width: 100%; padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <div class="image-section">
+            <div class="image-content">
+                <h2>Rejoignez la communauté Atizay</h2>
+                <p>La plateforme qui connecte les passionnés de beauté en Haïti.</p>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="logo-container">
+                <a href="/" class="logo-text">Atizay</a>
+            </div>
+
+            <div class="auth-header">
+                <h1>Inscription</h1>
+                <p>Créez votre compte en quelques secondes.</p>
+            </div>
+
+            <form th:action="@{/auth/inscription}" method="post">
+                <div class="type-selection">
+                    <label class="type-option active" id="label-client">
+                        <input type="radio" name="type" value="client" checked onclick="updateType('client')">
+                        Client
+                    </label>
+                    <label class="type-option" id="label-pro">
+                        <input type="radio" name="type" value="proprietaire" onclick="updateType('pro')">
+                        Propriétaire
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nom</label>
+                        <input type="text" name="nom" class="form-input" placeholder="Nom" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Prénom</label>
+                        <input type="text" name="prenom" class="form-input" placeholder="Prénom" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-input" placeholder="votre@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" name="password" class="form-input" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirmer le mot de passe</label>
+                    <input type="password" name="confirmPassword" class="form-input" placeholder="••••••••" required>
+                </div>
+
+                <div class="terms-group">
+                    <input type="checkbox" required>
+                    <p>J'accepte les <a href="#">conditions générales</a> et la <a href="#">politique de confidentialité</a>.</p>
+                </div>
+
+                <button type="submit" class="btn-submit">S'inscrire</button>
+            </form>
+
+            <div class="divider"><span>ou s'inscrire avec</span></div>
+
+            <div class="social-grid">
+                <a href="/oauth2/authorization/google" class="btn-social">
+                    <img width="18" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> Google
+                </a>
+                <a href="/oauth2/authorization/facebook" class="btn-social">
+                    <img width="18" src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg"> Facebook
+                </a>
+            </div>
+
+            <div class="auth-footer">
+                <p>Déjà un compte ? <a href="/auth/connexion">Se connecter</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateType(type) {
+            const clientLabel = document.getElementById('label-client');
+            const proLabel = document.getElementById('label-pro');
+            
+            if(type === 'client') {
+                clientLabel.classList.add('active');
+                proLabel.classList.remove('active');
+            } else {
+                proLabel.classList.add('active');
+                clientLabel.classList.remove('active');
+            }
+        }
+
+        // Gestion automatique via l'URL (?type=proprietaire)
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if(params.get('type') === 'proprietaire') {
+                document.querySelector('input[value="proprietaire"]').checked = true;
+                updateType('pro');
+            }
+        });
+    </script>
+</body>
+</html>

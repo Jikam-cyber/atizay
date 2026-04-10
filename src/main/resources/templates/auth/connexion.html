@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Atizay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #f4f7f9;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+            --radius-card: 12px;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--white);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Layout Split-Screen */
+        .page-wrapper {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Section Image (Gauche) */
+        .image-section {
+            flex: 1;
+            position: relative;
+            background: url('https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=2069&auto=format&fit=crop') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 60px;
+            color: var(--white);
+        }
+
+        .image-section::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+        }
+
+        .image-content {
+            position: relative;
+            z-index: 2;
+            max-width: 500px;
+        }
+
+        .image-content h2 {
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .image-content p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* Section Formulaire (Droite) */
+        .form-section {
+            width: 550px;
+            display: flex;
+            flex-direction: column;
+            padding: 60px;
+            overflow-y: auto;
+            background: var(--white);
+        }
+
+        .logo-container {
+            margin-bottom: 60px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--black);
+            text-decoration: none;
+        }
+
+        .auth-header {
+            margin-bottom: 40px;
+        }
+
+        .auth-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .auth-header p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        /* Formulaire */
+        .form-group { margin-bottom: 20px; }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            background: var(--bg-light);
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--black);
+            background: var(--white);
+        }
+
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .checkbox-group { display: flex; align-items: center; gap: 8px; }
+
+        .forgot-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+        }
+
+        .forgot-link:hover { border-bottom-color: var(--text-muted); }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-submit:hover { opacity: 0.9; }
+
+        /* Social */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .divider span { padding: 0 15px; }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .btn-social {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--white);
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: border-color 0.2s;
+        }
+
+        .btn-social:hover { border-color: var(--black); }
+
+        .social-icon { width: 18px; height: 18px; }
+
+        /* Footer */
+        .auth-footer {
+            margin-top: auto;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .auth-footer a {
+            color: var(--black);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .error-message {
+            color: #d93025;
+            background: #fce8e6;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .image-section { display: none; }
+            .form-section { width: 100%; padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <div class="image-section">
+            <div class="image-content">
+                <h2>Votre beauté, sans attente.</h2>
+                <p>Prenez rendez-vous dans les meilleurs salons autour de vous.</p>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="logo-container">
+                <a href="/" class="logo-text">Atizay</a>
+            </div>
+
+            <div class="auth-header">
+                <h1>Bienvenue</h1>
+                <p>Connectez-vous à votre espace personnel.</p>
+            </div>
+
+            <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+            <form th:action="@{/auth/connexion}" method="post">
+                <div class="form-group">
+                    <label class="form-label">Adresse e-mail</label>
+                    <input type="email" name="email" class="form-input" placeholder="salon@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" name="password" class="form-input" placeholder="••••••••" required>
+                </div>
+
+                <div class="options-row">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Se souvenir de moi</label>
+                    </div>
+                    <a href="/auth/mot-de-passe-oublie" class="forgot-link">Mot de passe oublié ?</a>
+                </div>
+
+                <button type="submit" class="btn-submit">Se connecter</button>
+            </form>
+
+            <div class="divider"><span>ou continuer avec</span></div>
+
+            <div class="social-grid">
+                <a href="/oauth2/authorization/google" class="btn-social">
+                    <img class="social-icon" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                    Google
+                </a>
+                <a href="/oauth2/authorization/facebook" class="btn-social">
+                    <img class="social-icon" src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="FB">
+                    Facebook
+                </a>
+            </div>
+
+            <div class="auth-footer">
+                <p>Pas encore de compte ? <a href="/auth/inscription">S'inscrire</a></p>
+                <p>Vous êtes un professionnel ? <a href="/auth/inscription?type=proprietaire">Inscrivez votre salon</a></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

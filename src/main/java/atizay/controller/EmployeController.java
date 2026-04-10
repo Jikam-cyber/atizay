@@ -24,8 +24,10 @@ public class EmployeController {
 
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
-        Employe employe = (Employe) session.getAttribute("employe");
-        if (employe == null) {
+        String userType = (String) session.getAttribute("userType");
+        Employe employe = (Employe) session.getAttribute("user");
+        
+        if (!"employe".equals(userType) || employe == null) {
             return "redirect:/auth/connexion";
         }
 
@@ -35,10 +37,12 @@ public class EmployeController {
         List<RendezVous> appointments = rendezVousRepository.findByEmploye(employe);
         
         model.addAttribute("employe", employe);
-        model.addAttribute("appointments", appointments);
-        model.addAttribute("section", "dashboard");
+        model.addAttribute("rdvCount", appointments.size());
+        model.addAttribute("clientsCount", 0);
+        model.addAttribute("prestationsCount", 0);
+        model.addAttribute("todayAppointments", appointments);
         
-        return "employe/dashboard";
+        return "employe/dashboard-employe";
     }
 
     @GetMapping("/profil")

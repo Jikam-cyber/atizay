@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion du Salon - Atizay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-sidebar: #f5f5f5;
+            --bg-main: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #888888;
+            --border-color: #eeeeee;
+            --radius-card: 16px;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main);
+            display: flex;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        /* Sidebar */
+        aside {
+            width: 280px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            padding: 40px 24px;
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+        }
+
+        .brand { margin-bottom: 40px; }
+        .brand h1 { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; }
+        .brand p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+        .nav-group { margin-bottom: 32px; }
+        .nav-label { 
+            font-size: 11px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            color: var(--text-muted); 
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 12px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+
+        .nav-link i { width: 20px; text-align: center; font-size: 16px; }
+        .nav-link.active { background-color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-weight: 600; }
+
+        .logout-link {
+            margin-top: auto;
+            color: #e74c3c;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-left: 16px;
+        }
+
+        /* Sections visibility */
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px 60px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+        .page-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .page-header p { color: var(--text-muted); font-size: 14px; }
+
+        .salon-info-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .salon-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .salon-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .salon-type {
+            background: #f5f5f5;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .salon-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .detail-item label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .detail-item p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .management-sections {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .management-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .management-icon {
+            width: 48px;
+            height: 48px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: black;
+        }
+
+        .management-info h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .management-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .btn-action {
+            padding: 10px 20px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            width: fit-content;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background: #333;
+        }
+
+        @media (max-width: 1024px) {
+            aside { width: 80px; padding: 20px 10px; }
+            .brand span, .nav-label, .nav-link span, .logout-link span { display: none; }
+            main { margin-left: 80px; padding: 30px 40px; }
+            .salon-details, .management-sections { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<aside>
+    <div class="brand">
+        <h1>ATIZAY</h1>
+        <p>Salut, <span th:text="${proprietaire?.prenom ?: 'Propriétaire'}">Propriétaire</span></p>
+    </div>
+
+    <div class="nav-group">
+        <div class="nav-label">Principal</div>
+        <a href="/proprietaire/dashboard" class="nav-link">
+            <i class="fa-solid fa-house-chimney"></i> <span>Mes Salons</span>
+        </a>
+    </div>
+
+    <div class="nav-group">
+        <div class="nav-label">Ce salon</div>
+        <a href="#" onclick="showSection('profil')" class="nav-link active" id="nav-profil">
+            <i class="fa-solid fa-user"></i> <span>Profil</span>
+        </a>
+        <a href="#" onclick="showSection('horaire')" class="nav-link" id="nav-horaire">
+            <i class="fa-solid fa-clock"></i> <span>Horaire</span>
+        </a>
+        <a href="#" onclick="showSection('prestation')" class="nav-link" id="nav-prestation">
+            <i class="fa-solid fa-scissors"></i> <span>Prestation</span>
+        </a>
+        <a href="#" onclick="showSection('services')" class="nav-link" id="nav-services">
+            <i class="fa-solid fa-list"></i> <span>Services</span>
+        </a>
+        <a href="#" onclick="showSection('rendez-vous')" class="nav-link" id="nav-rendez-vous">
+            <i class="fa-solid fa-calendar"></i> <span>Rendez-vous</span>
+        </a>
+        <a href="#" onclick="showSection('employes')" class="nav-link" id="nav-employes">
+            <i class="fa-solid fa-users"></i> <span>Employés</span>
+        </a>
+    </div>
+
+    <a href="/auth/deconnexion" class="logout-link">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Se déconnecter</span>
+    </a>
+</aside>
+
+<main>
+    <!-- Messages flash -->
+    <div th:if="${successMessage}" style="background: #4CAF50; color: white; padding: 16px 24px; border-radius: 8px; margin-bottom: 24px;">
+        <p th:text="${successMessage}">Message de succès</p>
+    </div>
+    <div th:if="${errorMessage}" style="background: #f44336; color: white; padding: 16px 24px; border-radius: 8px; margin-bottom: 24px;">
+        <p th:text="${errorMessage}">Message d'erreur</p>
+    </div>
+
+    <!-- Section Profil -->
+    <section id="profil" class="content-section active">
+        <div class="page-header">
+            <h1>Profil du salon</h1>
+            <p>Vue client et modification des informations</p>
+        </div>
+
+        <div class="salon-info-card">
+            <div class="salon-info-header">
+                <div>
+                    <div class="salon-name" th:text="${salon.nomSalon}">Nom du salon</div>
+                    <span class="salon-type" th:text="${salon.typeSalon}">Type</span>
+                </div>
+            </div>
+
+            <div class="salon-details">
+                <div class="detail-item">
+                    <label>Adresse</label>
+                    <p th:text="${salon.adresseSalon}">Adresse</p>
+                </div>
+                <div class="detail-item">
+                    <label>Ville</label>
+                    <p th:text="${salon.villeSalon}">Ville</p>
+                </div>
+                <div class="detail-item">
+                    <label>Département</label>
+                    <p th:text="${salon.departement}">Département</p>
+                </div>
+                <div class="detail-item">
+                    <label>Téléphone</label>
+                    <p th:text="${salon.telephoneSalon}">Téléphone</p>
+                </div>
+            </div>
+
+            <form th:action="@{/proprietaire/salon/{id}/profil/modifier(id=${salon.idSalon})}" method="post" enctype="multipart/form-data">
+                <div class="form-group" style="margin-top: 24px;">
+                    <label>Description</label>
+                    <textarea name="descriptionSalon" th:text="${salon.descriptionSalon}" placeholder="Description du salon..." style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; min-height: 100px; resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group" style="margin-top: 24px;">
+                    <label>Photos du salon (Max 15)</label>
+                    <input type="file" name="photos" multiple accept="image/*" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                </div>
+
+                <!-- Galerie de photos existantes -->
+                <div th:if="${salon.listeMedias != null and !salon.listeMedias.isEmpty()}" style="margin-top: 32px;">
+                    <label>Photos actuelles (<span th:text="${salon.listeMedias.size()}">0</span>/15)</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-top: 16px;">
+                        <div th:each="media : ${salon.listeMedias}" style="position: relative;">
+                            <img th:src="@{/uploads/salons/{filename}(filename=${media.urlMedia})}"
+                                 th:alt="${media.urlMedia}"
+                                 style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);"
+                                 onerror="this.src='https://via.placeholder.com/150?text=Image+non+disponible';">
+                            <a th:href="@{/proprietaire/salon/{id}/photo/supprimer/{idMedia}(id=${salon.idSalon}, idMedia=${media.idMediaSalon})}"
+                               onclick="return confirm('Voulez-vous vraiment supprimer cette photo ?');"
+                               style="position: absolute; top: 8px; right: 8px; background: rgba(244, 67, 54, 0.9); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; font-size: 14px;">
+                                <i class="fa-solid fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-action" style="margin-top: 24px;">Enregistrer les modifications</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Section Horaire -->
+    <section id="horaire" class="content-section">
+        <div class="page-header">
+            <h1>Horaires d'ouverture</h1>
+            <p>Modifiez et enregistrez vos horaires</p>
+        </div>
+
+        <div class="salon-info-card">
+            <form th:action="@{/proprietaire/salon/{id}/horaire/modifier(id=${salon.idSalon})}" method="post">
+                <div class="form-group">
+                    <label>Heure d'ouverture</label>
+                    <input type="time" name="heureOuverture" value="08:00" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                </div>
+
+                <div class="form-group">
+                    <label>Heure de fermeture</label>
+                    <input type="time" name="heureFermeture" value="18:00" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                </div>
+
+                <div class="form-group">
+                    <label>Jours d'ouverture</label>
+                    <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <input type="checkbox" name="joursOuverture" value="Lundi" checked>
+                            <span>Lundi</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <input type="checkbox" name="joursOuverture" value="Mardi" checked>
+                            <span>Mardi</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <input type="checkbox" name="joursOuverture" value="Mercredi" checked>
+                            <span>Mercredi</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <input type="checkbox" name="joursOuverture" value="Jeudi" checked>
+                            <span>Jeudi</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <input type="checkbox" name="joursOuverture" value="Vendredi" checked>
+                            <span>Vendredi</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <input type="checkbox" name="joursOuverture" value="Samedi" checked>
+                            <span>Samedi</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <input type="checkbox" name="joursOuverture" value="Dimanche">
+                            <span>Dimanche</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-action" style="margin-top: 24px;">Enregistrer les horaires</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Section Prestation -->
+    <section id="prestation" class="content-section">
+        <div class="page-header">
+            <h1>Prestations</h1>
+            <p>Gérez vos prestations</p>
+        </div>
+
+        <div class="salon-info-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3>Liste des prestations</h3>
+                <button class="btn-action" onclick="showAddPrestationForm()">+ Ajouter une prestation</button>
+            </div>
+
+            <!-- Formulaire d'ajout de prestation (caché par défaut) -->
+            <div id="add-prestation-form" style="display: none; margin-bottom: 24px; padding: 24px; background: #f9f9f9; border-radius: 12px;">
+                <form th:action="@{/proprietaire/salon/{id}/prestation/ajouter(id=${salon.idSalon})}" method="post">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Nom de la prestation</label>
+                        <input type="text" name="nomPrestation" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Description</label>
+                        <textarea name="descriptionPrestation" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; min-height: 80px; resize: vertical;"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label>Catégorie</label>
+                            <select name="categorie" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                <option value="Coupe">Coupe</option>
+                                <option value="Barbe">Barbe</option>
+                                <option value="Coloration">Coloration</option>
+                                <option value="Soins">Soins</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Durée (minutes)</label>
+                            <input type="number" name="dureeMinutes" required min="5" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Prix (HTG)</label>
+                        <input type="number" name="prix" required min="0" step="0.01" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button type="submit" class="btn-action">Ajouter</button>
+                        <button type="button" class="btn-action" onclick="hideAddPrestationForm()" style="background: var(--border-color); color: var(--text-main);">Annuler</button>
+                    </div>
+                </form>
+            </div>
+
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                <p>Aucune prestation pour le moment</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Services -->
+    <section id="services" class="content-section">
+        <div class="page-header">
+            <h1>Services</h1>
+            <p>Gérez vos services</p>
+        </div>
+
+        <div class="salon-info-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3>Liste des services</h3>
+                <button class="btn-action" onclick="showAddServiceForm()">+ Ajouter un service</button>
+            </div>
+
+            <!-- Formulaire d'ajout de service (caché par défaut) -->
+            <div id="add-service-form" style="display: none; margin-bottom: 24px; padding: 24px; background: #f9f9f9; border-radius: 12px;">
+                <form th:action="@{/proprietaire/salon/{id}/service/ajouter(id=${salon.idSalon})}" method="post">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Nom du service</label>
+                        <input type="text" name="nomService" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Description</label>
+                        <textarea name="descriptionService" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; min-height: 80px; resize: vertical;"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label>Durée (minutes)</label>
+                            <input type="number" name="dureeMinutes" required min="5" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Prix (HTG)</label>
+                            <input type="number" name="prix" required min="0" step="0.01" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button type="submit" class="btn-action">Ajouter</button>
+                        <button type="button" class="btn-action" onclick="hideAddServiceForm()" style="background: var(--border-color); color: var(--text-main);">Annuler</button>
+                    </div>
+                </form>
+            </div>
+
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                <p>Aucun service pour le moment</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Rendez-vous -->
+    <section id="rendez-vous" class="content-section">
+        <div class="page-header">
+            <h1>Rendez-vous</h1>
+            <p>Consultez et gérez les rendez-vous</p>
+        </div>
+
+        <div class="salon-info-card">
+            <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+                <a th:href="@{/proprietaire/salon/{id}/rendez-vous(id=${salon.idSalon}, filtre='jour')}" class="btn-action" style="background: var(--border-color); color: var(--text-main); text-decoration: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; display: inline-block;">Jour</a>
+                <a th:href="@{/proprietaire/salon/{id}/rendez-vous(id=${salon.idSalon}, filtre='semaine')}" class="btn-action" style="background: var(--border-color); color: var(--text-main); text-decoration: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; display: inline-block;">Semaine</a>
+                <a th:href="@{/proprietaire/salon/{id}/rendez-vous(id=${salon.idSalon}, filtre='mois')}" class="btn-action" style="text-decoration: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; display: inline-block;">Mois</a>
+            </div>
+
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                <p>Aucun rendez-vous pour le moment</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Employés -->
+    <section id="employes" class="content-section">
+        <div class="page-header">
+            <h1>Employés</h1>
+            <p>Gérez votre équipe</p>
+        </div>
+
+        <div class="salon-info-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3>Liste des employés</h3>
+                <button class="btn-action" onclick="showAddEmployeForm()">+ Ajouter un employé</button>
+            </div>
+
+            <!-- Formulaire d'ajout d'employé (caché par défaut) -->
+            <div id="add-employe-form" style="display: none; margin-bottom: 24px; padding: 24px; background: #f9f9f9; border-radius: 12px;">
+                <form th:action="@{/proprietaire/salon/{id}/employe/ajouter(id=${salon.idSalon})}" method="post">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label>Nom</label>
+                            <input type="text" name="nom" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Prénom</label>
+                            <input type="text" name="prenom" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Email</label>
+                        <input type="email" name="email" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label>Mot de passe</label>
+                            <input type="password" name="password" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Spécialité</label>
+                            <input type="text" name="specialite" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button type="submit" class="btn-action">Ajouter</button>
+                        <button type="button" class="btn-action" onclick="hideAddEmployeForm()" style="background: var(--border-color); color: var(--text-main);">Annuler</button>
+                    </div>
+                </form>
+            </div>
+
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                <p>Aucun employé pour le moment</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    function showSection(sectionId) {
+        // Masquer toutes les sections
+        const sections = document.querySelectorAll('.content-section');
+        sections.forEach(section => {
+            section.classList.remove('active');
+        });
+
+        // Afficher la section sélectionnée
+        const selectedSection = document.getElementById(sectionId);
+        if (selectedSection) {
+            selectedSection.classList.add('active');
+        }
+
+        // Mettre à jour les liens actifs dans la sidebar
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+        });
+
+        const activeNav = document.getElementById('nav-' + sectionId);
+        if (activeNav) {
+            activeNav.classList.add('active');
+        }
+
+        // Empêcher le comportement par défaut du lien
+        event.preventDefault();
+    }
+
+    function showAddPrestationForm() {
+        document.getElementById('add-prestation-form').style.display = 'block';
+    }
+
+    function hideAddPrestationForm() {
+        document.getElementById('add-prestation-form').style.display = 'none';
+    }
+
+    function showAddServiceForm() {
+        document.getElementById('add-service-form').style.display = 'block';
+    }
+
+    function hideAddServiceForm() {
+        document.getElementById('add-service-form').style.display = 'none';
+    }
+
+    function showAddEmployeForm() {
+        document.getElementById('add-employe-form').style.display = 'block';
+    }
+
+    function hideAddEmployeForm() {
+        document.getElementById('add-employe-form').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
