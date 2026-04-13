@@ -45,6 +45,17 @@ public abstract class Utilisateur {
     @Column(name = "est_actif")
     private boolean estActif = true;
     
+    @Column(name = "photo_profil")
+    private String photoProfil;
+
+    public String getPhotoProfil() {
+        return photoProfil;
+    }
+
+    public void setPhotoProfil(String photoProfil) {
+        this.photoProfil = photoProfil;
+    }
+    
     public Utilisateur() {
         this.dateCreation = LocalDateTime.now();
     }

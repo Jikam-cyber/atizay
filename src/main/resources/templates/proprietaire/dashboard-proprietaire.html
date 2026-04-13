@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,49 +8,78 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --bg-sidebar: #f5f5f5;
-            --bg-main: #ffffff;
-            --text-main: #1a1a1a;
-            --text-muted: #888888;
-            --border-color: #eeeeee;
-            --radius-card: 16px;
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-main);
+        :root {
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #f9f9f9;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+            --radius-pill: 50px;
+            --radius-card: 12px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
             display: flex;
             min-height: 100vh;
             color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Barre Latérale (Sidebar) */
         aside {
             width: 280px;
-            background-color: var(--bg-sidebar);
+            background-color: var(--white);
             display: flex;
             flex-direction: column;
             padding: 40px 24px;
-            border-right: 1px solid var(--border-color);
+            border-right: 1px solid var(--border);
             position: fixed;
             height: 100vh;
+            z-index: 100;
         }
 
-        .brand { margin-bottom: 40px; }
-        .brand h1 { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; }
-        .brand p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .brand {
+            margin-bottom: 40px;
+        }
 
-        .nav-group { margin-bottom: 32px; }
-        .nav-label { 
-            font-size: 11px; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            color: var(--text-muted); 
+        .brand h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--black);
+            text-transform: uppercase;
+        }
+
+        .brand p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .nav-group {
+            margin-bottom: 32px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
             margin-bottom: 16px;
             letter-spacing: 1px;
+            padding-left: 12px;
         }
 
         .nav-link {
@@ -58,10 +88,10 @@
             gap: 12px;
             padding: 12px 16px;
             text-decoration: none;
-            color: var(--text-main);
+            color: var(--text-muted);
             font-size: 14px;
             font-weight: 500;
-            border-radius: 12px;
+            border-radius: 8px;
             margin-bottom: 4px;
             transition: all 0.2s;
         }
@@ -72,31 +102,44 @@
             font-size: 16px;
         }
 
+        .nav-link:hover {
+            color: var(--black);
+            background: var(--bg-light);
+        }
+
         .nav-link.active {
-            background-color: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background-color: var(--black);
+            color: var(--white);
             font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .nav-link .badge {
-            background: black;
-            color: white;
+            background: var(--white);
+            color: var(--black);
             font-size: 10px;
             padding: 2px 6px;
             border-radius: 10px;
             margin-left: auto;
+            font-weight: 700;
         }
 
         .logout-link {
             margin-top: auto;
-            color: #e74c3c;
+            color: #d93025;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 12px;
-            padding-left: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .logout-link:hover {
+            background: #fce8e6;
         }
 
         /* Contenu Principal */
@@ -111,24 +154,42 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 40px;
+            background: var(--white);
+            padding: 24px 32px;
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border);
         }
 
-        .page-title h2 { font-size: 24px; font-weight: 700; }
-        .page-title p { font-size: 14px; color: var(--text-muted); }
+        .page-title h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
 
         .btn-new-salon {
-            padding: 10px 24px;
-            border: 1px solid var(--border-color);
-            background: white;
-            border-radius: 25px;
+            padding: 12px 24px;
+            background: var(--black);
+            border: none;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
-            color: black;
+            color: var(--white);
             transition: all 0.2s;
         }
-        .btn-new-salon:hover { background: #f9f9f9; border-color: #ccc; }
+
+        .btn-new-salon:hover {
+            background: #333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
 
         /* Grille de Cartes (Stats) */
         .stats-container {
@@ -139,10 +200,17 @@
         }
 
         .card {
-            background: white;
-            border: 1px solid var(--border-color);
+            background: var(--white);
+            border: 1px solid var(--border);
             border-radius: var(--radius-card);
             padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
         }
 
         .card-label {
@@ -167,11 +235,12 @@
             font-weight: 600;
         }
 
-        /* Liste des Établissements */
         .list-card {
-            border: 1px solid var(--border-color);
+            background: var(--white);
+            border: 1px solid var(--border);
             border-radius: var(--radius-card);
             padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
         }
 
         .list-header {
@@ -181,62 +250,106 @@
             margin-bottom: 30px;
         }
 
-        .list-header h3 { font-size: 16px; font-weight: 700; }
-        .btn-add { text-decoration: none; color: black; font-size: 13px; font-weight: 700; }
+        .list-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .btn-add {
+            text-decoration: none;
+            color: var(--black);
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
 
         .salon-name {
-            font-size: 15px;
-            font-weight: 600;
-            padding: 20px 0;
-            border-top: 1px solid var(--border-color);
+            font-size: 16px;
+            font-weight: 700;
         }
 
         /* Section Abonnement */
         .subscription-card {
-            background: linear-gradient(135deg, #111 0%, #333 100%);
+            background: linear-gradient(135deg, var(--black) 0%, #333 100%);
             border-radius: var(--radius-card);
-            padding: 32px;
-            color: white;
+            padding: 40px;
+            color: var(--white);
             margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
         }
+
+        .subscription-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
         .subscription-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
         }
-        .subscription-header h3 { font-size: 18px; font-weight: 700; }
+
+        .subscription-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
         .subscription-badge {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
         }
+
         .subscription-plan {
             font-size: 32px;
             font-weight: 700;
             margin-bottom: 8px;
         }
+
         .subscription-period {
             font-size: 14px;
             opacity: 0.8;
             margin-bottom: 24px;
         }
+
         .subscription-features {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
             margin-bottom: 24px;
         }
+
         .feature-item {
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 13px;
         }
-        .feature-item i { color: #4ade80; }
+
+        .feature-item i {
+            color: #4ade80;
+        }
+
         .btn-upgrade {
             background: white;
             color: black;
@@ -248,7 +361,208 @@
             cursor: pointer;
             transition: opacity 0.2s;
         }
-        .btn-upgrade:hover { opacity: 0.9; }
+
+        .btn-upgrade:hover {
+            opacity: 0.9;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            border-color: var(--black);
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .step.completed .step-number {
+            background: var(--black);
+            border-color: var(--black);
+            color: var(--white);
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .step.active .step-label {
+            color: var(--black);
+        }
+
+        /* Form styling for integration */
+        .form-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s;
+            background: var(--bg-light);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--black);
+            background: var(--white);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .btn-back {
+            padding: 12px 32px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            background: var(--bg-light);
+            border-color: var(--black);
+        }
+
+        .btn-next {
+            padding: 12px 32px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-next:hover {
+            background: #333;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--white);
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--black);
+        }
+
+        .checkbox-item input {
+            width: auto;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 13px;
+        }
 
         /* Sections */
         .content-section {
@@ -256,54 +570,64 @@
             scroll-margin-top: 40px;
         }
 
-        /* Salon Items */
         .salon-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-            border-top: 1px solid var(--border-color);
+            padding: 24px 0;
+            border-top: 1px solid var(--border);
         }
+
         .salon-item:first-child {
             border-top: none;
+            padding-top: 0;
         }
+
         .salon-info {
             flex: 1;
         }
+
         .salon-address {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 6px;
         }
+
         .salon-actions {
             display: flex;
             gap: 12px;
         }
+
         .btn-action {
-            padding: 8px 16px;
-            border: 1px solid var(--border-color);
-            background: white;
+            padding: 10px 20px;
+            background: var(--white);
+            border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
-            color: black;
+            color: var(--black);
             transition: all 0.2s;
         }
+
         .btn-action:hover {
-            background: #f9f9f9;
-            border-color: #ccc;
+            border-color: var(--black);
         }
 
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
+            padding: 60px 20px;
+            background: var(--bg-light);
+            border-radius: 12px;
+            border: 1px dashed var(--border);
         }
+
         .empty-state p {
-            margin-bottom: 16px;
+            margin-bottom: 24px;
+            font-weight: 500;
+            font-size: 16px;
         }
 
         /* Salon Subscription Items */
@@ -311,49 +635,58 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-            border-top: 1px solid var(--border-color);
+            padding: 24px 0;
+            border-top: 1px solid var(--border);
         }
+
         .salon-subscription-item:first-child {
             border-top: none;
+            padding-top: 0;
         }
+
         .salon-subscription-info {
             flex: 1;
         }
+
         .subscription-status {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             margin-top: 8px;
         }
+
         .status-badge {
             background: #e8f5e9;
             color: #2e7d32;
             padding: 4px 12px;
             border-radius: 12px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             display: inline-block;
             width: fit-content;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+
         .status-date {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-muted);
         }
+
         .btn-upgrade-small {
-            padding: 8px 16px;
-            background: white;
-            color: black;
-            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
             border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
+
         .btn-upgrade-small:hover {
-            background: #f9f9f9;
-            border-color: #ccc;
+            background: #333;
         }
 
         /* Gestion Grid */
@@ -362,57 +695,86 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 24px;
         }
+
         .gestion-card {
-            background: white;
-            border: 1px solid var(--border-color);
+            background: var(--white);
+            border: 1px solid var(--border);
             border-radius: var(--radius-card);
-            padding: 32px;
+            padding: 40px;
             display: flex;
             flex-direction: column;
             gap: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+
+        .gestion-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+        }
+
         .gestion-icon {
             width: 48px;
             height: 48px;
-            background: #f5f5f5;
+            background: var(--black);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            color: black;
+            color: var(--white);
         }
+
         .gestion-info h3 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
             margin-bottom: 8px;
         }
+
         .gestion-info p {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-muted);
             margin-bottom: 16px;
+            line-height: 1.6;
         }
+
         .gestion-card .btn-action {
             margin-top: auto;
             width: fit-content;
         }
 
         @media (max-width: 1024px) {
-            aside { width: 80px; padding: 20px 10px; }
-            .brand span, .nav-label, .nav-link span, .logout-link span { display: none; }
-            main { margin-left: 80px; }
-            .gestion-grid { grid-template-columns: 1fr; }
+            aside {
+                width: 80px;
+                padding: 20px 10px;
+            }
+
+            .brand span,
+            .nav-label,
+            .nav-link span,
+            .logout-link span {
+                display: none;
+            }
+
+            main {
+                margin-left: 80px;
+            }
+
+            .gestion-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Sections visibility */
         .content-section {
             display: none;
         }
+
         .content-section.active {
             display: block;
         }
     </style>
 </head>
+
 <body>
 
     <aside>
@@ -431,12 +793,7 @@
             </a>
         </div>
 
-        <div class="nav-group">
-            <div class="nav-label">Gestion</div>
-            <a href="#" onclick="showSection('creer-salon')" class="nav-link" id="nav-creer-salon">
-                <i class="fa-solid fa-circle-plus"></i> <span>Créer un Salon</span>
-            </a>
-        </div>
+        <!-- Removed Gestion section -->
 
         <a href="/auth/deconnexion" class="logout-link">
             <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Se déconnecter</span>
@@ -444,6 +801,16 @@
     </aside>
 
     <main>
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" style="margin-bottom: 24px; padding: 16px 20px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; color: #065f46; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px;">
+            <i class="fa-solid fa-circle-check" style="font-size: 18px; color: #10b981;"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" style="margin-bottom: 24px; padding: 16px 20px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #991b1b; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px;">
+            <i class="fa-solid fa-circle-exclamation" style="font-size: 18px; color: #dc3545;"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
         <!-- Section Mes Salons -->
         <section id="mes-salons" class="content-section active">
             <div class="top-bar">
@@ -451,28 +818,37 @@
                     <h2>Mes Salons</h2>
                     <p>Gérez tous vos établissements</p>
                 </div>
-                <a href="/proprietaire/creer-salon" class="btn-new-salon">+ Nouveau Salon</a>
+                <a href="#" onclick="showSection('creer-salon'); return false;" class="btn-new-salon">+ Nouveau
+                    Salon</a>
             </div>
 
             <div class="list-card">
                 <div class="list-header">
                     <h3>Mes établissements</h3>
                 </div>
-                
+
                 <div th:if="${salons}">
                     <div th:each="salon : ${salons}" class="salon-item">
                         <div class="salon-info">
                             <div class="salon-name" th:text="${salon.nomSalon}">Nom du salon</div>
-                            <div class="salon-address" th:text="${salon.adresseSalon} + ', ' + ${salon.villeSalon}">Adresse</div>
+                            <div class="salon-address" th:text="${salon.adresseSalon} + ', ' + ${salon.villeSalon}">
+                                Adresse</div>
                         </div>
-                        <div class="salon-actions">
-                            <a th:href="'/proprietaire/salon/' + ${salon.idSalon} + '/gestion'" class="btn-action">Gérer</a>
+                        <div class="salon-actions" style="display: flex; gap: 8px;">
+                            <a th:href="'/proprietaire/salon/' + ${salon.idSalon} + '/gestion'"
+                                class="btn-action">Gérer</a>
+                            <button th:data-id="${salon.idSalon}" th:data-nom="${salon.nomSalon}"
+                                onclick="confirmDelete(this.dataset.id, this.dataset.nom)"
+                                class="btn-action" style="background: #fef2f2; color: #dc3545; border-color: #fecaca;" title="Supprimer ce salon">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div th:unless="${salons}" class="empty-state">
                     <p>Vous n'avez pas encore de salon</p>
-                    <a href="/proprietaire/creer-salon" class="btn-add">+ Créer votre premier salon</a>
+                    <a href="#" onclick="showSection('creer-salon'); return false;" class="btn-add">+ Créer votre
+                        premier salon</a>
                 </div>
             </div>
         </section>
@@ -518,7 +894,7 @@
                 <div class="list-header">
                     <h3>Abonnements par salon</h3>
                 </div>
-                
+
                 <div th:if="${salons}">
                     <div th:each="salon : ${salons}" class="salon-subscription-item">
                         <div class="salon-subscription-info">
@@ -543,28 +919,181 @@
         <section id="creer-salon" class="content-section">
             <div class="top-bar">
                 <div class="page-title">
-                    <h2>Créer un Salon</h2>
-                    <p>Ajoutez un nouvel établissement à votre compte</p>
+                    <h2>Créer un nouveau salon</h2>
+                    <p>Complétez seulement 2 étapes pour enregistrer votre établissement</p>
                 </div>
             </div>
 
-            <div class="gestion-grid">
-                <div class="gestion-card">
-                    <div class="gestion-icon">
-                        <i class="fa-solid fa-circle-plus"></i>
-                    </div>
-                    <div class="gestion-info">
-                        <h3>Nouveau Salon</h3>
-                        <p>Commencez par créer votre premier établissement</p>
-                    </div>
-                    <a href="/proprietaire/creer-salon" class="btn-action">Créer</a>
+            <div class="progress-steps">
+                <div class="step active" id="step-indicator-1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Informations</div>
+                </div>
+                <div class="step" id="step-indicator-2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Adresse</div>
                 </div>
             </div>
+
+            <form th:action="@{/proprietaire/creer-salon}" method="post" id="salonForm">
+                <!-- Étape 1: Informations générales -->
+                <div class="form-card step-content active" id="step-1">
+                    <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 24px;">Informations générales</h2>
+
+                    <div class="form-group">
+                        <label>Type de salon *</label>
+                        <select id="typeSalonSelect" name="typeSalon" required onchange="toggleAutreType(this.value)">
+                            <option value="">Sélectionner</option>
+                            <option value="Barber Shop">Barber Shop</option>
+                            <option value="Salon de Beauté">Salon de Beauté</option>
+                            <option value="Salon Mixte">Salon Mixte</option>
+                            <option value="Nails Bar">Nails Bar</option>
+                            <option value="Salon & Spa">Salon & Spa</option>
+                            <option value="Autre">Autre (Précisez)</option>
+                        </select>
+                        <input type="text" id="autreTypeInput" placeholder="Saisissez votre spécialité..."
+                            style="display: none; margin-top: 10px; padding: 12px; width: 100%; border: 1px solid var(--border); border-radius: 8px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nom du salon *</label>
+                        <input type="text" name="nomSalon" placeholder="Ex: Salon Élégance" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="descriptionSalon"
+                            placeholder="Décrivez votre salon en quelques mots..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Téléphone</label>
+                        <input type="tel" name="telephone" placeholder="+509 XXXX XXXX">
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="button" class="btn-back" onclick="showSection('mes-salons')">Annuler</button>
+                        <button type="button" class="btn-next" onclick="nextStep(1)">Suivant →</button>
+                    </div>
+                </div>
+
+                <!-- Étape 2: Adresse et localisation -->
+                <div class="form-card step-content" id="step-2">
+                    <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 24px;">Adresse et localisation</h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Département *</label>
+                            <select id="departementSelect" name="departement" required onchange="updateVilles()">
+                                <option value="">Sélectionner</option>
+                                <option value="Ouest">Ouest</option>
+                                <option value="Artibonite">Artibonite</option>
+                                <option value="Nord">Nord</option>
+                                <option value="Nord-Est">Nord-Est</option>
+                                <option value="Nord-Ouest">Nord-Ouest</option>
+                                <option value="Sud">Sud</option>
+                                <option value="Sud-Est">Sud-Est</option>
+                                <option value="Grand'Anse">Grand'Anse</option>
+                                <option value="Nippes">Nippes</option>
+                                <option value="Centre">Centre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ville *</label>
+                            <select id="villeSelect" name="ville" required>
+                                <option value="">Sélectionner d'abord un département</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Adresse *</label>
+                        <input type="text" name="adresseSalon" placeholder="N°, Rue, Quartier" required>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="button" class="btn-back" onclick="prevStep(2)">← Retour</button>
+                        <button type="submit" class="btn-next">Créer le salon</button>
+                    </div>
+                </div>
+            </form>
         </section>
     </main>
 
+    <!-- Modal Suppression Salon -->
+    <div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--white); padding: 32px; border-radius: 16px; width: 100%; max-width: 450px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3 style="font-size: 18px; font-weight: 800; color: #dc3545;">Supprimer le salon</h3>
+                <button onclick="document.getElementById('deleteModal').style.display='none'" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <p style="font-size: 14px; margin-bottom: 16px; color: var(--text-main); line-height: 1.5;">
+                Cette action est <strong>irréversible</strong>. Toutes les données liées à ce salon (employés, prestations, photos, rendez-vous) seront définitivement effacées du système.
+            </p>
+            <p style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Pour confirmer, tapez le nom exact ci-dessous :</p>
+            <form id="deleteSalonForm" method="post">
+                <input type="text" name="confirmName" id="confirmSalonName" placeholder="" required style="width: 100%; padding: 14px 16px; margin-bottom: 24px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Inter', sans-serif;">
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" onclick="document.getElementById('deleteModal').style.display='none'" class="btn-action" style="padding: 10px 16px; border: 1px solid var(--border); background: var(--bg-light);">Annuler</button>
+                    <button type="submit" class="btn-action" style="background: #dc3545; color: white; border: none; padding: 10px 16px;">Supprimer définitivement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        function confirmDelete(idSalon, nomSalon) {
+            const form = document.getElementById('deleteSalonForm');
+            form.action = '/proprietaire/salon/' + idSalon + '/supprimer';
+            const input = document.getElementById('confirmSalonName');
+            input.placeholder = nomSalon;
+            input.value = '';
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        let currentStep = 1;
+        const totalSteps = 2;
+
+        function showStep(step) {
+            // Hide all steps inside the form
+            document.querySelectorAll('#creer-salon .step-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // Show current step
+            document.getElementById(`step-${step}`).classList.add('active');
+            // Update indicators
+            for (let i = 1; i <= totalSteps; i++) {
+                const indicator = document.getElementById(`step-indicator-${i}`);
+                if (indicator) {
+                    indicator.classList.remove('active', 'completed');
+                    if (i < step) indicator.classList.add('completed');
+                    else if (i === step) indicator.classList.add('active');
+                }
+            }
+        }
+
+        function nextStep(current) {
+            if (current < totalSteps) {
+                currentStep = current + 1;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep(current) {
+            if (current > 1) {
+                currentStep = current - 1;
+                showStep(currentStep);
+            }
+        }
+
         function showSection(sectionId) {
+            // Reset wizard to step 1 when opening the creation section
+            if (sectionId === 'creer-salon') {
+                currentStep = 1;
+                showStep(1);
+                // Optionnel : document.getElementById("salonForm").reset();
+            }
+
             // Masquer toutes les sections
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => {
@@ -589,9 +1118,59 @@
             }
 
             // Empêcher le comportement par défaut du lien
-            event.preventDefault();
+            if (event) event.preventDefault();
+        }
+
+        function toggleAutreType(val) {
+            const select = document.getElementById('typeSalonSelect');
+            const input = document.getElementById('autreTypeInput');
+            if (val === 'Autre') {
+                input.style.display = 'block';
+                input.required = true;
+                input.name = 'typeSalon';
+                select.removeAttribute('name');
+            } else {
+                input.style.display = 'none';
+                input.required = false;
+                input.removeAttribute('name');
+                select.name = 'typeSalon';
+                input.value = ''; // Clean up so no old text remains
+            }
+        }
+
+        const villesHaiti = {
+            "Ouest": ["Port-au-Prince", "Pétion-Ville", "Delmas", "Carrefour", "Tabarre", "Cité Soleil", "Croix-des-Bouquets", "Léogâne", "Petit-Goâve", "Arcahaie", "Cabaret", "Kenscoff"],
+            "Artibonite": ["Gonaïves", "Saint-Marc", "Dessalines", "Verrettes", "Gros-Morne", "L'Estère", "Marmelade"],
+            "Nord": ["Cap-Haïtien", "Milot", "Plaine-du-Nord", "Limonade", "Acul-du-Nord", "Borgne", "Dondon"],
+            "Nord-Est": ["Fort-Liberté", "Ouanaminthe", "Trou-du-Nord", "Terrier-Rouge", "Caracol", "Ferrier"],
+            "Nord-Ouest": ["Port-de-Paix", "Saint-Louis-du-Nord", "Jean-Rabel", "Bassins-Bleu", "Chansolme"],
+            "Sud": ["Les Cayes", "Port-Salut", "Camp-Perrin", "Aquin", "Chantal", "Torbeck", "Cavaillon", "Saint-Louis-du-Sud"],
+            "Sud-Est": ["Jacmel", "Cayes-Jacmel", "Marigot", "Bainet", "La Vallée-de-Jacmel", "Côtes-de-Fer"],
+            "Grand'Anse": ["Jérémie", "Dame-Marie", "Corail", "Chambellan", "Beaumont", "Roseaux"],
+            "Nippes": ["Miragoâne", "Petite-Rivière-de-Nippes", "Anse-à-Veau", "Fonds-des-Nègres", "Baradères"],
+            "Centre": ["Hinche", "Mirebalais", "Lascahobas", "Thomonde", "Maïssade", "Belladère"]
+        };
+
+        function updateVilles() {
+            const depSelect = document.getElementById('departementSelect');
+            const villeSelect = document.getElementById('villeSelect');
+            const selectedDep = depSelect.value;
+
+            villeSelect.innerHTML = '<option value="">Sélectionner</option>';
+
+            if (selectedDep && villesHaiti[selectedDep]) {
+                villesHaiti[selectedDep].forEach(ville => {
+                    const option = document.createElement('option');
+                    option.value = ville;
+                    option.textContent = ville;
+                    villeSelect.appendChild(option);
+                });
+            } else {
+                villeSelect.innerHTML = '<option value="">Sélectionner d\'abord un département</option>';
+            }
         }
     </script>
 
 </body>
+
 </html>

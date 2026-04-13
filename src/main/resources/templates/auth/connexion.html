@@ -34,21 +34,31 @@
 
         /* Section Image (Gauche) */
         .image-section {
-            flex: 1;
+            width: 50%;
             position: relative;
-            background: url('https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=2069&auto=format&fit=crop') center/cover no-repeat;
+            background: #111;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             padding: 60px;
             color: var(--white);
+            overflow: hidden;
         }
+
+        .bg-img {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+            z-index: 0;
+            transition: opacity 2s ease-in-out;
+        }
+        .bg-img.fade-out { opacity: 0; }
 
         .image-section::after {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8));
+            z-index: 1;
         }
 
         .image-content {
@@ -71,13 +81,14 @@
 
         /* Section Formulaire (Droite) */
         .form-section {
-            width: 550px;
+            width: 50%;
             display: flex;
             flex-direction: column;
-            padding: 60px;
+            padding: 40px;
             overflow-y: auto;
             background: var(--white);
         }
+        .form-wrapper { width: 100%; max-width: 420px; margin: auto; }
 
         .logo-container {
             margin-bottom: 60px;
@@ -246,6 +257,8 @@
 
     <div class="page-wrapper">
         <div class="image-section">
+            <img class="bg-img img-active" src="https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=2069&auto=format&fit=crop" alt="bg">
+            <img class="bg-img img-next fade-out" src="" alt="bg">
             <div class="image-content">
                 <h2>Votre beauté, sans attente.</h2>
                 <p>Prenez rendez-vous dans les meilleurs salons autour de vous.</p>
@@ -253,6 +266,7 @@
         </div>
 
         <div class="form-section">
+            <div class="form-wrapper">
             <div class="logo-container">
                 <a href="/" class="logo-text">Atizay</a>
             </div>
@@ -304,7 +318,44 @@
                 <p>Vous êtes un professionnel ? <a href="/auth/inscription?type=proprietaire">Inscrivez votre salon</a></p>
             </div>
         </div>
+            </div>
+        </div>
     </div>
 
+    <script>
+        const authImgData = [
+            'https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=2069&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=2000&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?q=80&w=2000&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=2000&auto=format&fit=crop'
+        ];
+
+        // Preload images
+        authImgData.forEach(url => {
+            const img = new Image();
+            img.src = url;
+        });
+
+        let idx = 0;
+        setInterval(() => {
+            let imgActive = document.querySelector('.img-active');
+            let imgNext = document.querySelector('.img-next');
+            
+            idx = (idx + 1) % authImgData.length;
+            imgNext.src = authImgData[idx];
+            
+            setTimeout(() => {
+                imgNext.classList.remove('fade-out');
+                imgActive.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    imgNext.classList.remove('img-next');
+                    imgNext.classList.add('img-active');
+                    imgActive.classList.remove('img-active');
+                    imgActive.classList.add('img-next');
+                }, 2000);
+            }, 50);
+        }, 5000);
+    </script>
 </body>
 </html>

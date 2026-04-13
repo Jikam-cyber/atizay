@@ -10,37 +10,42 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg-sidebar: #f5f5f5;
-            --bg-main: #ffffff;
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #f9f9f9;
             --text-main: #1a1a1a;
-            --text-muted: #888888;
-            --border-color: #eeeeee;
-            --radius-card: 16px;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+            --radius-pill: 50px;
+            --radius-card: 12px;
+            --primary-color: #111111;
         }
 
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-main);
+            background-color: var(--bg-light);
             display: flex;
             min-height: 100vh;
             color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Sidebar */
         aside {
             width: 280px;
-            background-color: var(--bg-sidebar);
+            background-color: var(--white);
             display: flex;
             flex-direction: column;
             padding: 40px 24px;
-            border-right: 1px solid var(--border-color);
+            border-right: 1px solid var(--border);
             position: fixed;
             height: 100vh;
+            z-index: 100;
         }
 
         .brand { margin-bottom: 40px; }
-        .brand h1 { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; }
-        .brand p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .brand h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: var(--black); text-transform: uppercase; }
+        .brand p { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
 
         .nav-group { margin-bottom: 32px; }
         .nav-label { 
@@ -50,6 +55,7 @@
             color: var(--text-muted); 
             margin-bottom: 16px;
             letter-spacing: 1px;
+            padding-left: 12px;
         }
 
         .nav-link {
@@ -58,28 +64,32 @@
             gap: 12px;
             padding: 12px 16px;
             text-decoration: none;
-            color: var(--text-main);
+            color: var(--text-muted);
             font-size: 14px;
             font-weight: 500;
-            border-radius: 12px;
+            border-radius: 8px;
             margin-bottom: 4px;
             transition: all 0.2s;
         }
 
         .nav-link i { width: 20px; text-align: center; font-size: 16px; }
-        .nav-link.active { background-color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-weight: 600; }
+        .nav-link:hover { color: var(--black); background: var(--bg-light); }
+        .nav-link.active { background-color: var(--black); color: var(--white); box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: 600; }
 
         .logout-link {
             margin-top: auto;
-            color: #e74c3c;
+            color: #d93025;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 12px;
-            padding-left: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: background 0.2s;
         }
+        .logout-link:hover { background: #fce8e6; }
 
         /* Sections visibility */
         .content-section {
@@ -103,11 +113,12 @@
         .page-header p { color: var(--text-muted); font-size: 14px; }
 
         .salon-info-card {
-            background: white;
-            border: 1px solid var(--border-color);
+            background: var(--white);
+            border: 1px solid var(--border);
             border-radius: var(--radius-card);
-            padding: 32px;
+            padding: 40px;
             margin-bottom: 32px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
         }
 
         .salon-info-header {
@@ -124,9 +135,10 @@
         }
 
         .salon-type {
-            background: #f5f5f5;
-            padding: 4px 12px;
-            border-radius: 12px;
+            background: var(--black);
+            color: var(--white);
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
             font-size: 12px;
             font-weight: 600;
         }
@@ -158,8 +170,8 @@
         }
 
         .management-card {
-            background: white;
-            border: 1px solid var(--border-color);
+            background: var(--white);
+            border: 1px solid var(--border);
             border-radius: var(--radius-card);
             padding: 32px;
             display: flex;
@@ -170,31 +182,31 @@
         .management-icon {
             width: 48px;
             height: 48px;
-            background: #f5f5f5;
+            background: var(--bg-light);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            color: black;
+            color: var(--black);
         }
 
         .management-info h3 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
             margin-bottom: 8px;
         }
 
         .management-info p {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-muted);
             margin-bottom: 16px;
         }
 
         .btn-action {
-            padding: 10px 20px;
-            background: black;
-            color: white;
+            padding: 12px 24px;
+            background: var(--black);
+            color: var(--white);
             border: none;
             border-radius: 8px;
             font-size: 14px;
@@ -244,9 +256,6 @@
         <a href="#" onclick="showSection('prestation')" class="nav-link" id="nav-prestation">
             <i class="fa-solid fa-scissors"></i> <span>Prestation</span>
         </a>
-        <a href="#" onclick="showSection('services')" class="nav-link" id="nav-services">
-            <i class="fa-solid fa-list"></i> <span>Services</span>
-        </a>
         <a href="#" onclick="showSection('rendez-vous')" class="nav-link" id="nav-rendez-vous">
             <i class="fa-solid fa-calendar"></i> <span>Rendez-vous</span>
         </a>
@@ -271,122 +280,242 @@
 
     <!-- Section Profil -->
     <section id="profil" class="content-section active">
-        <div class="page-header">
-            <h1>Profil du salon</h1>
-            <p>Vue client et modification des informations</p>
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h1>Profil du salon</h1>
+                <p>Gérez l'identité visuelle et les informations de votre établissement</p>
+            </div>
+            <div>
+                <button type="submit" form="profilForm" class="btn-action" style="padding: 12px 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">Enregistrer les modifications</button>
+            </div>
         </div>
 
-        <div class="salon-info-card">
-            <div class="salon-info-header">
-                <div>
-                    <div class="salon-name" th:text="${salon.nomSalon}">Nom du salon</div>
-                    <span class="salon-type" th:text="${salon.typeSalon}">Type</span>
-                </div>
-            </div>
+        <form id="profilForm" th:action="@{/proprietaire/salon/{id}/profil/modifier(id=${salon.idSalon})}" method="post" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; align-items: start;">
+                <!-- Colonne principale (Identité & Galerie) -->
+                <div style="display: flex; flex-direction: column; gap: 32px;">
+                    <!-- Section Identité -->
+                    <div class="salon-info-card" style="padding: 32px; margin-bottom: 0;">
+                        <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">Identité de l'établissement</h3>
+                        
+                        <div style="display: flex; gap: 32px; margin-bottom: 28px;">
+                            <div style="flex: 1;">
+                                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Nom du salon</label>
+                                <div th:text="${salon.nomSalon}" style="font-size: 22px; font-weight: 800; color: var(--black);">Nom</div>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Spécialité</label>
+                                <span class="salon-type" th:text="${salon.typeSalon}" style="display: inline-block;">Type</span>
+                            </div>
+                        </div>
 
-            <div class="salon-details">
-                <div class="detail-item">
-                    <label>Adresse</label>
-                    <p th:text="${salon.adresseSalon}">Adresse</p>
-                </div>
-                <div class="detail-item">
-                    <label>Ville</label>
-                    <p th:text="${salon.villeSalon}">Ville</p>
-                </div>
-                <div class="detail-item">
-                    <label>Département</label>
-                    <p th:text="${salon.departement}">Département</p>
-                </div>
-                <div class="detail-item">
-                    <label>Téléphone</label>
-                    <p th:text="${salon.telephoneSalon}">Téléphone</p>
-                </div>
-            </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px;">Description pour les clients</label>
+                            <textarea name="descriptionSalon" th:text="${salon.descriptionSalon}" placeholder="Décrivez l'ambiance, votre expertise, et ce qui rend votre salon unique..." style="width: 100%; padding: 20px; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; font-family: 'Inter', sans-serif; min-height: 140px; resize: vertical; line-height: 1.6; outline: none; transition: all 0.2s; background: var(--bg-light);" onfocus="this.style.borderColor='var(--black)'; this.style.background='var(--white)'" onblur="this.style.borderColor='var(--border)'; this.style.background='var(--bg-light)'"></textarea>
+                        </div>
+                    </div>
 
-            <form th:action="@{/proprietaire/salon/{id}/profil/modifier(id=${salon.idSalon})}" method="post" enctype="multipart/form-data">
-                <div class="form-group" style="margin-top: 24px;">
-                    <label>Description</label>
-                    <textarea name="descriptionSalon" th:text="${salon.descriptionSalon}" placeholder="Description du salon..." style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; min-height: 100px; resize: vertical;"></textarea>
-                </div>
+                    <!-- Section Galerie -->
+                    <div class="salon-info-card" style="padding: 32px; margin-bottom: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+                            <h3 style="font-size: 17px; font-weight: 700;">Galerie du salon</h3>
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); background: var(--bg-light); padding: 4px 12px; border-radius: 20px;"><span th:text="${salon.listeMedias != null ? salon.listeMedias.size() : 0}">0</span>/15 photos</span>
+                        </div>
 
-                <div class="form-group" style="margin-top: 24px;">
-                    <label>Photos du salon (Max 15)</label>
-                    <input type="file" name="photos" multiple accept="image/*" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
-                </div>
+                        <!-- Dropzone Custom -->
+                        <div style="position: relative; border: 2px dashed #d1d5db; border-radius: 16px; padding: 48px 24px; text-align: center; background: #f9fafb; cursor: pointer; transition: all 0.2s; margin-bottom: 32px;" onclick="document.getElementById('fileUpload').click()" onmouseover="this.style.borderColor='var(--black)'; this.style.background='var(--white)'" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='#f9fafb'">
+                            <input type="file" id="fileUpload" name="photos" multiple accept="image/*" style="display: none;" onchange="document.getElementById('uploadMessage').innerHTML = '<span style=\'color: var(--black); font-weight: 600;\'>' + this.files.length + ' fichier(s) sélectionné(s)</span>'">
+                            <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+                                <i class="fa-solid fa-camera" style="font-size: 24px; color: var(--black);"></i>
+                            </div>
+                            <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Ajouter des photos</h4>
+                            <p id="uploadMessage" style="font-size: 14px; color: var(--text-muted); font-weight: 500;">Glissez-déposez ou cliquez ici (Max 15)</p>
+                        </div>
 
-                <!-- Galerie de photos existantes -->
-                <div th:if="${salon.listeMedias != null and !salon.listeMedias.isEmpty()}" style="margin-top: 32px;">
-                    <label>Photos actuelles (<span th:text="${salon.listeMedias.size()}">0</span>/15)</label>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-top: 16px;">
-                        <div th:each="media : ${salon.listeMedias}" style="position: relative;">
-                            <img th:src="@{/uploads/salons/{filename}(filename=${media.urlMedia})}"
-                                 th:alt="${media.urlMedia}"
-                                 style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);"
-                                 onerror="this.src='https://via.placeholder.com/150?text=Image+non+disponible';">
-                            <a th:href="@{/proprietaire/salon/{id}/photo/supprimer/{idMedia}(id=${salon.idSalon}, idMedia=${media.idMediaSalon})}"
-                               onclick="return confirm('Voulez-vous vraiment supprimer cette photo ?');"
-                               style="position: absolute; top: 8px; right: 8px; background: rgba(244, 67, 54, 0.9); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; font-size: 14px;">
-                                <i class="fa-solid fa-times"></i>
-                            </a>
+                        <!-- Galerie existante -->
+                        <div th:if="${salon.listeMedias != null and !salon.listeMedias.isEmpty()}">
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 150px; gap: 16px;">
+                                <div th:each="media, iterStat : ${salon.listeMedias}" 
+                                     th:style="${iterStat.index == 0 ? 'grid-column: span 2; grid-row: span 2; position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid var(--border);' : 'position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--border);'}">
+                                    <img th:src="@{/uploads/salons/{filename}(filename=${media.urlMedia})}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                    <a th:href="@{/proprietaire/salon/{id}/photo/supprimer/{idMedia}(id=${salon.idSalon}, idMedia=${media.idMediaSalon})}"
+                                       onclick="return confirm('Voulez-vous vraiment supprimer cette photo ?');"
+                                       title="Supprimer"
+                                       style="position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95); color: #dc3545; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.2s; z-index: 10;" onmouseover="this.style.background='#dc3545'; this.style.color='white'" onmouseout="this.style.background='rgba(255, 255, 255, 0.95)'; this.style.color='#dc3545'">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-action" style="margin-top: 24px;">Enregistrer les modifications</button>
-            </form>
-        </div>
+                <!-- Colonne latérale (Contact & Localisation) -->
+                <div>
+                    <div class="salon-info-card" style="padding: 32px; position: sticky; top: 40px; margin-bottom: 0;">
+                        <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">Contact & Accès</h3>
+                        
+                        <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px;">
+                            <div style="width: 44px; height: 44px; border-radius: 12px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: var(--black); flex-shrink: 0;">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Téléphone</label>
+                                <div th:text="${salon.telephoneSalon}" style="font-size: 15px; font-weight: 600; color: var(--black);">Tel</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px;">
+                            <div style="width: 44px; height: 44px; border-radius: 12px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: var(--black); flex-shrink: 0;">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Adresse</label>
+                                <div th:text="${salon.adresseSalon}" style="font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--black);">Adresse</div>
+                                <div style="font-size: 14px; color: var(--text-muted);" th:text="${salon.villeSalon + ', ' + salon.departement}">Ville, Dép</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 16px; padding-top: 24px; border-top: 1px solid var(--border);">
+                            <div style="width: 44px; height: 44px; border-radius: 12px; background: #fffbeb; display: flex; align-items: center; justify-content: center; color: #fbbf24; flex-shrink: 0;">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Note Globale</label>
+                                <div style="font-size: 22px; font-weight: 800; color: var(--black);" th:text="${salon.noteMoyenne != null ? salon.noteMoyenne : '0.0'} + '/5'">0.0/5</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
     </section>
 
     <!-- Section Horaire -->
     <section id="horaire" class="content-section">
         <div class="page-header">
             <h1>Horaires d'ouverture</h1>
-            <p>Modifiez et enregistrez vos horaires</p>
+            <p>Modifiez les horaires de chaque jour indépendamment</p>
         </div>
 
         <div class="salon-info-card">
             <form th:action="@{/proprietaire/salon/{id}/horaire/modifier(id=${salon.idSalon})}" method="post">
-                <div class="form-group">
-                    <label>Heure d'ouverture</label>
-                    <input type="time" name="heureOuverture" value="08:00" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>Lundi</label>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input type="time" name="lundi_ouverture" 
+                               th:value="${horaireLundi != null ? horaireLundi.heureOuverture : '08:00'}" 
+                               value="08:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <span>à</span>
+                        <input type="time" name="lundi_fermeture" 
+                               th:value="${horaireLundi != null ? horaireLundi.heureFermeture : '18:00'}" 
+                               value="18:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <input type="checkbox" name="lundi_ferme" value="true" 
+                               th:checked="${horaireLundi != null && !horaireLundi.estOuvert}" 
+                               style="width: 20px; height: 20px;">
+                        <span>Fermé</span>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Heure de fermeture</label>
-                    <input type="time" name="heureFermeture" value="18:00" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>Mardi</label>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input type="time" name="mardi_ouverture" 
+                               th:value="${horaireMardi != null ? horaireMardi.heureOuverture : '08:00'}" 
+                               value="08:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <span>à</span>
+                        <input type="time" name="mardi_fermeture" 
+                               th:value="${horaireMardi != null ? horaireMardi.heureFermeture : '18:00'}" 
+                               value="18:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <input type="checkbox" name="mardi_ferme" value="true" 
+                               th:checked="${horaireMardi != null && !horaireMardi.estOuvert}" 
+                               style="width: 20px; height: 20px;">
+                        <span>Fermé</span>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Jours d'ouverture</label>
-                    <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            <input type="checkbox" name="joursOuverture" value="Lundi" checked>
-                            <span>Lundi</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            <input type="checkbox" name="joursOuverture" value="Mardi" checked>
-                            <span>Mardi</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            <input type="checkbox" name="joursOuverture" value="Mercredi" checked>
-                            <span>Mercredi</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            <input type="checkbox" name="joursOuverture" value="Jeudi" checked>
-                            <span>Jeudi</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            <input type="checkbox" name="joursOuverture" value="Vendredi" checked>
-                            <span>Vendredi</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            <input type="checkbox" name="joursOuverture" value="Samedi" checked>
-                            <span>Samedi</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            <input type="checkbox" name="joursOuverture" value="Dimanche">
-                            <span>Dimanche</span>
-                        </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>Mercredi</label>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input type="time" name="mercredi_ouverture" 
+                               th:value="${horaireMercredi != null ? horaireMercredi.heureOuverture : '08:00'}" 
+                               value="08:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <span>à</span>
+                        <input type="time" name="mercredi_fermeture" 
+                               th:value="${horaireMercredi != null ? horaireMercredi.heureFermeture : '18:00'}" 
+                               value="18:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <input type="checkbox" name="mercredi_ferme" value="true" 
+                               th:checked="${horaireMercredi != null && !horaireMercredi.estOuvert}" 
+                               style="width: 20px; height: 20px;">
+                        <span>Fermé</span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>Jeudi</label>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input type="time" name="jeudi_ouverture" 
+                               th:value="${horaireJeudi != null ? horaireJeudi.heureOuverture : '08:00'}" 
+                               value="08:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <span>à</span>
+                        <input type="time" name="jeudi_fermeture" 
+                               th:value="${horaireJeudi != null ? horaireJeudi.heureFermeture : '18:00'}" 
+                               value="18:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <input type="checkbox" name="jeudi_ferme" value="true" 
+                               th:checked="${horaireJeudi != null && !horaireJeudi.estOuvert}" 
+                               style="width: 20px; height: 20px;">
+                        <span>Fermé</span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>Vendredi</label>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input type="time" name="vendredi_ouverture" 
+                               th:value="${horaireVendredi != null ? horaireVendredi.heureOuverture : '08:00'}" 
+                               value="08:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <span>à</span>
+                        <input type="time" name="vendredi_fermeture" 
+                               th:value="${horaireVendredi != null ? horaireVendredi.heureFermeture : '18:00'}" 
+                               value="18:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <input type="checkbox" name="vendredi_ferme" value="true" 
+                               th:checked="${horaireVendredi != null && !horaireVendredi.estOuvert}" 
+                               style="width: 20px; height: 20px;">
+                        <span>Fermé</span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>Samedi</label>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input type="time" name="samedi_ouverture" 
+                               th:value="${horaireSamedi != null ? horaireSamedi.heureOuverture : '08:00'}" 
+                               value="08:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <span>à</span>
+                        <input type="time" name="samedi_fermeture" 
+                               th:value="${horaireSamedi != null ? horaireSamedi.heureFermeture : '18:00'}" 
+                               value="18:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <input type="checkbox" name="samedi_ferme" value="true" 
+                               th:checked="${horaireSamedi != null && !horaireSamedi.estOuvert}" 
+                               style="width: 20px; height: 20px;">
+                        <span>Fermé</span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>Dimanche</label>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input type="time" name="dimanche_ouverture" 
+                               th:value="${horaireDimanche != null ? horaireDimanche.heureOuverture : '08:00'}" 
+                               value="08:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <span>à</span>
+                        <input type="time" name="dimanche_fermeture" 
+                               th:value="${horaireDimanche != null ? horaireDimanche.heureFermeture : '18:00'}" 
+                               value="18:00" style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <input type="checkbox" name="dimanche_ferme" value="true" 
+                               th:checked="${horaireDimanche != null && !horaireDimanche.estOuvert}" 
+                               checked style="width: 20px; height: 20px;">
+                        <span>Fermé</span>
                     </div>
                 </div>
 
@@ -397,104 +526,179 @@
 
     <!-- Section Prestation -->
     <section id="prestation" class="content-section">
-        <div class="page-header">
-            <h1>Prestations</h1>
-            <p>Gérez vos prestations</p>
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h1>Catalogue de prestations</h1>
+                <p>Gérez vos services, durée et tarifs professionnels (<span th:text="${salon.listePrestations != null ? salon.listePrestations.size() : 0}">0</span>/50 max)</p>
+            </div>
+            <div>
+                <button class="btn-action" onclick="document.getElementById('add-prestation-form').style.display='block'" style="padding: 12px 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">+ Nouvelle Prestation</button>
+            </div>
         </div>
 
-        <div class="salon-info-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h3>Liste des prestations</h3>
-                <button class="btn-action" onclick="showAddPrestationForm()">+ Ajouter une prestation</button>
-            </div>
-
-            <!-- Formulaire d'ajout de prestation (caché par défaut) -->
-            <div id="add-prestation-form" style="display: none; margin-bottom: 24px; padding: 24px; background: #f9f9f9; border-radius: 12px;">
-                <form th:action="@{/proprietaire/salon/{id}/prestation/ajouter(id=${salon.idSalon})}" method="post">
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>Nom de la prestation</label>
-                        <input type="text" name="nomPrestation" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>Description</label>
-                        <textarea name="descriptionPrestation" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; min-height: 80px; resize: vertical;"></textarea>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
-                        <div class="form-group">
-                            <label>Catégorie</label>
-                            <select name="categorie" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
-                                <option value="Coupe">Coupe</option>
-                                <option value="Barbe">Barbe</option>
-                                <option value="Coloration">Coloration</option>
-                                <option value="Soins">Soins</option>
-                                <option value="Autre">Autre</option>
-                            </select>
+        <div class="salon-info-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+            
+            <!-- Formulaire d'ajout de prestation -->
+            <div id="add-prestation-form" style="display: none; margin-bottom: 40px; border: 1px solid var(--border); padding: 32px; background: var(--white); border-radius: 16px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <button type="button" onclick="document.getElementById('add-prestation-form').style.display='none'" style="position: absolute; top: 24px; right: 24px; background: var(--bg-light); border: none; font-size: 16px; width: 32px; height: 32px; border-radius: 50%; color: var(--text-main); cursor: pointer;"><i class="fa-solid fa-times"></i></button>
+                <h4 style="font-size: 18px; font-weight: 800; margin-bottom: 24px;">Créer une prestation</h4>
+                
+                <form th:action="@{/proprietaire/salon/{id}/prestation/ajouter(id=${salon.idSalon})}" method="post" enctype="multipart/form-data">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px;">
+                        <div>
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Nom du service *</label>
+                                <input type="text" name="nomPrestation" required style="width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--black)'" onblur="this.style.borderColor='var(--border)'">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Description pour les clients (Optionnel)</label>
+                                <textarea name="descriptionPrestation" style="width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; height: 100px; resize: none; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="Détails de la prestation..." onfocus="this.style.borderColor='var(--black)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+                                <div class="form-group">
+                                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Catégorie *</label>
+                                    <select name="categorie" required style="width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--white);">
+                                        <option value="Coupe">Coupe</option>
+                                        <option value="Barbe">Barbe</option>
+                                        <option value="Coloration">Coloration</option>
+                                        <option value="Soins">Soins</option>
+                                        <option value="Autre">Autre</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Durée (Min) *</label>
+                                    <input type="number" name="dureeMinutes" required min="5" placeholder="30" style="width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--black)'" onblur="this.style.borderColor='var(--border)'">
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Prix (HTG) *</label>
+                                    <input type="number" name="prix" required min="0" step="0.01" placeholder="0.00" style="width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--black)'" onblur="this.style.borderColor='var(--border)'">
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn-action">Créer la prestation</button>
                         </div>
-                        <div class="form-group">
-                            <label>Durée (minutes)</label>
-                            <input type="number" name="dureeMinutes" required min="5" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Photos d'illustration (Max 5)</label>
+                            <div style="border: 2px dashed #d1d5db; border-radius: 12px; padding: 40px 20px; text-align: center; background: #f9fafb; cursor: pointer; transition: all 0.2s; height: calc(100% - 28px); display: flex; flex-direction: column; justify-content: center; align-items: center;" onclick="document.getElementById('addPrestaPhotos').click()" onmouseover="this.style.borderColor='var(--black)'; this.style.background='var(--white)'" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='#f9fafb'">
+                                <input type="file" id="addPrestaPhotos" name="photos" multiple accept="image/*" style="display: none;" onchange="document.getElementById('addPrestaMsg').innerHTML = '<span style=\'color: var(--black); font-weight: 600;\'>' + this.files.length + ' photo(s) prêtes</span>'">
+                                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+                                    <i class="fa-solid fa-camera" style="font-size: 18px; color: var(--black);"></i>
+                                </div>
+                                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 4px;">Ajouter des photos</h4>
+                                <p id="addPrestaMsg" style="font-size: 12px; color: var(--text-muted);">Format JPG/PNG</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>Prix (HTG)</label>
-                        <input type="number" name="prix" required min="0" step="0.01" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
-                    </div>
-                    <div style="display: flex; gap: 12px;">
-                        <button type="submit" class="btn-action">Ajouter</button>
-                        <button type="button" class="btn-action" onclick="hideAddPrestationForm()" style="background: var(--border-color); color: var(--text-main);">Annuler</button>
                     </div>
                 </form>
             </div>
 
-            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-                <p>Aucune prestation pour le moment</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section Services -->
-    <section id="services" class="content-section">
-        <div class="page-header">
-            <h1>Services</h1>
-            <p>Gérez vos services</p>
-        </div>
-
-        <div class="salon-info-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h3>Liste des services</h3>
-                <button class="btn-action" onclick="showAddServiceForm()">+ Ajouter un service</button>
-            </div>
-
-            <!-- Formulaire d'ajout de service (caché par défaut) -->
-            <div id="add-service-form" style="display: none; margin-bottom: 24px; padding: 24px; background: #f9f9f9; border-radius: 12px;">
-                <form th:action="@{/proprietaire/salon/{id}/service/ajouter(id=${salon.idSalon})}" method="post">
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>Nom du service</label>
-                        <input type="text" name="nomService" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>Description</label>
-                        <textarea name="descriptionService" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; min-height: 80px; resize: vertical;"></textarea>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
-                        <div class="form-group">
-                            <label>Durée (minutes)</label>
-                            <input type="number" name="dureeMinutes" required min="5" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <!-- Liste des prestations -->
+            <div th:if="${salon.listePrestations != null && !salon.listePrestations.isEmpty()}" style="display: flex; flex-direction: column; gap: 16px;">
+                <div th:each="prestation : ${salon.listePrestations}" style="background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                    
+                    <!-- Ligne Vue -->
+                    <div th:id="'view-presta-' + ${prestation.idPrestation}" style="display: flex; align-items: stretch; justify-content: space-between; padding: 20px;">
+                        <div style="display: flex; gap: 24px; align-items: center;">
+                            <!-- Aperçu Photo -->
+                            <div style="width: 80px; height: 80px; border-radius: 8px; background: var(--bg-light); border: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                <img th:if="${prestation.medias != null && !prestation.medias.isEmpty()}" th:src="@{/uploads/salons/{filename}(filename=${prestation.medias[0].urlMedia})}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <i th:unless="${prestation.medias != null && !prestation.medias.isEmpty()}" class="fa-solid fa-scissors" style="font-size: 24px; color: #ccc;"></i>
+                            </div>
+                            
+                            <!-- Infos -->
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+                                    <h4 th:text="${prestation.nomPrestation}" style="margin: 0; font-size: 18px; font-weight: 700; color: var(--black);">Nom prestation</h4>
+                                    <span th:text="${prestation.categorie}" style="padding: 4px 10px; background: var(--bg-light); color: var(--text-muted); border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">Catégorie</span>
+                                </div>
+                                <p th:text="${prestation.descriptionPrestation}" style="margin: 0 0 12px 0; font-size: 14px; color: var(--text-muted); max-width: 600px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Description</p>
+                                <div style="display: flex; gap: 24px;">
+                                    <div style="font-size: 14px; font-weight: 600; color: var(--black);"><i class="fa-regular fa-clock" style="color: var(--text-muted); margin-right: 6px;"></i><span th:text="${prestation.dureeMinutes + ' min'}">30 min</span></div>
+                                    <div style="font-size: 14px; font-weight: 800; color: var(--primary-color);"><span th:text="${prestation.prix + ' HTG'}">0 HTG</span></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Prix (HTG)</label>
-                            <input type="number" name="prix" required min="0" step="0.01" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        
+                        <div style="display: flex; align-items: flex-start; gap: 8px;">
+                            <button th:onclick="'document.getElementById(\'view-presta-' + ${prestation.idPrestation} + '\').style.display=\'none\'; document.getElementById(\'edit-presta-' + ${prestation.idPrestation} + '\').style.display=\'block\';'" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--white); color: var(--black); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="Modifier" onmouseover="this.style.background='var(--bg-light)'" onmouseout="this.style.background='var(--white)'"><i class="fa-solid fa-pen"></i></button>
+                            <a th:href="@{/proprietaire/salon/{id}/prestation/supprimer/{idp}(id=${salon.idSalon}, idp=${prestation.idPrestation})}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette prestation ?');" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid #fecaca; background: #fef2f2; color: #dc3545; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: all 0.2s;" title="Supprimer" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fef2f2'"><i class="fa-solid fa-trash"></i></a>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 12px;">
-                        <button type="submit" class="btn-action">Ajouter</button>
-                        <button type="button" class="btn-action" onclick="hideAddServiceForm()" style="background: var(--border-color); color: var(--text-main);">Annuler</button>
+                    
+                    <!-- Ligne Edition -->
+                    <div th:id="'edit-presta-' + ${prestation.idPrestation}" style="display: none; padding: 32px; background: #f9fafb; border-top: 1px solid var(--border);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                            <h4 style="font-size: 16px; font-weight: 700;">Modifier la prestation</h4>
+                            <button type="button" th:onclick="'document.getElementById(\'view-presta-' + ${prestation.idPrestation} + '\').style.display=\'flex\'; document.getElementById(\'edit-presta-' + ${prestation.idPrestation} + '\').style.display=\'none\';'" style="background: none; border: none; font-size: 16px; color: var(--text-muted); cursor: pointer;"><i class="fa-solid fa-times"></i></button>
+                        </div>
+                        
+                        <form th:action="@{/proprietaire/salon/{id}/prestation/modifier(id=${salon.idSalon})}" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="idPrestation" th:value="${prestation.idPrestation}">
+                            
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px;">
+                                <div>
+                                    <div class="form-group" style="margin-bottom: 16px;">
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Nom</label>
+                                        <input type="text" name="nomPrestation" th:value="${prestation.nomPrestation}" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 16px;">
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Description</label>
+                                        <textarea name="descriptionPrestation" th:text="${prestation.descriptionPrestation}" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; min-height: 80px; resize: none;"></textarea>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+                                        <div class="form-group">
+                                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Catégorie</label>
+                                            <select name="categorie" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                                <option th:selected="${prestation.categorie == 'Coupe'}" value="Coupe">Coupe</option>
+                                                <option th:selected="${prestation.categorie == 'Barbe'}" value="Barbe">Barbe</option>
+                                                <option th:selected="${prestation.categorie == 'Coloration'}" value="Coloration">Coloration</option>
+                                                <option th:selected="${prestation.categorie == 'Soins'}" value="Soins">Soins</option>
+                                                <option th:selected="${prestation.categorie == 'Autre'}" value="Autre">Autre</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Durée (Min)</label>
+                                            <input type="number" name="dureeMinutes" th:value="${prestation.dureeMinutes}" required min="5" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                        </div>
+                                        <div class="form-group">
+                                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Prix (HTG)</label>
+                                            <input type="number" name="prix" th:value="${prestation.prix}" required min="0" step="0.01" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn-action">Mettre à jour la prestation</button>
+                                </div>
+                                
+                                <div>
+                                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Photos d'illustration (<span th:text="${prestation.medias != null ? prestation.medias.size() : 0}">0</span>/5)</label>
+                                    <div style="border: 2px dashed #d1d5db; border-radius: 8px; padding: 20px 16px; text-align: center; background: var(--white); cursor: pointer; margin-bottom: 16px;" th:onclick="'document.getElementById(\'editPrestaPhotos-' + ${prestation.idPrestation} + '\').click()'">
+                                        <input type="file" th:id="'editPrestaPhotos-' + ${prestation.idPrestation}" name="photos" multiple accept="image/*" style="display: none;" th:onchange="'document.getElementById(\'editPrestaMsg-' + ${prestation.idPrestation} + '\').innerHTML = \'<b>\' + this.files.length + \' photo(s)</b>\''">
+                                        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 20px; color: var(--text-muted); margin-bottom: 8px;"></i>
+                                        <p th:id="'editPrestaMsg-' + ${prestation.idPrestation}" style="font-size: 12px; color: var(--text-muted); margin: 0;">Ajouter des photos</p>
+                                    </div>
+                                    
+                                    <div th:if="${prestation.medias != null && !prestation.medias.isEmpty()}" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                                        <div th:each="media : ${prestation.medias}" style="position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 1px solid var(--border);">
+                                            <img th:src="@{/uploads/salons/{filename}(filename=${media.urlMedia})}" style="width: 100%; height: 100%; object-fit: cover;">
+                                            <a th:href="@{/proprietaire/salon/{id}/prestation/{idp}/photo/supprimer/{idm}(id=${salon.idSalon}, idp=${prestation.idPrestation}, idm=${media.idMedia})}" onclick="return confirm('Confirmer la suppression de cette photo ?');" style="position: absolute; top: 4px; right: 4px; background: rgba(255,255,255,0.95); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #dc3545; font-size: 11px; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.15);"><i class="fa-solid fa-times"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                </form>
+                </div>
             </div>
 
-            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-                <p>Aucun service pour le moment</p>
+            <!-- Empty State -->
+            <div th:if="${salon.listePrestations == null || salon.listePrestations.isEmpty()}" style="text-align: center; padding: 60px 20px; border-radius: 12px; border: 1px dashed var(--border); background: var(--white); margin-top: 24px;">
+                <div style="width: 64px; height: 64px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    <i class="fa-solid fa-scissors" style="font-size: 24px; color: var(--text-muted);"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Aucune prestation</h3>
+                <p style="color: var(--text-muted); font-size: 14px; max-width: 300px; margin: 0 auto;">Commencez à proposer vos services en ajoutant votre première prestation.</p>
             </div>
         </div>
     </section>
@@ -508,12 +712,35 @@
 
         <div class="salon-info-card">
             <div style="display: flex; gap: 16px; margin-bottom: 24px;">
-                <a th:href="@{/proprietaire/salon/{id}/rendez-vous(id=${salon.idSalon}, filtre='jour')}" class="btn-action" style="background: var(--border-color); color: var(--text-main); text-decoration: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; display: inline-block;">Jour</a>
-                <a th:href="@{/proprietaire/salon/{id}/rendez-vous(id=${salon.idSalon}, filtre='semaine')}" class="btn-action" style="background: var(--border-color); color: var(--text-main); text-decoration: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; display: inline-block;">Semaine</a>
-                <a th:href="@{/proprietaire/salon/{id}/rendez-vous(id=${salon.idSalon}, filtre='mois')}" class="btn-action" style="text-decoration: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; display: inline-block;">Mois</a>
+                <button class="btn-action" onclick="filterRendezVous('tout')" style="background: var(--primary-color); color: white; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;">Tout</button>
+                <button class="btn-action" onclick="filterRendezVous('jour')" style="background: var(--border-color); color: var(--text-main); padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;">Jour</button>
+                <button class="btn-action" onclick="filterRendezVous('semaine')" style="background: var(--border-color); color: var(--text-main); padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;">Semaine</button>
+                <button class="btn-action" onclick="filterRendezVous('mois')" style="background: var(--border-color); color: var(--text-main); padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;">Mois</button>
             </div>
 
-            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+            <div th:if="${salon.listeRendezVous != null && !salon.listeRendezVous.isEmpty()}" style="display: flex; flex-direction: column; gap: 16px;">
+                <div th:each="rdv : ${salon.listeRendezVous}" class="rendezvous-card" 
+                     th:data-date="${#temporals.format(rdv.dateRendezVous, 'yyyy-MM-dd HH:mm:ss')}"
+                     style="padding: 20px; background: #f9f9f9; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 48px; height: 48px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 18px;">
+                                <span th:text="${rdv.client != null ? rdv.client.prenom.substring(0, 1).toUpperCase() + rdv.client.nom.substring(0, 1).toUpperCase() : 'NA'}">NA</span>
+                            </div>
+                            <div>
+                                <h4 th:text="${rdv.client != null ? rdv.client.prenom + ' ' + rdv.client.nom : 'Client inconnu'}" style="margin: 0; font-size: 16px; font-weight: 600;">Nom client</h4>
+                                <p th:text="${rdv.prestation != null ? rdv.prestation.nomPrestation : 'Prestation inconnue'}" style="margin: 0; font-size: 14px; color: var(--text-muted);">Prestation</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div th:text="${#temporals.format(rdv.dateRendezVous, 'dd/MM/yyyy HH:mm')}" style="font-size: 16px; font-weight: 600; color: var(--primary-color);">Date</div>
+                            <span th:text="${rdv.statut}" style="padding: 4px 8px; background: #e8f5e9; color: #2e7d32; border-radius: 4px; font-size: 12px; font-weight: 600;">Statut</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${salon.listeRendezVous == null || salon.listeRendezVous.isEmpty()}" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
                 <p>Aucun rendez-vous pour le moment</p>
             </div>
         </div>
@@ -551,12 +778,23 @@
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
                         <div class="form-group">
-                            <label>Mot de passe</label>
-                            <input type="password" name="password" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <label>Mot de passe temporaire</label>
+                            <input type="password" name="password" required placeholder="Mot de passe temporaire (sera à changer)" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
                         </div>
                         <div class="form-group">
                             <label>Spécialité</label>
-                            <input type="text" name="specialite" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <select name="specialite" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                <option value="">Sélectionner une spécialité</option>
+                                <option value="Coiffure">Coiffure</option>
+                                <option value="Barbe">Barbe</option>
+                                <option value="Coloration">Coloration</option>
+                                <option value="Soins">Soins</option>
+                                <option value="Manucure">Manucure</option>
+                                <option value="Pédicure">Pédicure</option>
+                                <option value="Maquillage">Maquillage</option>
+                                <option value="Massage">Massage</option>
+                                <option value="Autre">Autre</option>
+                            </select>
                         </div>
                     </div>
                     <div style="display: flex; gap: 12px;">
@@ -566,7 +804,29 @@
                 </form>
             </div>
 
-            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+            <div th:if="${salon.listeEmployes != null && !salon.listeEmployes.isEmpty()}" style="display: flex; flex-direction: column; gap: 16px;">
+                <div th:each="employe : ${salon.listeEmployes}" class="employe-card" 
+                     style="padding: 20px; background: #f9f9f9; border-radius: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 48px; height: 48px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 18px;">
+                            <span th:text="${employe.prenom.substring(0, 1).toUpperCase() + employe.nom.substring(0, 1).toUpperCase()}">NA</span>
+                        </div>
+                        <div>
+                            <h4 th:text="${employe.prenom + ' ' + employe.nom}" style="margin: 0; font-size: 16px; font-weight: 600;">Nom employé</h4>
+                            <p th:text="${employe.specialite}" style="margin: 0; font-size: 14px; color: var(--text-muted);">Spécialité</p>
+                            <p th:text="${employe.email}" style="margin: 0; font-size: 13px; color: var(--text-muted);">Email</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-action" th:onclick="'modifierEmploye(' + ${employe.id} + ')'" style="padding: 8px 16px; background: var(--border-color); color: var(--text-main); border-radius: 6px; font-size: 13px; font-weight: 600;">Modifier</button>
+                        <a th:href="@{/proprietaire/salon/{id}/employe/supprimer/{idEmploye}(id=${salon.idSalon}, idEmploye=${employe.id})}" 
+                           class="btn-action" style="padding: 8px 16px; background: #dc3545; color: white; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none;"
+                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet employé ?');">Supprimer</a>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${salon.listeEmployes == null || salon.listeEmployes.isEmpty()}" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
                 <p>Aucun employé pour le moment</p>
             </div>
         </div>
@@ -610,13 +870,48 @@
         document.getElementById('add-prestation-form').style.display = 'none';
     }
 
-    function showAddServiceForm() {
-        document.getElementById('add-service-form').style.display = 'block';
+    function showEditPrestationForm(id) {
+        const card = document.querySelector(`.prestation-card[data-id="${id}"]`);
+        if (card) {
+            document.getElementById('edit-idPrestation').value = card.dataset.id;
+            document.getElementById('edit-nomPrestation').value = card.dataset.nom;
+            document.getElementById('edit-categorie').value = card.dataset.categorie;
+            document.getElementById('edit-dureeMinutes').value = card.dataset.duree;
+            document.getElementById('edit-prix').value = card.dataset.prix;
+            document.getElementById('edit-prestation-form').style.display = 'block';
+        }
     }
 
-    function hideAddServiceForm() {
-        document.getElementById('add-service-form').style.display = 'none';
+    function hideEditPrestationForm() {
+        document.getElementById('edit-prestation-form').style.display = 'none';
     }
+
+    function deletePrestation(id) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cette prestation ?')) {
+            const salonId = document.querySelector('input[name="idPrestation"]').closest('form').action.match(/\/salon\/(\d+)\//)[1];
+            window.location.href = '/proprietaire/salon/' + salonId + '/prestation/supprimer/' + id;
+        }
+    }
+
+    // Event listeners pour les cartes de prestation
+    document.addEventListener('DOMContentLoaded', function() {
+        const prestationCards = document.querySelectorAll('.prestation-card');
+        prestationCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const id = this.dataset.id;
+                showEditPrestationForm(id);
+            });
+        });
+
+        const deleteButtons = document.querySelectorAll('.delete-prestation-btn');
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const id = this.dataset.id;
+                deletePrestation(id);
+            });
+        });
+    });
 
     function showAddEmployeForm() {
         document.getElementById('add-employe-form').style.display = 'block';
@@ -624,6 +919,61 @@
 
     function hideAddEmployeForm() {
         document.getElementById('add-employe-form').style.display = 'none';
+    }
+
+    function filterRendezVous(filtre) {
+        console.log('Fonction filterRendezVous appelée avec:', filtre);
+        
+        const cards = document.querySelectorAll('.rendezvous-card');
+        console.log('Nombre de cartes trouvées:', cards.length);
+        
+        const now = new Date();
+        console.log('Date actuelle:', now);
+
+        cards.forEach((card, index) => {
+            const dateStr = card.dataset.date;
+            console.log(`Carte ${index} - dateStr:`, dateStr);
+            
+            if (!dateStr) {
+                console.log(`Carte ${index} - pas de date, affichée par défaut`);
+                card.style.display = 'block';
+                return;
+            }
+
+            const rdvDate = new Date(dateStr);
+            console.log(`Carte ${index} - rdvDate:`, rdvDate);
+            
+            let visible = false;
+
+            if (filtre === 'tout') {
+                visible = true;
+            } else if (filtre === 'jour') {
+                const rdvDateStr = rdvDate.toDateString();
+                const nowStr = now.toDateString();
+                visible = rdvDateStr === nowStr;
+                console.log(`Carte ${index} - jour: rdvDateStr=${rdvDateStr}, nowStr=${nowStr}, visible=${visible}`);
+            } else if (filtre === 'semaine') {
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - now.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
+                visible = rdvDate >= weekStart && rdvDate <= weekEnd;
+                console.log(`Carte ${index} - semaine: weekStart=${weekStart}, weekEnd=${weekEnd}, visible=${visible}`);
+            } else if (filtre === 'mois') {
+                visible = rdvDate.getMonth() === now.getMonth() && rdvDate.getFullYear() === now.getFullYear();
+                console.log(`Carte ${index} - mois: rdvMonth=${rdvDate.getMonth()}, nowMonth=${now.getMonth()}, visible=${visible}`);
+            } else {
+                visible = true;
+            }
+
+            card.style.display = visible ? 'block' : 'none';
+            console.log(`Carte ${index} - display:`, card.style.display);
+        });
+
+        const visibleCount = Array.from(cards).filter(c => c.style.display !== 'none').length;
+        console.log('Filtre appliqué:', filtre, '- Cartes visibles:', visibleCount, '/', cards.length);
     }
 </script>
 

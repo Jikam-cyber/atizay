@@ -30,6 +30,9 @@ public class Employe extends Utilisateur {
     @Column(name = "actif")
     private boolean actifEmploye = true;
     
+    @Column(name = "doit_changer_mdp")
+    private boolean doitChangerMdp = true;
+    
     // Relations avec le salon (OBLIGATOIRE)
     @ManyToOne
     @JoinColumn(name = "id_salon", nullable = false)
@@ -124,6 +127,14 @@ public class Employe extends Utilisateur {
     
     public void setActifEmploye(boolean actifEmploye) {
         this.actifEmploye = actifEmploye;
+    }
+    
+    public boolean isDoitChangerMdp() {
+        return doitChangerMdp;
+    }
+    
+    public void setDoitChangerMdp(boolean doitChangerMdp) {
+        this.doitChangerMdp = doitChangerMdp;
     }
     
     public Salon getSalon() {
