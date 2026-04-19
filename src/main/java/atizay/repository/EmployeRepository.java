@@ -37,4 +37,9 @@ public interface EmployeRepository extends JpaRepository<Employe, Long> {
      * Récupère les employés qui peuvent réaliser une prestation
      */
     List<Employe> findByServicesRealisablesContaining(atizay.model.Prestation prestation);
+
+    /**
+     * Récupère un employé par son username
+     */
+    Employe findByUsername(String username);
 }

@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Client - Atizay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         :root {
             --black: #111111;
@@ -19,317 +27,510 @@
             --radius-card: 12px;
         }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            color: var(--text-main); 
-            background: var(--white); 
-            line-height: 1.5; 
-            -webkit-font-smoothing: antialiased; 
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: var(--white);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* ── NAVIGATION ── */
         nav {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 40px; height: 72px; border-bottom: 1px solid var(--border);
-            background: var(--white); 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 72px;
+            border-bottom: 1px solid var(--border);
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
-        .logo { 
-            font-size: 22px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; 
-            text-decoration: none; color: var(--black); 
-        }
-        .nav-links { display: flex; gap: 32px; font-size: 14px; font-weight: 500; }
-        .nav-links a { text-decoration: none; color: var(--black); transition: opacity .2s; }
-        .nav-links a:hover { opacity: 0.6; }
-        
-        .nav-right { display: flex; gap: 16px; align-items: center; }
-        .btn-outline {
-            padding: 10px 18px; font-size: 13px; font-weight: 600;
-            background: transparent; color: var(--black); border: 1px solid var(--black); 
-            border-radius: 6px; cursor: pointer; transition: all .2s;
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             text-decoration: none;
+            color: var(--black);
         }
-        .btn-outline:hover { background: var(--black); color: var(--white); }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--black);
+            transition: opacity .2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.6;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
 
         .btn-solid {
-            background: var(--black); color: var(--white); padding: 10px 18px;
-            font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer;
-            text-decoration: none; transition: background .2s;
+            background: var(--black);
+            color: var(--white);
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background .2s;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #111;
+            color: var(--white);
+            padding: 80px 40px 30px;
+            margin-top: 100px;
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .footer-col h4 {
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            color: #777;
+            letter-spacing: 1px;
+        }
+
+        .footer-col a {
+            font-size: 14px;
+            color: #aaa;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 12px;
+            transition: color 0.2s;
+        }
+
+        .footer-col a:hover {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #222;
+            margin-top: 60px;
+            padding-top: 30px;
+            text-align: center;
+            color: #555;
+            font-size: 13px;
         }
 
         /* ── HERO ── */
         .hero {
-            position: relative; height: 550px; display: flex; align-items: center; justify-content: center;
+            position: relative;
+            height: 550px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: url('https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
         }
+
         .hero::after {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4); z-index: 1;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
         }
-        .hero-content { position: relative; z-index: 2; text-align: center; width: 100%; max-width: 850px; padding: 0 20px; }
-        .hero h1 { font-size: 48px; font-weight: 700; color: var(--white); margin-bottom: 40px; }
-        
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 100%;
+            max-width: 850px;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 40px;
+        }
+
         /* ── SEARCH BAR ── */
         .search-bar {
-            display: flex; align-items: center; background: var(--white);
-            border-radius: 12px; padding: 10px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
-        .search-field { flex: 1; display: flex; flex-direction: column; text-align: left; padding: 8px 24px; }
-        .search-field label { font-size: 11px; font-weight: 700; color: var(--black); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;}
-        .search-field input { border: none; outline: none; font-size: 15px; width: 100%; }
-        .search-bar .divider { width: 1px; height: 40px; background: var(--border); }
+
+        .search-field {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            padding: 8px 24px;
+        }
+
+        .search-field label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .search-field input {
+            border: none;
+            outline: none;
+            font-size: 15px;
+            width: 100%;
+        }
+
+        .search-bar .divider {
+            width: 1px;
+            height: 40px;
+            background: var(--border);
+        }
+
         .search-btn {
-            background: var(--black); border: none; color: var(--white);
-            height: 54px; padding: 0 35px; border-radius: 8px;
-            cursor: pointer; font-size: 15px; font-weight: 600;
+            background: var(--black);
+            border: none;
+            color: var(--white);
+            height: 54px;
+            padding: 0 35px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
         }
 
         /* ── SALONS GRID ── */
-        .salons-section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
-        .salons-section h2 { font-size: 32px; font-weight: 700; margin-bottom: 60px; text-align: center; }
-        .salons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-        
+        .salons-section {
+            padding: 100px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .salons-section h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .salons-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
         .salon-card {
+            position: relative;
             background: var(--white);
             border-radius: var(--radius-card);
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: transform .2s, box-shadow .2s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .3s ease;
         }
+
         .salon-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
         }
-        .salon-card img { width: 100%; height: 220px; object-fit: cover; }
-        .salon-card-content { padding: 24px; }
-        .salon-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-        .salon-card .type { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        .salon-card .address { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .salon-card .rating { font-size: 14px; color: #ffc107; margin-bottom: 16px; }
-        .salon-card a {
-            display: inline-block; padding: 10px 20px;
-            background: var(--black); color: var(--white);
-            text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 600;
-            transition: background .2s;
-        }
-        .salon-card a:hover { background: #333; }
 
-        /* ── PRESTATIONS MODAL ── */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); z-index: 2000;
-            align-items: center; justify-content: center;
+        .salon-card-image-wrapper {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
         }
-        .modal.open { display: flex; }
-        .modal-content {
-            background: var(--white); border-radius: var(--radius-card);
-            max-width: 800px; width: 90%; max-height: 80vh;
-            overflow-y: auto; padding: 40px;
+
+        .salon-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .5s ease;
         }
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+
+        .salon-card:hover img {
+            transform: scale(1.05);
         }
-        .modal-header h2 { font-size: 24px; font-weight: 700; }
-        .modal-close {
-            background: none; border: none; font-size: 28px; cursor: pointer;
-            color: var(--text-muted); transition: color .2s;
+
+        .btn-favorite {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s;
+            color: #ccc;
+            font-size: 20px;
         }
-        .modal-close:hover { color: var(--black); }
-        
-        .prestations-list { display: flex; flex-direction: column; gap: 16px; }
-        .prestation-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px; border: 1px solid var(--border);
-            border-radius: var(--radius-card); transition: border-color .2s;
+
+        .btn-favorite.active {
+            color: #ffcc00;
         }
-        .prestation-item:hover { border-color: var(--black); }
-        .prestation-info h4 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-        .prestation-info p { font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
-        .prestation-info .price { font-size: 18px; font-weight: 700; color: var(--black); }
-        .prestation-book-btn {
-            padding: 10px 20px; background: var(--black); color: var(--white);
-            border: none; border-radius: 6px; font-size: 14px; font-weight: 600;
-            cursor: pointer; transition: background .2s;
+
+        .salon-card-content {
+            padding: 24px;
         }
-        .prestation-book-btn:hover { background: #333; }
+
+        .salon-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .salon-card .type {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .salon-card .address {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .salon-card .rating {
+            font-size: 14px;
+            color: #ffc107;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-more-info {
+            display: block;
+            padding: 12px;
+            background: transparent;
+            color: var(--black);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            border: 1.5px solid var(--black);
+        }
 
         @media (max-width: 900px) {
             .salons-grid { grid-template-columns: 1fr 1fr; }
             .search-bar { flex-direction: column; }
-            .search-bar .divider { display: none; }
             .search-btn { width: 100%; margin-top: 10px; }
-        }
-        @media (max-width: 600px) {
-            .salons-grid { grid-template-columns: 1fr; }
-            nav { padding: 0 20px; }
-            .nav-links { display: none; }
         }
     </style>
 </head>
+
 <body>
 
-<nav>
-    <a href="/client/dashboard" class="logo">Atizay</a>
-    <div class="nav-links">
-        <a href="/client/dashboard">Accueil</a>
-        <a href="/client/reservations">Mes Réservations</a>
-        <a href="/client/favoris">Favoris</a>
-    </div>
-    <div class="nav-right">
-        <span th:text="${client?.prenom}" style="font-size: 14px; font-weight: 500; margin-right: 16px;"></span>
-        <a href="/auth/deconnexion" class="btn-solid">Déconnexion</a>
-    </div>
-</nav>
-
-<section class="hero">
-    <div class="hero-content">
-        <h1>Bonjour, <span th:text="${client?.prenom}">Client</span></h1>
-        <div class="search-bar">
-            <form th:action="@{/client/recherche}" method="get" style="display: flex; align-items: center; width: 100%;">
-                <div class="search-field">
-                    <label>Quoi ?</label>
-                    <input type="text" name="prestation" placeholder="Prestation, service..." list="prestations-suggestions" autocomplete="off">
-                    <datalist id="prestations-suggestions">
-                        <option value="Coiffure">
-                        <option value="Coupe">
-                        <option value="Coupe homme">
-                        <option value="Coupe femme">
-                        <option value="Barbe">
-                        <option value="Rasage">
-                        <option value="Coloration">
-                        <option value="Teinture">
-                        <option value="Mèche">
-                        <option value="Soins">
-                        <option value="Soin cheveux">
-                        <option value="Soin visage">
-                        <option value="Massage">
-                        <option value="Manucure">
-                        <option value="Pédicure">
-                        <option value="Ongles">
-                        <option value="Épilation">
-                        <option value="Maquillage">
-                        <option value="Brushing">
-                        <option value="Lissage">
-                        <option value="Permanente">
-                    </datalist>
-                </div>
-                <div class="divider"></div>
-                <div class="search-field">
-                    <label>Où ?</label>
-                    <input type="text" name="lieu" placeholder="Adresse, ville..." list="villes-suggestions" autocomplete="off">
-                    <datalist id="villes-suggestions">
-                        <option value="Port-au-Prince">
-                        <option value="Pétion-Ville">
-                        <option value="Delmas">
-                        <option value="Carrefour">
-                        <option value="Tabarre">
-                        <option value="Croix-des-Bouquets">
-                        <option value="Gressier">
-                        <option value="Cap-Haïtien">
-                        <option value="Gonaïves">
-                        <option value="Saint-Marc">
-                        <option value="Jacmel">
-                        <option value="Les Cayes">
-                        <option value="Jérémie">
-                        <option value="Hinche">
-                        <option value="Miragoâne">
-                        <option value="Petit-Goâve">
-                        <option value="Grande-Rivière-du-Nord">
-                        <option value="Ouanaminthe">
-                    </datalist>
-                </div>
-                <button type="submit" class="search-btn">Rechercher</button>
-            </form>
+    <nav>
+        <a href="/client/dashboard" class="logo">Atizay</a>
+        <div class="nav-links">
+            <a href="/client/recherche?prestation=Barber+Shop">Barber Shop</a>
+            <a href="/client/recherche?prestation=Salon+de+Beauté">Salon de Beauté</a>
+            <a href="/client/recherche?prestation=Salon+Mixte">Salon Mixte</a>
+            <a href="/client/recherche?prestation=Nails+Bar">Nails Bar</a>
+            <a href="/client/recherche?prestation=Salon+%26+Spa">Salon & Spa</a>
+            <span style="color: #eee; margin: 0 -10px;">|</span>
+            <a href="/client/reservations">Mes Réservations</a>
+            <a href="/client/favoris">Favoris</a>
         </div>
-    </div>
-</section>
+        <div class="nav-right">
+            <a href="/client/dashboard" style="text-decoration: none; color: var(--black); font-size: 14px; font-weight: 600;">
+                <i class="fa-regular fa-user" style="margin-right: 8px;"></i>
+                <span th:text="${client?.prenom}">Pierre</span>
+            </a>
+            <a href="/auth/deconnexion" class="btn-solid">Déconnexion</a>
+        </div>
+    </nav>
 
-<section class="salons-section">
-    <h2>Salons Recommandés</h2>
-    <div class="salons-grid">
-        <div class="salon-card" th:each="salon : ${salons}">
-            <img th:if="${salon.listeMedias != null and !salon.listeMedias.isEmpty()}"
-                 th:src="${salon.listeMedias[0].urlMedia.startsWith('/uploads/salons/') ? salon.listeMedias[0].urlMedia : '/uploads/salons/' + salon.listeMedias[0].urlMedia}"
-                 th:alt="${salon.nomSalon}"
-                 onerror="this.src='https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop'; console.error('Image failed to load:', this.src);">
-            <img th:if="${salon.listeMedias == null or salon.listeMedias.isEmpty()}"
-                 src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop"
-                 th:alt="${salon.nomSalon}">
-            <div class="salon-card-content">
-                <h3 th:text="${salon.nomSalon}">Nom du salon</h3>
-                <div class="type" th:text="${salon.typeSalon}">Type</div>
-                <div class="address">
-                    <span>📍</span>
-                    <span th:text="${salon.adresseSalon + ', ' + salon.villeSalon}">Adresse</span>
-                </div>
-                <div class="rating">⭐ 4.5</div>
-                <a href="#" th:onclick="'showPrestations(' + ${salon.idSalon} + ')'" class="btn-solid">Voir les prestations</a>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Bonjour, <span th:text="${client?.prenom}">Client</span></h1>
+            <div class="search-bar">
+                <form th:action="@{/client/recherche}" method="get"
+                    style="display: flex; align-items: center; width: 100%;">
+                    <div class="search-field">
+                        <label>Quoi ?</label>
+                        <input type="text" name="prestation" th:value="${quoi}" placeholder="Prestation, service..."
+                            list="prestations-suggestions" autocomplete="off">
+                        <datalist id="prestations-suggestions">
+                            <option value="Coiffure">
+                            <option value="Coupe homme">
+                            <option value="Coupe femme">
+                            <option value="Manucure">
+                        </datalist>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="search-field">
+                        <label>Où ?</label>
+                        <input type="text" name="lieu" th:value="${ou}" placeholder="Adresse, ville..." list="villes-suggestions"
+                            autocomplete="off">
+                        <datalist id="villes-suggestions">
+                            <option value="Pétion-Ville">
+                            <option value="Delmas">
+                            <option value="Cap-Haïtien">
+                        </datalist>
+                    </div>
+                    <button type="submit" class="search-btn">Rechercher</button>
+                </form>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Modal Prestations -->
-<div class="modal" id="prestationsModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="modalSalonName">Prestations du salon</h2>
-            <button class="modal-close" onclick="closeModal()">&times;</button>
+    <section id="search-results" class="salons-section">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+            <div>
+                <h2 style="margin: 0; text-align: left;">Salons Recommandés</h2>
+                <p th:if="${searchMode}" style="margin: 8px 0 0; color: var(--text-muted); font-size: 14px;">
+                    Résultats pour "<span th:text="${quoi != '' ? quoi : 'Tout'}"></span>" 
+                    <span th:if="${ou != ''}">à "<span th:text="${ou}"></span>"</span>
+                </p>
+            </div>
+            <a th:if="${searchMode}" href="/client/dashboard" style="color: var(--black); font-size: 14px; font-weight: 600; text-decoration: underline;">Voir tous les salons</a>
         </div>
-        <div class="prestations-list" id="prestationsList">
-            <!-- Les prestations seront chargées dynamiquement -->
-        </div>
-    </div>
-</div>
 
-<script>
-    function showPrestations(salonId) {
-        const modal = document.getElementById('prestationsModal');
-        const prestationsList = document.getElementById('prestationsList');
-        
-        // Charger les prestations via AJAX
-        fetch(`/client/salon/${salonId}/prestations`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('modalSalonName').textContent = data.salonName;
-                prestationsList.innerHTML = data.prestations.map(p => `
-                    <div class="prestation-item">
-                        <div class="prestation-info">
-                            <h4>${p.nom}</h4>
-                            <p>${p.description || ''}</p>
-                            <div class="price">${p.prix} HTG</div>
-                        </div>
-                        <button class="prestation-book-btn" onclick="bookPrestation(${p.id}, ${salonId})">Réserver</button>
+        <div th:if="${salons == null || #lists.isEmpty(salons)}" style="text-align: center; padding: 60px 20px;">
+            <div style="width: 80px; height: 80px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: #999;">
+                <i class="fa-solid fa-magnifying-glass" style="font-size: 32px;"></i>
+            </div>
+            <h3 style="font-size: 20px; font-weight: 700; color: var(--black); margin-bottom: 10px;">Aucun salon trouvé</h3>
+            <p style="color: var(--text-muted); font-size: 15px;">Désolé, nous n'avons trouvé aucun résultat pour votre recherche.<br>Essayez avec d'autres critères ou une autre ville.</p>
+            <a href="/client/dashboard" class="btn-outline" style="display: inline-block; margin-top: 25px;">Voir tous les salons</a>
+        </div>
+
+        <div th:if="${salons != null && !#lists.isEmpty(salons)}" class="salons-grid">
+            <div class="salon-card" th:each="salon : ${salons}">
+                <div class="salon-card-image-wrapper">
+                    <img th:if="${salon.listeMedias != null and !salon.listeMedias.isEmpty()}"
+                        th:src="${salon.listeMedias[0].urlMedia.startsWith('/uploads/salons/') ? salon.listeMedias[0].urlMedia : '/uploads/salons/' + salon.listeMedias[0].urlMedia}"
+                        th:alt="${salon.nomSalon}"
+                        onerror="this.src='https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop';">
+                    <img th:if="${salon.listeMedias == null or salon.listeMedias.isEmpty()}"
+                        src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop"
+                        th:alt="${salon.nomSalon}">
+                    <button class="btn-favorite" th:classappend="${favoriIds != null and favoriIds.contains(salon.idSalon) ? 'active' : ''}" th:onclick="'toggleFavorite(this, ' + ${salon.idSalon} + ')'">
+                        <i class="fa-solid fa-bookmark"></i>
+                    </button>
+                </div>
+                <div class="salon-card-content">
+                    <h3 th:text="${salon.nomSalon}">Nom du salon</h3>
+                    <div class="type" th:text="${salon.typeSalon}">Type</div>
+                    <div class="address">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span th:text="${salon.adresseSalon + ', ' + salon.villeSalon}">Adresse</span>
                     </div>
-                `).join('');
-                modal.classList.add('open');
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                prestationsList.innerHTML = '<p>Erreur lors du chargement des prestations.</p>';
-                modal.classList.add('open');
-            });
-    }
-    
-    function closeModal() {
-        document.getElementById('prestationsModal').classList.remove('open');
-    }
-    
-    function bookPrestation(prestationId, salonId) {
-        // Rediriger vers la page de réservation
-        window.location.href = `/client/reservation/nouvelle?salon=${salonId}&prestation=${prestationId}`;
-    }
-    
-    // Fermer le modal en cliquant à l'extérieur
-    document.getElementById('prestationsModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeModal();
-        }
-    });
-</script>
+                    <div class="rating">
+                        <i class="fa-solid fa-star"></i>
+                        <span th:text="${salon.noteMoyenne != null ? #numbers.formatDecimal(salon.noteMoyenne, 1, 1) : '0.0'}">0.0</span>
+                        <span style="color: var(--text-muted); font-size: 12px; margin-left: 8px;">(<span th:text="${salon.listeAvis != null ? salon.listeAvis.size() : 0}">0</span> avis)</span>
+                    </div>
+                    <a th:href="@{/client/salon/{id}(id=${salon.idSalon})}" class="btn-more-info">Plus d'infos</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="footer-logo">ATIZAY</div>
+                <p style="font-size: 13px; color: #888;">La plateforme numéro 1 pour la gestion et la visibilité des salons en Haïti.</p>
+            </div>
+            <div class="footer-col">
+                <h4>À propos</h4>
+                <a href="/concept">Concept</a>
+                <a href="/guide">Guide d'utilisation</a>
+                <a href="/technique">Document technique</a>
+            </div>
+            <div class="footer-col">
+                <h4>Prestations</h4>
+                <a href="/client/recherche?prestation=Coupe+homme">Coupe homme</a>
+                <a href="/client/recherche?prestation=Coupe+femme">Coupe femme</a>
+                <a href="/client/recherche?prestation=Manucure">Manucure</a>
+            </div>
+            <div class="footer-col">
+                <h4>Villes</h4>
+                <a href="/client/recherche?lieu=Pétion-Ville">Pétion-Ville</a>
+                <a href="/client/recherche?lieu=Delmas">Delmas</a>
+                <a href="/client/recherche?lieu=Cap-Haïtien">Cap-Haïtien</a>
+            </div>
+        </div>
+        <div class="footer-bottom">© Copyright Atizay 2026. Tous droits réservés.</div>
+    </footer>
+
+    <script>
+        function toggleFavorite(btn, salonId) {
+            fetch(`/client/favoris/toggle/${salonId}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => { if (data.success) btn.classList.toggle('active', data.isFavori); });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const resultsSection = document.getElementById('search-results');
+            if (resultsSection) {
+                const savedScroll = localStorage.getItem('lastSearchScroll');
+                if (savedScroll && savedScroll !== 'null') {
+                    window.scrollTo(0, parseInt(savedScroll));
+                    localStorage.removeItem('lastSearchScroll');
+                }
+                setTimeout(() => { resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400);
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            const link = e.target.closest('a');
+            if (link && (link.href.includes('/client/recherche'))) {
+                localStorage.setItem('lastSearchScroll', window.scrollY);
+            }
+        });
+    </script>
 </body>
 </html>

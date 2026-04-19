@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide d'utilisation - Atizay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #f9f9f9;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+        }
+
+        body { font-family: 'Inter', sans-serif; color: var(--text-main); background: var(--white); line-height: 1.6; margin: 0; }
+        
+        nav { display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 72px; border-bottom: 1px solid var(--border); background: var(--white); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 22px; font-weight: 800; text-decoration: none; color: var(--black); text-transform: uppercase; }
+        .nav-links { display: flex; gap: 32px; font-size: 14px; font-weight: 500; }
+        .nav-links a { text-decoration: none; color: var(--black); }
+        .nav-right { display: flex; gap: 16px; align-items: center; }
+        .btn-outline { padding: 10px 18px; font-size: 13px; font-weight: 600; background: transparent; border: 1px solid var(--black); border-radius: 6px; text-decoration: none; color: var(--black); }
+        .btn-solid { padding: 10px 18px; font-size: 13px; font-weight: 600; background: var(--black); color: var(--white); border: none; border-radius: 6px; text-decoration: none; }
+
+        .container { max-width: 900px; margin: 80px auto; padding: 0 20px; }
+        h1 { font-size: 42px; font-weight: 800; margin-bottom: 24px; color: var(--black); }
+        h2 { font-size: 22px; font-weight: 700; margin-top: 48px; margin-bottom: 20px; border-left: 4px solid var(--black); padding-left: 15px; }
+        .step { display: flex; gap: 20px; margin-bottom: 30px; }
+        .step-number { width: 40px; height: 40px; background: var(--black); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+        .step-content h3 { font-size: 18px; margin: 0 0 8px 0; }
+        .step-content p { color: var(--text-muted); margin: 0; }
+
+        footer { background: #111; color: var(--white); padding: 80px 40px 30px; margin-top: 100px; }
+        .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+        .footer-logo { font-size: 24px; font-weight: 800; margin-bottom: 20px; }
+        .footer-col h4 { font-size: 14px; text-transform: uppercase; margin-bottom: 25px; color: #777; }
+        .footer-col a { font-size: 14px; color: #aaa; text-decoration: none; display: block; margin-bottom: 12px; }
+        .footer-bottom { border-top: 1px solid #222; margin-top: 60px; padding-top: 30px; text-align: center; color: #555; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">Atizay</a>
+        <div class="nav-links">
+            <a href="/recherche?prestation=Barber+Shop">Barber Shop</a>
+            <a href="/recherche?prestation=Salon+de+Beauté">Salon de Beauté</a>
+            <a href="/recherche?prestation=Salon+Mixte">Salon Mixte</a>
+            <a href="/recherche?prestation=Nails+Bar">Nails Bar</a>
+            <a href="/recherche?prestation=Salon+%26+Spa">Salon & Spa</a>
+        </div>
+        <div class="nav-right">
+            <th:block th:if="${session.user == null}">
+                <a href="/auth/inscription?type=proprietaire" class="btn-outline">Vous êtes un professionnel ?</a>
+                <a href="/auth/connexion" class="btn-solid">Se connecter</a>
+            </th:block>
+            <th:block th:if="${session.user != null}">
+                <a th:if="${session.userType == 'client'}" href="/client/dashboard" class="btn-outline">Mon Espace</a>
+                <a th:if="${session.userType == 'proprietaire'}" href="/proprietaire/dashboard" class="btn-outline">Mon Espace</a>
+                <a href="/auth/deconnexion" class="btn-solid">Déconnexion</a>
+            </th:block>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Guide d'utilisation</h1>
+        <p>Découvrez comment profiter pleinement de l'expérience Atizay, que vous soyez un client ou un professionnel de la beauté.</p>
+        
+        <h2>Pour les Clients</h2>
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Recherchez votre service</h3>
+                <p>Utilisez la barre de recherche sur la page d'accueil. Précisez "Quoi" (coiffure, barbe, ongles...) et "Où" pour filtrer les salons proches de chez vous.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>Choisissez votre salon</h3>
+                <p>Consultez les photos, les tarifs et les avis des autres clients pour faire votre choix en toute confiance.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>Réservez instantanément</h3>
+                <p>Sélectionnez votre prestation, votre professionnel préféré et le créneau horaire qui vous convient. Connectez-vous pour confirmer votre rendez-vous.</p>
+            </div>
+        </div>
+
+        <h2>Pour les Professionnels</h2>
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Inscrivez votre salon</h3>
+                <p>Cliquez sur "Vous êtes un professionnel ?", créez votre compte propriétaire et paramétrez votre salon (prestations, horaires, employés).</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>Gérez votre agenda</h3>
+                <p>Accédez à votre dashboard pour suivre vos rendez-vous en temps réel et optimiser le planning de votre équipe.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="footer-logo">ATIZAY</div>
+                <p style="font-size: 13px; color: #888; line-height: 1.6; max-width: 250px;">La plateforme numéro 1 pour la gestion et la visibilité des salons en Haïti.</p>
+            </div>
+            <div class="footer-col">
+                <h4>À propos</h4>
+                <a href="/concept">Concept</a>
+                <a href="/guide">Guide d'utilisation</a>
+                <a href="/technique">Document technique</a>
+            </div>
+            <div class="footer-col">
+                <h4>Prestations</h4>
+                <a href="/recherche?prestation=Coupe+homme">Coupe homme</a>
+                <a href="/recherche?prestation=Coupe+femme">Coupe femme</a>
+                <a href="/recherche?prestation=Manucure">Manucure</a>
+            </div>
+            <div class="footer-col">
+                <h4>Villes</h4>
+                <a href="/recherche?lieu=Pétion-Ville">Pétion-Ville</a>
+                <a href="/recherche?lieu=Delmas">Delmas</a>
+                <a href="/recherche?lieu=Cap-Haïtien">Cap-Haïtien</a>
+            </div>
+        </div>
+        <div class="footer-bottom">© Copyright Atizay 2026. Tous droits réservés.</div>
+    </footer>
+</body>
+</html>

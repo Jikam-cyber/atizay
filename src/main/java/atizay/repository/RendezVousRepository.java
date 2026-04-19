@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
     List<RendezVous> findByClient_Id(Long idClient);
+    List<RendezVous> findByClient_IdOrderByDateRendezVousDesc(Long idClient);
 
     List<RendezVous> findBySalon_IdSalon(Long idSalon);
 

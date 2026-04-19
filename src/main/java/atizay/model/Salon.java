@@ -80,6 +80,9 @@ public class Salon {
     @OneToMany(mappedBy = "salon", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RendezVous> listeRendezVous;
 
+    @OneToMany(mappedBy = "salon", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AvisSalon> listeAvis;
+
     public Salon() {
     }
 
@@ -242,6 +245,14 @@ public class Salon {
 
     public void setListeMedias(List<MediaSalon> listeMedias) {
         this.listeMedias = listeMedias;
+    }
+
+    public List<AvisSalon> getListeAvis() {
+        return listeAvis;
+    }
+
+    public void setListeAvis(List<AvisSalon> listeAvis) {
+        this.listeAvis = listeAvis;
     }
 
     public Abonnement getAbonnementActif() {

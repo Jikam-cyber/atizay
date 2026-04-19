@@ -42,51 +42,48 @@ public class EmployeController {
     private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/employes/";
 
     @GetMapping("/dashboard")
-    public String dashboard(HttpSession session, Model model, 
-                            @RequestParam(value = "section", required = false, defaultValue = "profil") String section) {
+    public String dashboard(HttpSession session, Model model,
+            @RequestParam(value = "section", required = false) String section) {
         String userType = (String) session.getAttribute("userType");
         Employe employe = (Employe) session.getAttribute("user");
-        
+
         if (!"employe".equals(userType) || employe == null) {
             return "redirect:/auth/connexion";
         }
 
         // Recharger l'employé pour avoir les données à jour
         employe = employeRepository.findById(employe.getId()).orElse(employe);
-        
-        // Liste des rendez-vous personnels
+
+        // Charger les rendez-vous personnels de l'employé
         List<RendezVous> personalAppointments = rendezVousRepository.findByEmploye(employe);
+
+        // Charger tous les rendez-vous du salon
+        List<RendezVous> salonAppointments = new java.util.ArrayList<>();
+        List<atizay.model.HoraireSalon> salonHours = new java.util.ArrayList<>();
         
-        // Liste des rendez-vous du salon (si l'employé y appartient)
-        List<RendezVous> salonAppointments = null;
-        List<HoraireSalon> salonHours = null;
         if (employe.getSalon() != null) {
-            salonAppointments = rendezVousRepository.findBySalon(employe.getSalon());
             salonHours = horaireSalonRepository.findBySalonOrderByJourSemaine(employe.getSalon());
+            salonAppointments = rendezVousRepository.findBySalon(employe.getSalon());
         }
-        
-        // Planning de l'employé
-        List<HoraireEmploye> employeePlanning = horaireEmployeRepository.findByEmploye(employe);
-        
+
         model.addAttribute("employe", employe);
+
         model.addAttribute("section", section);
         model.addAttribute("personalAppointments", personalAppointments);
         model.addAttribute("salonAppointments", salonAppointments);
         model.addAttribute("salonHours", salonHours);
-        model.addAttribute("employeePlanning", employeePlanning);
-        model.addAttribute("rdvCount", personalAppointments.size());
-        
+
         return "employe/dashboard-employe";
     }
 
     @PostMapping("/profil/modifier")
-    public String modifierProfil(@ModelAttribute("employe") Employe employeForm, 
-                                 @RequestParam(value = "photo", required = false) MultipartFile photo,
-                                 HttpSession session,
-                                 RedirectAttributes redirectAttributes) {
+    public String modifierProfil(@ModelAttribute("employe") Employe employeForm,
+            @RequestParam(value = "photo", required = false) MultipartFile photo,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
         String userType = (String) session.getAttribute("userType");
         Employe employeSession = (Employe) session.getAttribute("user");
-        
+
         if (!"employe".equals(userType) || employeSession == null) {
             return "redirect:/auth/connexion";
         }
@@ -100,7 +97,7 @@ public class EmployeController {
             employe.setTelephone(employeForm.getTelephone());
             employe.setVille(employeForm.getVille());
             employe.setAdresse(employeForm.getAdresse());
-            
+
             // Gestion de la photo de profil
             if (photo != null && !photo.isEmpty()) {
                 try {
@@ -110,13 +107,13 @@ public class EmployeController {
                         Files.createDirectories(path);
                     }
                     Files.copy(photo.getInputStream(), path.resolve(fileName));
-                    
-                    employe.setPhotoProfil(fileName); 
+
+                    employe.setPhotoProfil(fileName);
                 } catch (IOException e) {
                     redirectAttributes.addFlashAttribute("error", "Erreur lors du téléchargement de la photo.");
                 }
             }
-            
+
             employeRepository.save(employe);
             session.setAttribute("user", employe);
             redirectAttributes.addFlashAttribute("success", "Profil mis à jour avec succès.");
@@ -125,22 +122,12 @@ public class EmployeController {
         return "redirect:/employe/dashboard?section=profil";
     }
 
-    @GetMapping("/changer-mot-de-passe")
-    public String afficherChangerMotDePasse(HttpSession session, Model model) {
-        Employe employe = (Employe) session.getAttribute("user");
-        if (employe == null) {
-            return "redirect:/auth/connexion";
-        }
-        model.addAttribute("employe", employe);
-        return "employe/changer-mot-de-passe";
-    }
-
     @PostMapping("/changer-mot-de-passe")
     public String changerMotDePasse(@RequestParam("currentPassword") String currentPassword,
-                                   @RequestParam("newPassword") String newPassword,
-                                   @RequestParam("confirmPassword") String confirmPassword,
-                                   HttpSession session,
-                                   RedirectAttributes redirectAttributes) {
+            @RequestParam("newPassword") String newPassword,
+            @RequestParam("confirmPassword") String confirmPassword,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
         Employe employe = (Employe) session.getAttribute("user");
         if (employe == null) {
             return "redirect:/auth/connexion";
@@ -149,22 +136,22 @@ public class EmployeController {
         Employe employeDB = employeRepository.findById(employe.getId()).orElse(null);
         if (employeDB == null) {
             redirectAttributes.addFlashAttribute("error", "Employé non trouvé");
-            return "redirect:/employe/changer-mot-de-passe";
+            return "redirect:/employe/dashboard?section=profil";
         }
 
         if (!employeDB.getPassword().equals(currentPassword)) {
             redirectAttributes.addFlashAttribute("error", "Le mot de passe actuel est incorrect");
-            return "redirect:/employe/changer-mot-de-passe";
+            return "redirect:/employe/dashboard?section=profil";
         }
 
         if (!newPassword.equals(confirmPassword)) {
             redirectAttributes.addFlashAttribute("error", "Les nouveaux mots de passe ne correspondent pas");
-            return "redirect:/employe/changer-mot-de-passe";
+            return "redirect:/employe/dashboard?section=profil";
         }
 
         if (newPassword.length() < 6) {
             redirectAttributes.addFlashAttribute("error", "Le mot de passe doit contenir au moins 6 caractères");
-            return "redirect:/employe/changer-mot-de-passe";
+            return "redirect:/employe/dashboard?section=profil";
         }
 
         employeDB.setPassword(newPassword);
@@ -175,5 +162,72 @@ public class EmployeController {
         redirectAttributes.addFlashAttribute("success", "Mot de passe changé avec succès !");
         return "redirect:/employe/dashboard?section=profil";
     }
-}
 
+    @GetMapping("/photo/supprimer")
+    public String supprimerPhoto(HttpSession session, RedirectAttributes redirectAttributes) {
+        String userType = (String) session.getAttribute("userType");
+        Employe employeSession = (Employe) session.getAttribute("user");
+
+        if (!"employe".equals(userType) || employeSession == null) {
+            return "redirect:/auth/connexion";
+        }
+
+        Employe employe = employeRepository.findById(employeSession.getId()).orElse(null);
+        if (employe != null && employe.getPhotoProfil() != null) {
+            try {
+                // Supprimer le fichier physique
+                Path filePath = Paths.get(UPLOAD_DIR + employe.getPhotoProfil());
+                if (Files.exists(filePath)) {
+                    Files.delete(filePath);
+                }
+
+                // Supprimer le nom de la photo dans la base de données
+                employe.setPhotoProfil(null);
+                employeRepository.save(employe);
+                session.setAttribute("user", employe);
+
+                redirectAttributes.addFlashAttribute("success", "Photo de profil supprimée avec succès.");
+            } catch (IOException e) {
+                redirectAttributes.addFlashAttribute("error", "Erreur lors de la suppression de la photo.");
+            }
+        }
+
+        return "redirect:/employe/dashboard?section=profil";
+    }
+
+    @GetMapping("/rendezvous/{id}/confirmer")
+    public String confirmerRendezVous(@PathVariable("id") Long id, HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        Employe employe = (Employe) session.getAttribute("user");
+        if (employe == null)
+            return "redirect:/auth/connexion";
+
+        RendezVous rdv = rendezVousRepository.findById(id).orElse(null);
+        if (rdv != null) {
+            if (rdv.getEmploye() != null && rdv.getEmploye().getId().equals(employe.getId())) {
+                rdv.setStatut("Confirmé");
+                rendezVousRepository.save(rdv);
+            }
+        }
+        return "redirect:/employe/dashboard?section=rendezvous";
+    }
+
+
+    @GetMapping("/rendezvous/{id}/annuler")
+    public String annulerRendezVous(@PathVariable("id") Long id, HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        Employe employe = (Employe) session.getAttribute("user");
+        if (employe == null)
+            return "redirect:/auth/connexion";
+
+        RendezVous rdv = rendezVousRepository.findById(id).orElse(null);
+        if (rdv != null) {
+            if (rdv.getEmploye() != null && rdv.getEmploye().getId().equals(employe.getId())) {
+                rdv.setStatut("Annulé");
+                rendezVousRepository.save(rdv);
+            }
+        }
+        return "redirect:/employe/dashboard?section=rendezvous";
+    }
+
+}

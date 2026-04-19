@@ -37,7 +37,7 @@ public class RendezVous {
     private Utilisateur client;
 
     @ManyToOne
-    @JoinColumn(name = "id_employe", nullable = false)
+    @JoinColumn(name = "id_employe", nullable = true)
     private Employe employe;
 
     @ManyToOne

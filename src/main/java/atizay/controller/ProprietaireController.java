@@ -36,6 +36,10 @@ import atizay.model.HoraireSalon;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import atizay.repository.MediaPrestationRepository;
 import atizay.model.MediaPrestation;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import atizay.repository.ClientRepository;
+import atizay.repository.ProprietaireRepository;
+
 @Controller
 @RequestMapping("/proprietaire")
 public class ProprietaireController {
@@ -60,6 +64,16 @@ public class ProprietaireController {
 
     @Autowired
     private MediaPrestationRepository mediaPrestationRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private ProprietaireRepository proprietaireRepository;
+
 
     private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/salons/";
 
@@ -718,12 +732,10 @@ public class ProprietaireController {
 
                     // Supprimer l'enregistrement en base de données
                     mediaSalonRepository.delete(media);
-                    redirectAttributes.addFlashAttribute("successMessage", "Photo supprimée avec succès !");
-                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion";
+                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion#profil";
                 }
             }
         }
-        redirectAttributes.addFlashAttribute("errorMessage", "Accès non autorisé");
         return "redirect:/auth/connexion";
     }
 
@@ -754,21 +766,14 @@ public class ProprietaireController {
                                        @RequestParam(value = "dimanche_ferme", required = false) String dimancheFerme,
                                        HttpSession session,
                                        RedirectAttributes redirectAttributes) {
-        System.out.println("=== Modification horaires ===");
-        System.out.println("ID du salon: " + id);
         
         String userType = (String) session.getAttribute("userType");
         Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
         
-        System.out.println("UserType: " + userType);
-        System.out.println("Proprietaire: " + (proprietaire != null ? proprietaire.getId() : "null"));
-
         if ("proprietaire".equals(userType) && proprietaire != null) {
             Salon salon = salonRepository.findById(id).orElse(null);
-            System.out.println("Salon trouvé: " + (salon != null ? salon.getNomSalon() : "null"));
             
             if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
-                System.out.println("Vérification OK, modification des horaires");
                 // Supprimer les anciens horaires
                 horaireSalonRepository.deleteBySalon(salon);
 
@@ -781,13 +786,8 @@ public class ProprietaireController {
                 createOrUpdateHoraire("Samedi", samediOuverture, samediFermeture, samediFerme, salon);
                 createOrUpdateHoraire("Dimanche", dimancheOuverture, dimancheFermeture, dimancheFerme, salon);
 
-                redirectAttributes.addFlashAttribute("successMessage", "Horaires mis à jour avec succès !");
-                return "redirect:/proprietaire/salon/" + id + "/gestion";
-            } else {
-                System.out.println("Salon null ou propriétaire ne correspond pas");
+                return "redirect:/proprietaire/salon/" + id + "/gestion#profil";
             }
-        } else {
-            System.out.println("Session invalide");
         }
         return "redirect:/auth/connexion";
     }
@@ -826,8 +826,7 @@ public class ProprietaireController {
             if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
                 List<Prestation> existantes = prestationRepository.findBySalon(salon);
                 if (existantes.size() >= 50) {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Limite atteinte : un salon ne peut pas avoir plus de 50 prestations.");
-                    return "redirect:/proprietaire/salon/" + id + "/gestion";
+                    return "redirect:/proprietaire/salon/" + id + "/gestion#prestation";
                 }
 
                 Prestation prestation = new Prestation();
@@ -842,8 +841,7 @@ public class ProprietaireController {
 
                 gererPhotosPrestation(prestation, photos, salon.getIdSalon());
 
-                redirectAttributes.addFlashAttribute("successMessage", "Prestation ajoutée avec succès !");
-                return "redirect:/proprietaire/salon/" + id + "/gestion";
+                return "redirect:/proprietaire/salon/" + id + "/gestion#prestation";
             }
         }
         return "redirect:/auth/connexion";
@@ -877,8 +875,7 @@ public class ProprietaireController {
 
                     gererPhotosPrestation(prestation, photos, idSalon);
 
-                    redirectAttributes.addFlashAttribute("successMessage", "Prestation modifiée avec succès !");
-                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion";
+                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion#prestation";
                 }
             }
         }
@@ -934,8 +931,7 @@ public class ProprietaireController {
                         }
                     }
                     prestationRepository.delete(prestation);
-                    redirectAttributes.addFlashAttribute("successMessage", "Prestation supprimée avec succès !");
-                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion";
+                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion#prestation";
                 }
             }
         }
@@ -961,8 +957,7 @@ public class ProprietaireController {
                         Files.deleteIfExists(filePath);
                     } catch (IOException e) {}
                     mediaPrestationRepository.delete(media);
-                    redirectAttributes.addFlashAttribute("successMessage", "Photo de la prestation supprimée avec succès !");
-                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion";
+                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion#prestation";
                 }
             }
         }
@@ -995,8 +990,7 @@ public class ProprietaireController {
                 service.setActif(true);
                 prestationRepository.save(service);
 
-                redirectAttributes.addFlashAttribute("successMessage", "Service ajouté avec succès !");
-                return "redirect:/proprietaire/salon/" + id + "/gestion";
+                return "redirect:/proprietaire/salon/" + id + "/gestion#prestation";
             }
         }
         return "redirect:/auth/connexion";
@@ -1043,22 +1037,42 @@ public class ProprietaireController {
         if ("proprietaire".equals(userType) && proprietaire != null) {
             Salon salon = salonRepository.findById(id).orElse(null);
             if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                // Vérifier l'unicité de l'email dans tous les types d'utilisateurs
+                if (clientRepository.findByEmail(email) != null || 
+                    proprietaireRepository.findByEmail(email) != null || 
+                    employeRepository.findByEmail(email) != null) {
+                    return "redirect:/proprietaire/salon/" + id + "/gestion#employes";
+                }
+
+                // Vérifier l'unicité du username (ceux-ci sont plus spécifiques, on vérifie au moins l'email de base)
+                // Pour faire simple et robuste, on s'assure que l'email n'est pas déjà pris
+                
+                String baseUsername = email.split("@")[0];
+                String username = baseUsername;
+                int counter = 1;
+                
+                // Boucle pour trouver un username unique par essais successifs sur tous les dépôts
+                while (clientRepository.findByUsername(username) != null || 
+                       proprietaireRepository.findByUsername(username) != null || 
+                       employeRepository.findByUsername(username) != null) {
+                    username = baseUsername + counter;
+                    counter++;
+                }
+
                 Employe employe = new Employe();
                 employe.setNom(nom);
                 employe.setPrenom(prenom);
                 employe.setEmail(email);
-                employe.setPassword(password);
+                employe.setPassword(passwordEncoder.encode(password));
                 employe.setSpecialite(specialite);
                 employe.setSalon(salon);
                 employe.setActifEmploye(true);
                 employe.setDoitChangerMdp(true);
-                // Générer un username basé sur l'email (partie avant @)
-                String username = email.split("@")[0];
                 employe.setUsername(username);
                 employeRepository.save(employe);
 
-                redirectAttributes.addFlashAttribute("successMessage", "Employé ajouté avec succès !");
-                return "redirect:/proprietaire/salon/" + id + "/gestion";
+
+                return "redirect:/proprietaire/salon/" + id + "/gestion#employes";
             }
         }
         return "redirect:/auth/connexion";
@@ -1078,11 +1092,36 @@ public class ProprietaireController {
                 Employe employe = employeRepository.findById(idEmploye).orElse(null);
                 if (employe != null && employe.getSalon().getIdSalon().equals(idSalon)) {
                     employeRepository.delete(employe);
-                    redirectAttributes.addFlashAttribute("successMessage", "Employé supprimé avec succès !");
-                    return "redirect:/proprietaire/salon/" + idSalon + "/gestion";
                 }
+                return "redirect:/proprietaire/salon/" + idSalon + "/gestion#employes";
             }
         }
         return "redirect:/auth/connexion";
+    }
+
+    @PostMapping("/salon/{salonId}/rendezvous/{id}/confirmer")
+    @Transactional
+    public String confirmerRendezVousProprio(@PathVariable("id") Long id, @PathVariable("salonId") Long salonId, HttpSession session, RedirectAttributes redirectAttributes) {
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+        RendezVous rdv = rendezVousRepository.findById(id).orElse(null);
+
+        if (rdv != null && rdv.getSalon().getProprietaire().getId().equals(proprietaire.getId())) {
+            rdv.setStatut("Confirmé");
+            rendezVousRepository.save(rdv);
+        }
+        return "redirect:/proprietaire/salon/" + salonId + "/gestion#rendez-vous";
+    }
+
+    @PostMapping("/salon/{salonId}/rendezvous/{id}/annuler")
+    @Transactional
+    public String annulerRendezVousProprio(@PathVariable("id") Long id, @PathVariable("salonId") Long salonId, HttpSession session, RedirectAttributes redirectAttributes) {
+        Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
+        RendezVous rdv = rendezVousRepository.findById(id).orElse(null);
+
+        if (rdv != null && rdv.getSalon().getProprietaire().getId().equals(proprietaire.getId())) {
+            rdv.setStatut("Annulé");
+            rendezVousRepository.save(rdv);
+        }
+        return "redirect:/proprietaire/salon/" + salonId + "/gestion#rendez-vous";
     }
 }

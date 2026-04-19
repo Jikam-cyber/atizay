@@ -247,19 +247,19 @@
 
     <div class="nav-group">
         <div class="nav-label">Ce salon</div>
-        <a href="#" onclick="showSection('profil')" class="nav-link active" id="nav-profil">
+        <a href="#" onclick="showSection('profil', event)" class="nav-link active" id="nav-profil">
             <i class="fa-solid fa-user"></i> <span>Profil</span>
         </a>
-        <a href="#" onclick="showSection('horaire')" class="nav-link" id="nav-horaire">
+        <a href="#" onclick="showSection('horaire', event)" class="nav-link" id="nav-horaire">
             <i class="fa-solid fa-clock"></i> <span>Horaire</span>
         </a>
-        <a href="#" onclick="showSection('prestation')" class="nav-link" id="nav-prestation">
+        <a href="#" onclick="showSection('prestation', event)" class="nav-link" id="nav-prestation">
             <i class="fa-solid fa-scissors"></i> <span>Prestation</span>
         </a>
-        <a href="#" onclick="showSection('rendez-vous')" class="nav-link" id="nav-rendez-vous">
+        <a href="#" onclick="showSection('rendez-vous', event)" class="nav-link" id="nav-rendez-vous">
             <i class="fa-solid fa-calendar"></i> <span>Rendez-vous</span>
         </a>
-        <a href="#" onclick="showSection('employes')" class="nav-link" id="nav-employes">
+        <a href="#" onclick="showSection('employes', event)" class="nav-link" id="nav-employes">
             <i class="fa-solid fa-users"></i> <span>Employés</span>
         </a>
     </div>
@@ -270,13 +270,7 @@
 </aside>
 
 <main>
-    <!-- Messages flash -->
-    <div th:if="${successMessage}" style="background: #4CAF50; color: white; padding: 16px 24px; border-radius: 8px; margin-bottom: 24px;">
-        <p th:text="${successMessage}">Message de succès</p>
-    </div>
-    <div th:if="${errorMessage}" style="background: #f44336; color: white; padding: 16px 24px; border-radius: 8px; margin-bottom: 24px;">
-        <p th:text="${errorMessage}">Message d'erreur</p>
-    </div>
+
 
     <!-- Section Profil -->
     <section id="profil" class="content-section active">
@@ -721,20 +715,58 @@
             <div th:if="${salon.listeRendezVous != null && !salon.listeRendezVous.isEmpty()}" style="display: flex; flex-direction: column; gap: 16px;">
                 <div th:each="rdv : ${salon.listeRendezVous}" class="rendezvous-card" 
                      th:data-date="${#temporals.format(rdv.dateRendezVous, 'yyyy-MM-dd HH:mm:ss')}"
-                     style="padding: 20px; background: #f9f9f9; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 48px; height: 48px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 18px;">
-                                <span th:text="${rdv.client != null ? rdv.client.prenom.substring(0, 1).toUpperCase() + rdv.client.nom.substring(0, 1).toUpperCase() : 'NA'}">NA</span>
+                     style="padding: 24px; background: #f9f9f9; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="width: 56px; height: 56px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 20px;">
+                                <span th:text="${rdv.client != null && rdv.client.prenom != null && !rdv.client.prenom.isEmpty() ? rdv.client.prenom.substring(0, 1).toUpperCase() : '?' } + ${rdv.client != null && rdv.client.nom != null && !rdv.client.nom.isEmpty() ? rdv.client.nom.substring(0, 1).toUpperCase() : ''}">NA</span>
                             </div>
                             <div>
-                                <h4 th:text="${rdv.client != null ? rdv.client.prenom + ' ' + rdv.client.nom : 'Client inconnu'}" style="margin: 0; font-size: 16px; font-weight: 600;">Nom client</h4>
-                                <p th:text="${rdv.prestation != null ? rdv.prestation.nomPrestation : 'Prestation inconnue'}" style="margin: 0; font-size: 14px; color: var(--text-muted);">Prestation</p>
+                                <h4 th:text="${rdv.client != null ? rdv.client.prenom + ' ' + rdv.client.nom : 'Client inconnu'}" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: var(--black);">Nom client</h4>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <span th:text="${rdv.prestation != null ? rdv.prestation.nomPrestation : 'Prestation inconnue'}" style="font-size: 14px; color: var(--text-muted);">Prestation</span>
+                                    <span style="color: var(--text-muted);">•</span>
+                                    <span th:text="${rdv.prixTotal != null ? rdv.prixTotal + ' HTG' : 'Prix non défini'}" style="font-size: 14px; color: var(--text-muted); font-weight: 600;">Prix</span>
+                                </div>
                             </div>
                         </div>
                         <div style="text-align: right;">
-                            <div th:text="${#temporals.format(rdv.dateRendezVous, 'dd/MM/yyyy HH:mm')}" style="font-size: 16px; font-weight: 600; color: var(--primary-color);">Date</div>
-                            <span th:text="${rdv.statut}" style="padding: 4px 8px; background: #e8f5e9; color: #2e7d32; border-radius: 4px; font-size: 12px; font-weight: 600;">Statut</span>
+                            <div th:text="${rdv.dateRendezVous != null ? #temporals.format(rdv.dateRendezVous, 'dd/MM/yyyy') : '--/--/----'}" style="font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Date</div>
+                            <div th:text="${rdv.heureDebut != null ? #temporals.format(rdv.heureDebut, 'HH:mm') : '--:--'}" style="font-size: 20px; font-weight: 700; color: var(--primary-color);">Heure</div>
+                            
+                            <!-- Badge Statut Sécurisé -->
+                            <div style="margin-top: 8px;">
+                                <span th:if="${rdv.statut == 'Confirmé'}" 
+                                      th:text="${rdv.employe != null ? 'Confirmé par ' + rdv.employe.prenom : 'Confirmé'}"
+                                      style="padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; background: #e8f5e9; color: #2e7d32; text-transform: uppercase;">Confirmé</span>
+                                
+                                <span th:if="${rdv.statut == 'Annulé'}" 
+                                      style="padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; background: #ffebee; color: #c62828; text-transform: uppercase;">Annulé</span>
+                                
+                                <span th:if="${rdv.statut != 'Confirmé' && rdv.statut != 'Annulé'}" 
+                                      th:text="${rdv.statut ?: 'EN ATTENTE'}"
+                                      style="padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; background: #fff3e0; color: #ef6c00; text-transform: uppercase;">En attente</span>
+                            </div>
+                            
+                            <!-- Boutons d'action pour le propriétaire -->
+                            <div th:if="${rdv.statut == 'En attente'}" style="margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end;">
+                                <form th:action="@{/proprietaire/salon/{salonId}/rendezvous/{id}/confirmer(id=${rdv.idRendezVous}, salonId=${salon.idSalon})}" method="post" style="margin:0;">
+                                    <button type="submit" class="btn-action" style="padding: 6px 12px; font-size: 11px; background: #2e7d32; border-radius: 4px;">Confirmer</button>
+                                </form>
+                                <form th:action="@{/proprietaire/salon/{salonId}/rendezvous/{id}/annuler(id=${rdv.idRendezVous}, salonId=${salon.idSalon})}" method="post" style="margin:0;">
+                                    <button type="submit" class="btn-action" style="padding: 6px 12px; font-size: 11px; background: #c62828; border-radius: 4px;">Annuler</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-user-tie" style="color: var(--text-muted); font-size: 14px;"></i>
+                            <span th:if="${rdv.employe != null}" th:text="${rdv.employe.prenom + ' ' + rdv.employe.nom}" style="font-size: 14px; font-weight: 600; color: var(--text-main);">Employé</span>
+                            <span th:if="${rdv.employe == null}" style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Aucun employé choisi</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted);">
+                            Durée: <span th:text="${rdv.dureeMinutes != null ? rdv.dureeMinutes + ' min' : 'Non définie'}">Durée</span>
                         </div>
                     </div>
                 </div>
@@ -834,7 +866,9 @@
 </main>
 
 <script>
-    function showSection(sectionId) {
+    function showSection(sectionId, event) {
+        if (event) event.preventDefault();
+        
         // Masquer toutes les sections
         const sections = document.querySelectorAll('.content-section');
         sections.forEach(section => {
@@ -857,9 +891,9 @@
         if (activeNav) {
             activeNav.classList.add('active');
         }
-
-        // Empêcher le comportement par défaut du lien
-        event.preventDefault();
+        
+        // Mettre à jour le hash sans recharger pour la persistance
+        history.replaceState(null, null, '#' + sectionId);
     }
 
     function showAddPrestationForm() {
@@ -895,6 +929,15 @@
 
     // Event listeners pour les cartes de prestation
     document.addEventListener('DOMContentLoaded', function() {
+        // Gérer l'ancre URL pour restaurer la section active
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            // Un petit délai pour s'assurer que tout est rendu
+            setTimeout(() => {
+                showSection(hash);
+            }, 10);
+        }
+
         const prestationCards = document.querySelectorAll('.prestation-card');
         prestationCards.forEach(card => {
             card.addEventListener('click', function() {

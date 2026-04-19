@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Employé - Atizay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -17,276 +17,803 @@
             --text-muted: #666666;
             --border: #e0e0e0;
             --radius-pill: 50px;
-            --radius-card: 16px;
-            --primary: #000;
-            --accent: #dc3545;
-            --success: #198754;
+            --radius-card: 12px;
+            --primary-color: #111111;
         }
 
         body { 
             font-family: 'Inter', sans-serif; 
-            color: var(--text-main); 
-            background: var(--bg-light); 
-            line-height: 1.6; 
-            -webkit-font-smoothing: antialiased; 
+            background-color: var(--bg-light);
+            display: flex;
+            min-height: 100vh;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ── NAVIGATION ── */
-        nav {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 40px; height: 80px; border-bottom: 1px solid var(--border);
-            background: var(--white); 
-            position: sticky; top: 0; z-index: 1000; 
-        }
-        .logo { 
-            font-size: 24px; font-weight: 800; letter-spacing: -0.5px;
-            text-decoration: none; color: var(--black); 
-        }
-        .nav-links { display: flex; gap: 32px; font-size: 14px; font-weight: 600; }
-        .nav-links a { 
-            text-decoration: none; color: var(--text-muted); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 8px 12px; border-radius: 8px;
-        }
-        .nav-links a:hover, .nav-links a.active { color: var(--black); background: #f0f0f0; }
-        
-        .nav-right { display: flex; gap: 16px; align-items: center; }
-        .logout-btn {
-            color: var(--accent); font-weight: 600; text-decoration: none; font-size: 14px;
-            padding: 8px 16px; border-radius: 8px; transition: background 0.3s;
-        }
-        .logout-btn:hover { background: #fff5f5; }
-
-        /* ── LAYOUT ── */
-        .dashboard-wrapper {
-            max-width: 1200px; margin: 40px auto; padding: 0 40px;
-            display: grid; grid-template-columns: 280px 1fr; gap: 40px;
+        /* Sidebar */
+        aside {
+            width: 280px;
+            background-color: var(--white);
+            display: flex;
+            flex-direction: column;
+            padding: 40px 24px;
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
         }
 
-        /* ── SIDEBAR ── */
-        .sidebar { background: var(--white); border-radius: var(--radius-card); border: 1px solid var(--border); padding: 32px; height: fit-content; text-align: center; }
-        .profile-pic-container { position: relative; width: 120px; height: 120px; margin: 0 auto 24px; }
-        .profile-pic { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid #f0f0f0; }
-        .profile-initials { width: 100%; height: 100%; border-radius: 50%; background: var(--black); color: var(--white); display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; }
-        
-        .sidebar h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-        .sidebar p { color: var(--text-muted); font-size: 13px; margin-bottom: 24px; }
-        
-        .sidebar-menu { list-style: none; text-align: left; }
-        .sidebar-menu li { margin-bottom: 8px; }
-        .sidebar-menu a {
-            display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px;
-            text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 14px;
+        .brand { margin-bottom: 40px; }
+        .brand h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: var(--black); text-transform: uppercase; }
+        .brand p { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+        .nav-group { margin-bottom: 32px; }
+        .nav-label { 
+            font-size: 11px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            color: var(--text-muted); 
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+            padding-left: 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 4px;
             transition: all 0.2s;
         }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background: #f0f0f0; color: var(--black); }
-        .sidebar-menu i { font-size: 18px; width: 20px; }
 
-        /* ── CONTENT ── */
-        .content-card { background: var(--white); border-radius: var(--radius-card); border: 1px solid var(--border); padding: 40px; min-height: 600px; }
-        .section-header { margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
-        .section-header h1 { font-size: 24px; font-weight: 700; }
+        .nav-link i { width: 20px; text-align: center; font-size: 16px; }
+        .nav-link:hover { color: var(--black); background: var(--bg-light); }
+        .nav-link.active { background-color: var(--black); color: var(--white); box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: 600; }
 
-        /* Forms */
-        .form-group { margin-bottom: 24px; }
-        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
-        input[type="text"], input[type="email"], select, textarea {
-            width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border);
-            font-family: inherit; font-size: 14px; transition: border-color 0.2s;
+        .logout-link {
+            margin-top: auto;
+            color: #d93025;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: background 0.2s;
         }
-        input:focus { outline: none; border-color: var(--black); }
-        
-        .btn-save {
-            background: var(--black); color: var(--white); padding: 12px 32px; border: none;
-            border-radius: 10px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
-        }
-        .btn-save:hover { opacity: 0.8; }
+        .logout-link:hover { background: #fce8e6; }
 
-        /* Appointments List */
-        .appointment-card {
-            padding: 24px; border: 1px solid var(--border); border-radius: 16px; margin-bottom: 16px;
-            display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s;
+        /* Sections visibility */
+        .content-section {
+            display: none;
         }
-        .appointment-card:hover { transform: translateY(-2px); border-color: var(--black); }
-        .appt-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-        .appt-info p { font-size: 13px; color: var(--text-muted); }
-        .appt-status { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; background: #f0f0f0; }
+        .content-section.active {
+            display: block;
+        }
 
-        /* Hours Grid */
-        .hours-grid { display: grid; gap: 12px; }
+        /* Main Content */
+        main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px 60px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+        .page-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .page-header p { color: var(--text-muted); font-size: 14px; }
+
+        .salon-info-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 40px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .btn-action {
+            padding: 14px 28px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            width: auto;
+            min-width: fit-content;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .btn-action:hover {
+            background: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .hours-grid {
+            display: grid;
+            gap: 12px;
+        }
         .hour-row {
-            display: flex; justify-content: space-between; align-items: center; padding: 16px;
-            background: #fcfcfc; border: 1px solid var(--border); border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
         }
-        .day-name { font-weight: 700; font-size: 14px; width: 100px; }
-        .salon-hours { font-size: 12px; color: var(--text-muted); }
-        .emp-hours { font-weight: 600; font-size: 14px; }
+        .hour-row:hover { background: var(--white); border-color: var(--black); transform: translateX(5px); }
+        .day-name { font-weight: 700; color: var(--black); font-size: 15px; }
+        .salon-hours { font-weight: 600; color: var(--text-muted); font-size: 14px; }
 
-        /* Alerts */
-        .alert { padding: 16px; border-radius: 12px; margin-bottom: 24px; font-size: 14px; font-weight: 500; }
-        .alert-success { background: #e6fffa; color: #234e52; border: 1px solid #b2f5ea; }
-        .alert-error { background: #fff5f5; color: #9b2c2c; border: 1px solid #feb2b2; }
-
-        @media (max-width: 900px) {
-            .dashboard-wrapper { grid-template-columns: 1fr; padding: 0 20px; }
-            nav { padding: 0 20px; }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
         }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--black);
+        }
+
+        .appointment-card {
+            padding: 24px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+            background: var(--white);
+        }
+
+        .appointment-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--black);
+        }
+
+        .appt-info h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .appt-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .appt-status {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #f0f0f0;
+        }
+
+        .hours-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .hour-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #fcfcfc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .day-name {
+            font-weight: 700;
+            font-size: 14px;
+            width: 100px;
+        }
+
+        .salon-hours {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .emp-hours {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #e6fffa;
+            color: #234e52;
+            border: 1px solid #b2f5ea;
+        }
+
+        .alert-error {
+            background: #fff5f5;
+            color: #9b2c2c;
+            border: 1px solid #feb2b2;
+        }
+
+        @media (max-width: 1024px) {
+            aside { width: 80px; padding: 20px 10px; }
+            .brand span, .nav-label, .nav-link span, .logout-link span { display: none; }
+            main { margin-left: 80px; padding: 30px 40px; }
+        }
+        .rdv-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .appt-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-action {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-confirm { background: #e6f4ea; color: #1e7e34; }
+        .btn-confirm:hover { background: #1e7e34; color: white; }
+        .btn-cancel { background: #fce8e6; color: #d93025; }
+        .btn-cancel:hover { background: #d93025; color: white; }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="/" class="logo">ATIZAY</a>
-        <div class="nav-links">
-            <a href="/" th:classappend="${section == 'home' ? 'active' : ''}">Accueil</a>
-            <a href="/employe/dashboard" th:classappend="${section == 'profil' ? 'active' : ''}">Mon Espace</a>
-        </div>
-        <div class="nav-right">
-            <a href="/auth/deconnexion" class="logout-btn">Se déconnecter</a>
-        </div>
-    </nav>
 
-    <div class="dashboard-wrapper">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="profile-pic-container">
-                <!-- Simple initials for now, image placeholder logic later -->
-                <div class="profile-initials" th:text="${#strings.substring(employe.prenom,0,1) + #strings.substring(employe.nom,0,1)}">JD</div>
-            </div>
-            <h2 th:text="${employe.prenom + ' ' + employe.nom}">Jon Doe</h2>
-            <p th:text="${employe.specialite ?: 'Coiffeur professionnel'}">Coiffeur professionnel</p>
-            
-            <div style="margin-bottom: 24px; padding: 12px; background: #f9f9f9; border-radius: 10px;">
-                <span style="font-size: 12px; color: var(--text-muted);">Note moyenne</span>
-                <div style="font-size: 20px; font-weight: 800; color: #ffbc00;">
-                    <i class="fa-solid fa-star"></i> <span th:text="${employe.noteMoyenne ?: '0.0'}">4.8</span>
-                </div>
-            </div>
-
-            <ul class="sidebar-menu">
-                <li><a href="/employe/dashboard?section=profil" th:classappend="${section == 'profil' ? 'active' : ''}"><i class="fa-solid fa-user"></i> Profil</a></li>
-                <li><a href="/employe/dashboard?section=rendezvous" th:classappend="${section == 'rendezvous' ? 'active' : ''}"><i class="fa-solid fa-calendar-check"></i> Rendez-vous</a></li>
-                <li><a href="/employe/dashboard?section=horaires" th:classappend="${section == 'horaires' ? 'active' : ''}"><i class="fa-solid fa-clock"></i> Mes Horaires</a></li>
-            </ul>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="content-card">
-            <!-- Messages -->
-            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-
-            <!-- SECTION PROFIL -->
-            <div th:if="${section == 'profil'}">
-                <div class="section-header">
-                    <h1>Informations personnelles</h1>
-                    <p style="font-size: 14px; color: var(--text-muted);">Gérez vos informations et votre photo de profil.</p>
-                </div>
-                
-                <form action="/employe/profil/modifier" method="POST" enctype="multipart/form-data">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                        <div class="form-group">
-                            <label>Prénom</label>
-                            <input type="text" name="prenom" th:value="${employe.prenom}" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Nom</label>
-                            <input type="text" name="nom" th:value="${employe.nom}" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Spécialité</label>
-                        <input type="text" name="specialite" th:value="${employe.specialite}" placeholder="ex: Coloriste, Barbier...">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Biographie</label>
-                        <textarea name="biographie" rows="4" th:text="${employe.biographie}" placeholder="Parlez un peu de vous..."></textarea>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                        <div class="form-group">
-                            <label>Téléphone</label>
-                            <input type="text" name="telephone" th:value="${employe.telephone}">
-                        </div>
-                        <div class="form-group">
-                            <label>Photo de profil</label>
-                            <input type="file" name="photo" accept="image/*">
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #f0f0f0;">
-                        <button type="submit" class="btn-save">Enregistrer les modifications</button>
-                    </div>
-                </form>
-
-                <div style="margin-top: 40px; padding: 24px; background: #fff5f5; border-radius: 12px; border: 1px solid #fed7d7;">
-                    <h3 style="font-size: 16px; color: #c53030; margin-bottom: 8px;">Sécurité</h3>
-                    <p style="font-size: 13px; color: #9b2c2c; margin-bottom: 16px;">Il est recommandé de changer votre mot de passe régulièrement.</p>
-                    <a href="/employe/changer-mot-de-passe" style="font-size: 14px; font-weight: 700; color: #c53030; text-decoration: none;">Modifier le mot de passe →</a>
-                </div>
-            </div>
-
-            <!-- SECTION RENDEZ-VOUS -->
-            <div th:if="${section == 'rendezvous'}">
-                <div class="section-header">
-                    <h1>Mes Rendez-vous</h1>
-                </div>
-
-                <div style="margin-bottom: 32px;">
-                    <h3 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 16px;">Mes réservations directes</h3>
-                    <div th:if="${#lists.isEmpty(personalAppointments)}" style="text-align: center; padding: 40px; color: var(--text-muted); background: #fafafa; border-radius: 12px; border: 1px dashed #ccc;">
-                        Aucun rendez-vous personnel pour le moment.
-                    </div>
-                    <div th:each="rdv : ${personalAppointments}" class="appointment-card">
-                        <div class="appt-info">
-                            <h3 th:text="${rdv.prestation != null ? rdv.prestation.nomPrestation : 'Service'}">Service</h3>
-                            <p><i class="fa-regular fa-clock"></i> <span th:text="${#temporals.format(rdv.heureDebut, 'dd MMM yyyy - HH:mm')}">12 Oct 2023 - 10:30</span></p>
-                            <p><i class="fa-regular fa-user"></i> Client: <span th:text="${rdv.client.prenom + ' ' + rdv.client.nom}">Client Name</span></p>
-                        </div>
-                        <span class="appt-status" th:text="${rdv.statut}">CONFIRMÉ</span>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 16px;">Toute l'activité du salon (<span th:text="${employe.salon.nomSalon}">Salon</span>)</h3>
-                    <div th:each="rdv : ${salonAppointments}" th:if="${rdv.employe == null || rdv.employe.id != employe.id}" class="appointment-card" style="opacity: 0.7; scale: 0.98;">
-                        <div class="appt-info">
-                            <h3 th:text="${rdv.prestation != null ? rdv.prestation.nomPrestation : 'Service'}">Service</h3>
-                            <p th:text="${#temporals.format(rdv.heureDebut, 'dd MMM HH:mm')}">Date</p>
-                            <p th:text="'Avec: ' + ${rdv.employe != null ? rdv.employe.prenom : 'Non assigné'}">Employé</p>
-                        </div>
-                        <span class="appt-status" th:text="${rdv.statut}">STATUS</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION HORAIRES -->
-            <div th:if="${section == 'horaires'}">
-                <div class="section-header">
-                    <h1>Mes Horaires de travail</h1>
-                    <p style="font-size: 14px; color: var(--text-muted);">Vos horaires doivent s'aligner sur ceux du salon.</p>
-                </div>
-
-                <div class="hours-grid">
-                    <div class="hour-row" th:each="sh : ${salonHours}">
-                        <div class="day-name" th:text="${sh.jourSemaine}">Lundi</div>
-                        <div class="salon-hours">
-                            <span th:if="${sh.estOuvert}" th:text="'Salon: ' + ${sh.heureOuverture} + ' - ' + ${sh.heureFermeture}">09:00 - 18:00</span>
-                            <span th:unless="${sh.estOuvert}" style="color: var(--accent);">Salon Fermé</span>
-                        </div>
-                        <div class="emp-hours">
-                            <span style="color: var(--success);"><i class="fa-solid fa-circle-check"></i> Présent</span>
-                            <!-- Logique dynamique pour l'employé à ajouter ensuite -->
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 32px; padding: 24px; background: #f0f0f0; border-radius: 12px; display: flex; align-items: center; gap: 16px;">
-                    <i class="fa-solid fa-circle-info" style="font-size: 24px; color: var(--text-muted);"></i>
-                    <p style="font-size: 13px; color: var(--text-muted);">Pour modifier vos jours de présence, veuillez contacter le gérant du salon.</p>
-                </div>
-            </div>
-        </main>
+<aside>
+    <div class="brand">
+        <h1>ATIZAY</h1>
+        <p style="text-transform: uppercase; font-size: 10px; font-weight: 800; letter-spacing: 2px; color: var(--text-muted); opacity: 0.8;">Connexion: <span th:text="${employe?.prenom ?: 'Employé'}" style="color: var(--black);">Employé</span></p>
     </div>
+
+
+
+    <div class="nav-group">
+        <div class="nav-label">Mon Espace</div>
+        <a href="#" onclick="showSection('rendezvous')" class="nav-link active" id="nav-rendezvous">
+            <i class="fa-solid fa-calendar"></i> <span>Rendez-vous</span>
+        </a>
+        <a href="#" onclick="showSection('profil')" class="nav-link" id="nav-profil">
+            <i class="fa-solid fa-user"></i> <span>Profil</span>
+        </a>
+        <a href="#" onclick="showSection('horaires')" class="nav-link" id="nav-horaires">
+            <i class="fa-solid fa-clock"></i> <span>Horaires</span>
+        </a>
+    </div>
+
+    <a href="/auth/deconnexion" class="logout-link">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Se déconnecter</span>
+    </a>
+</aside>
+
+<main>
+    <!-- Messages flash -->
+    <div th:if="${successMessage}" class="alert alert-success" style="background: #4CAF50; color: white;">
+        <p th:text="${successMessage}">Message de succès</p>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-error" style="background: #f44336; color: white;">
+        <p th:text="${errorMessage}">Message d'erreur</p>
+    </div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+
+    <!-- Section Profil -->
+    <section id="profil" class="content-section">
+        <div class="page-header">
+            <h1>Mon Profil</h1>
+            <p>Gérez vos informations personnelles et votre mot de passe</p>
+        </div>
+
+        <div class="salon-info-card">
+            <div style="display: flex; gap: 32px; margin-bottom: 32px; align-items: center;">
+                <div style="position: relative; width: 100px; height: 100px; border-radius: 50%; overflow: hidden; border: 4px solid #f0f0f0;">
+                    <div th:if="${employe.photoProfil == null}" style="width: 100%; height: 100%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 36px;">
+                        <span th:text="${#strings.substring(employe.prenom, 0, 1) + #strings.substring(employe.nom, 0, 1)}">JD</span>
+                    </div>
+                    <img th:if="${employe.photoProfil != null}" th:src="@{/uploads/employes/{filename}(filename=${employe.photoProfil})}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div>
+                    <h2 th:text="${employe.prenom + ' ' + employe.nom}" style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Nom Employé</h2>
+                    <p th:text="${employe.specialite ?: 'Coiffeur professionnel'}" style="color: var(--text-muted); font-size: 14px;">Spécialité</p>
+                    <div style="margin-top: 12px; display: flex; gap: 16px;">
+                        <span style="font-size: 14px; font-weight: 600; color: #ffbc00;">
+                            <i class="fa-solid fa-star"></i> <span th:text="${employe.noteMoyenne ?: '0.0'}">4.8</span>/5
+                        </span>
+                        <span style="font-size: 14px; color: var(--text-muted);">
+                            <i class="fa-solid fa-building"></i> <span th:text="${employe.salon?.nomSalon ?: 'Non assigné'}">Salon</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <form action="/employe/profil/modifier" method="POST" enctype="multipart/form-data">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 24px;">
+                    <div class="form-group">
+                        <label>Prénom</label>
+                        <input type="text" name="prenom" th:value="${employe.prenom}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nom</label>
+                        <input type="text" name="nom" th:value="${employe.nom}" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label>Email</label>
+                    <input type="email" name="email" th:value="${employe.email}" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label>Téléphone</label>
+                    <input type="text" name="telephone" th:value="${employe.telephone}">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label>Spécialité</label>
+                    <input type="text" name="specialite" th:value="${employe.specialite}" placeholder="ex: Coloriste, Barbier...">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label>Biographie</label>
+                    <textarea name="biographie" rows="4" th:text="${employe.biographie}" placeholder="Parlez un peu de vous..." style="resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label>Photo de profil</label>
+                    
+                    <!-- Zone de dropzone personnalisée -->
+                    <div style="position: relative; border: 2px dashed #d1d5db; border-radius: 16px; padding: 32px 24px; text-align: center; background: #f9fafb; cursor: pointer; transition: all 0.2s; margin-bottom: 24px;" onclick="document.getElementById('photoUpload').click()" onmouseover="this.style.borderColor='var(--black)'; this.style.background='var(--white)'" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='#f9fafb'">
+                        <input type="file" id="photoUpload" name="photo" accept="image/*" style="display: none;" onchange="document.getElementById('photoMessage').innerHTML = '<span style=\'color: var(--black); font-weight: 600;\'>' + this.files[0].name + '</span>'">
+                        <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+                            <i class="fa-solid fa-camera" style="font-size: 20px; color: var(--black);"></i>
+                        </div>
+                        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">Ajouter une photo</h4>
+                        <p id="photoMessage" style="font-size: 13px; color: var(--text-muted); font-weight: 500;">Cliquez pour sélectionner une photo</p>
+                    </div>
+
+                    <!-- Photo existante avec bouton de suppression -->
+                    <div th:if="${employe.photoProfil != null}" style="position: relative; width: 200px; height: 200px; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid var(--border); margin: 0 auto;">
+                        <img th:src="@{/uploads/employes/{filename}(filename=${employe.photoProfil})}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <a th:href="@{/employe/photo/supprimer}"
+                           onclick="return confirm('Voulez-vous vraiment supprimer cette photo ?');"
+                           title="Supprimer"
+                           style="position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95); color: #dc3545; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.2s; z-index: 10;" onmouseover="this.style.background='#dc3545'; this.style.color='white'" onmouseout="this.style.background='rgba(255, 255, 255, 0.95)'; this.style.color='#dc3545'">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 16px; margin-top: 32px;">
+                    <button type="submit" class="btn-action">Enregistrer les modifications</button>
+                </div>
+            </form>
+
+            <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border);">
+                <!-- Alert for password change (moved here) -->
+                <div th:if="${employe.doitChangerMdp}" style="background: #fff9c4; border-left: 4px solid #fbc02d; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 20px;">⚠️</span>
+                        <div>
+                            <h4 style="font-size: 14px; font-weight: 700; color: #5d4037; margin-bottom: 2px;">Mot de passe temporaire</h4>
+                            <p style="font-size: 13px; color: #795548; margin: 0;">Veuillez changer votre mot de passe pour sécuriser votre compte.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 24px;">Changer mon mot de passe</h3>
+                
+                <div th:if="${error}" class="alert alert-error" th:text="${error}">Erreur</div>
+                <div th:if="${success}" class="alert alert-success" th:text="${success}">Succès</div>
+
+                <form th:action="@{/employe/changer-mot-de-passe}" method="post">
+                    <div class="form-group">
+                        <label>Mot de passe actuel</label>
+                        <input type="password" name="currentPassword" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nouveau mot de passe</label>
+                        <input type="password" name="newPassword" required minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirmer le nouveau mot de passe</label>
+                        <input type="password" name="confirmPassword" required minlength="6">
+                    </div>
+
+                    <button type="submit" class="btn-action">Changer le mot de passe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Rendez-vous -->
+    <section id="rendezvous" class="content-section active">
+        <div class="page-header">
+            <h1>Mes Rendez-vous</h1>
+            <p>Consultez et gérez vos rendez-vous avec une interface optimisée</p>
+        </div>
+
+        <div class="salon-info-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+            <!-- Filtres Premium -->
+            <div style="display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap;">
+                <button onclick="filterRendezVous('jour')" class="btn-filter">Aujourd'hui</button>
+                <button onclick="filterRendezVous('semaine')" class="btn-filter">Cette semaine</button>
+                <button onclick="filterRendezVous('mois')" class="btn-filter">Ce mois</button>
+                <button onclick="filterRendezVous('tout')" class="btn-filter active">Tout</button>
+            </div>
+
+            <style>
+                .btn-filter {
+                    padding: 10px 24px;
+                    background: var(--white);
+                    border: 1px solid var(--border);
+                    border-radius: 10px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: var(--text-main);
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    min-width: 100px;
+                }
+                .btn-filter:hover {
+                    border-color: var(--black);
+                    background: #f5f5f5;
+                }
+                .btn-filter.active {
+                    background: var(--black);
+                    color: var(--white);
+                    border-color: var(--black);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                }
+
+                .rdv-card-premium {
+                    background: var(--white);
+                    border-radius: 20px;
+                    padding: 24px;
+                    margin-bottom: 20px;
+                    border: 1px solid var(--border);
+                    display: grid;
+                    grid-template-columns: auto 1fr auto;
+                    align-items: center;
+                    gap: 30px;
+                    transition: all 0.3s ease;
+                }
+                .rdv-card-premium:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+                    border-color: var(--black);
+                }
+
+                .rdv-time-box {
+                    background: #f0f0f0;
+                    padding: 15px;
+                    border-radius: 15px;
+                    text-align: center;
+                    min-width: 100px;
+                    transition: background 0.3s;
+                }
+                .rdv-card-premium:hover .rdv-time-box { background: #e8e8e8; }
+                .rdv-time-box .time { font-size: 20px; font-weight: 900; color: var(--black); display: block; }
+                .rdv-time-box .date { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+
+                .rdv-main-info h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--black); }
+                .rdv-main-info p { font-size: 14px; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+                .rdv-main-info i { color: var(--black); opacity: 0.6; font-size: 13px; }
+
+                .status-badge-new {
+                    padding: 8px 16px;
+                    border-radius: 12px;
+                    font-size: 11px;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+                .status-badge-new.attente { background: #fff3e0; color: #ef6c00; }
+                .status-badge-new.confirme { background: #e8f5e9; color: #2e7d32; }
+                .status-badge-new.annule { background: #ffebee; color: #c62828; }
+
+                .action-group-new { display: flex; gap: 10px; margin-top: 15px; }
+                .btn-icon-new {
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-decoration: none;
+                    transition: all 0.2s;
+                    border: 1px solid var(--border);
+                }
+                .btn-icon-new.confirm { background: #2e7d32; color: #fff; border: none; }
+                .btn-icon-new.confirm:hover { background: #1b5e20; transform: scale(1.05); }
+                .btn-icon-new.cancel { background: #fdfdfd; color: #c62828; }
+                .btn-icon-new.cancel:hover { background: #ffebee; border-color: #c62828; }
+                
+                .btn-take-premium {
+                    padding: 12px 28px;
+                    background: var(--black);
+                    color: white;
+                    border-radius: 12px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    text-decoration: none;
+                    transition: all 0.3s;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                }
+                .btn-take-premium:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+
+                @media (max-width: 768px) {
+                    .rdv-card-premium { grid-template-columns: 1fr; gap: 15px; text-align: center; }
+                    .rdv-time-box { width: 100%; min-width: auto; }
+                    .rdv-main-info p { justify-content: center; }
+                    .action-group-new { justify-content: center; }
+                }
+            </style>
+
+            <!-- Mes Rendez-vous Personnels -->
+            <div style="margin-bottom: 50px;">
+                <h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 25px; font-weight: 800; letter-spacing: 2px;">
+                   <i class="fa-solid fa-star" style="color: #ffc107; margin-right: 8px;"></i> Mes rendez-vous personnels
+                </h3>
+                
+                <div th:if="${personalAppointments == null || #lists.isEmpty(personalAppointments)}" style="text-align: center; padding: 50px; background: var(--white); border-radius: 20px; border: 1px dashed var(--border); color: var(--text-muted);">
+                    <i class="fa-regular fa-calendar-xmark" style="font-size: 40px; margin-bottom: 15px; display: block; opacity: 0.3;"></i>
+                    Aucun rendez-vous assigné pour le moment.
+                </div>
+
+                <div th:each="rdv : ${personalAppointments}" class="rdv-card-premium rdv-card" 
+                     th:data-date="${rdv.dateRendezVous != null ? #temporals.format(rdv.dateRendezVous, 'yyyy-MM-dd') : ''}"
+                     th:data-date-full="${rdv.dateRendezVous}">
+                    
+                    <div class="rdv-time-box">
+                        <span class="time" th:text="${rdv.dateRendezVous != null ? #temporals.format(rdv.dateRendezVous, 'HH:mm') : '--:--'}">10:30</span>
+                        <span class="date" th:text="${rdv.dateRendezVous != null ? #temporals.format(rdv.dateRendezVous, 'dd MMM') : '---'}">12 OCT</span>
+                    </div>
+
+                    <div class="rdv-main-info">
+                        <h3 th:text="${rdv.prestation != null ? rdv.prestation.nomPrestation : 'Service'}">Coupe homme</h3>
+                        <p><i class="fa-solid fa-user-circle"></i> <span>Client: <strong><span th:text="${rdv.client != null ? rdv.client.prenom + ' ' + rdv.client.nom : 'Client inconnu'}">Jean Dupont</span></strong></span></p>
+                        <p><i class="fa-solid fa-clock-rotate-left"></i> <span>Durée: <span th:text="${rdv.dureeMinutes ?: '30'} + ' min'">30 min</span></span></p>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <span th:class="'status-badge-new ' + (${rdv.statut == 'Confirmé' ? 'confirme' : (rdv.statut == 'Annulé' ? 'annule' : 'attente')})"
+                              th:text="${rdv.statut ?: 'EN ATTENTE'}">STATUS</span>
+                        
+                        <div class="action-group-new" th:if="${rdv.statut != 'Annulé'}">
+                            <a th:if="${rdv.statut == 'En attente'}" 
+                               th:href="@{'/employe/rendezvous/' + ${rdv.idRendezVous} + '/confirmer'}" 
+                               class="btn-icon-new confirm" title="Confirmer"><i class="fa-solid fa-check"></i></a>
+                            
+                            <a th:href="@{'/employe/rendezvous/' + ${rdv.idRendezVous} + '/annuler'}" 
+                               class="btn-icon-new cancel" title="Annuler"><i class="fa-solid fa-xmark"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toute l'activité du salon -->
+            <div style="padding-top: 20px; border-top: 1px solid var(--border);">
+                <h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 25px; font-weight: 800; letter-spacing: 2px;">
+                    <i class="fa-solid fa-hotel" style="margin-right: 8px;"></i> Activité globale du salon
+                </h3>
+                
+                <div th:if="${salonAppointments == null || #lists.isEmpty(salonAppointments)}" style="text-align: center; padding: 30px; color: var(--text-muted); font-size: 14px;">
+                    Pas d'autre activité prévue.
+                </div>
+
+                <div th:each="rdv : ${salonAppointments}" th:if="${rdv.employe == null or (rdv.employe != null and rdv.employe.id != employe.id)}" class="rdv-card-premium rdv-card"
+                     th:data-date="${rdv.dateRendezVous != null ? #temporals.format(rdv.dateRendezVous, 'yyyy-MM-dd') : ''}"
+                     style="background: #fafafa; border-style: dashed; opacity: 0.9;">
+                    
+                    <div class="rdv-time-box" style="background: #fff; box-shadow: inset 0 0 10px rgba(0,0,0,0.02);">
+                        <span class="time" th:text="${rdv.dateRendezVous != null ? #temporals.format(rdv.dateRendezVous, 'HH:mm') : '--:--'}">10:30</span>
+                        <span class="date" th:text="${rdv.dateRendezVous != null ? #temporals.format(rdv.dateRendezVous, 'dd MMM') : '---'}">12 OCT</span>
+                    </div>
+
+                    <div class="rdv-main-info">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <h3 th:text="${rdv.prestation != null ? rdv.prestation.nomPrestation : 'Service'}" style="margin: 0;">Service</h3>
+                            <span th:if="${rdv.employe == null}" style="background: var(--black); color: #fff; font-size: 10px; padding: 3px 10px; border-radius: 6px; font-weight: 800;">À PRENDRE</span>
+                        </div>
+                        <p><i class="fa-solid fa-user-tie"></i> <span>Assigné à: 
+                           <strong th:text="${rdv.employe != null ? rdv.employe.prenom : 'Non assigné'}" 
+                                 th:style="${rdv.employe == null ? 'color: #d93025;' : ''}">Employé</strong></span>
+                        </p>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 15px;">
+                        <span th:class="'status-badge-new ' + (${rdv.statut == 'Confirmé' ? 'confirme' : (rdv.statut == 'Annulé' ? 'annule' : 'attente')})"
+                              th:text="${rdv.statut ?: 'EN ATTENTE'}">STATUS</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Section Horaires -->
+    <section id="horaires" class="content-section">
+        <div class="page-header">
+            <h1>Horaires du salon</h1>
+            <p>Consultez les horaires d'ouverture du salon pour adapter votre disponibilité</p>
+        </div>
+
+        <div class="salon-info-card">
+            <div class="hours-grid">
+                <div class="hour-row" th:each="sh : ${salonHours}">
+                    <div class="day-name" th:text="${sh.jourSemaine}">Lundi</div>
+                    <div class="salon-hours">
+                        <span th:if="${sh.estOuvert}" th:text="${sh.heureOuverture} + ' - ' + ${sh.heureFermeture}">09:00 - 18:00</span>
+                        <span th:unless="${sh.estOuvert}" style="color: #d93025; font-weight: 600;">Fermé</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 32px; padding: 24px; background: #f0f0f0; border-radius: 12px; display: flex; align-items: center; gap: 16px;">
+                <i class="fa-solid fa-circle-info" style="font-size: 24px; color: var(--text-muted);"></i>
+                <p style="font-size: 13px; color: var(--text-muted);">Vous ne pouvez pas être présent un jour où le salon est fermé. Veuillez adapter votre disponibilité en conséquence.</p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    function showSection(sectionId) {
+        // Masquer toutes les sections
+        const sections = document.querySelectorAll('.content-section');
+        sections.forEach(section => {
+            section.classList.remove('active');
+        });
+
+        // Afficher la section sélectionnée
+        const selectedSection = document.getElementById(sectionId);
+        if (selectedSection) {
+            selectedSection.classList.add('active');
+        }
+
+        // Mettre à jour les liens actifs dans la sidebar
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+        });
+
+        const activeNav = document.getElementById('nav-' + sectionId);
+        if (activeNav) {
+            activeNav.classList.add('active');
+        }
+    }
+
+    // Initialiser la section active basée sur le paramètre URL
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const section = urlParams.get('section');
+        if (section) {
+            showSection(section);
+        }
+    });
+
+    // Fonction pour filtrer les rendez-vous par période
+    function filterRendezVous(period) {
+        // Mettre à jour les boutons actifs
+        const buttons = document.querySelectorAll('.btn-filter');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        // Trouver le bouton dont l'onclick contient le paramètre
+        buttons.forEach(btn => {
+            if (btn.getAttribute('onclick').includes("'" + period + "'")) {
+                btn.classList.add('active');
+            }
+        });
+
+        const rdvCards = document.querySelectorAll('.rdv-card');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        rdvCards.forEach(card => {
+            const dateStr = card.getAttribute('data-date');
+            if (!dateStr) {
+                card.style.display = 'none';
+                return;
+            }
+
+            const rdvDate = new Date(dateStr);
+            rdvDate.setHours(0, 0, 0, 0);
+
+            let show = false;
+
+            switch(period) {
+                case 'jour':
+                    show = rdvDate.getTime() === today.getTime();
+                    break;
+                case 'semaine':
+                    const startOfWeek = new Date(today);
+                    const day = startOfWeek.getDay();
+                    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+                    startOfWeek.setDate(diff);
+                    startOfWeek.setHours(0, 0, 0, 0);
+
+                    const endOfWeek = new Date(startOfWeek);
+                    endOfWeek.setDate(endOfWeek.getDate() + 6);
+                    endOfWeek.setHours(23, 59, 59, 999);
+
+                    show = rdvDate >= startOfWeek && rdvDate <= endOfWeek;
+                    break;
+                case 'mois':
+                    show = rdvDate.getMonth() === today.getMonth() && 
+                           rdvDate.getFullYear() === today.getFullYear();
+                    break;
+                case 'tout':
+                    show = true;
+                    break;
+            }
+
+            card.style.display = show ? 'grid' : 'none';
+        });
+    }
+</script>
+
 </body>
 </html>

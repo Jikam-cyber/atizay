@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prendre Rendez-vous - Atizay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #fdfdfd;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e8e8e8;
+            --radius-card: 16px;
+            --radius-btn: 8px;
+            --accent: #000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: #fafafa;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── NAVIGATION ── */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 72px;
+            border-bottom: 1px solid var(--border);
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--black);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--black);
+            transition: color .2s;
+        }
+
+        .nav-links a:hover {
+            color: #666;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn-solid {
+            background: var(--black);
+            color: var(--white);
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* ── MAIN CONTENT ── */
+        .page-container {
+            max-width: 1100px;
+            margin: 50px auto 100px;
+            padding: 0 20px;
+        }
+
+        .booking-header {
+            margin-bottom: 40px;
+        }
+
+        .booking-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .booking-header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* ── SUMMARY CARD (LEFT) ── */
+        .summary-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 30px;
+            position: sticky;
+            top: 112px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+
+        .salon-mini-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .salon-mini-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .salon-mini-text h4 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .salon-mini-text p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .service-details h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .service-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .meta-item i {
+            width: 16px;
+            color: var(--black);
+        }
+
+        .price-tag {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: var(--black);
+        }
+
+        .service-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        /* ── BOOKING FORM (RIGHT) ── */
+        .booking-form-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+        }
+
+        .form-section h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Radio Tiles */
+        .option-tiles {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .tile {
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .tile:hover {
+            border-color: var(--black);
+            background: #fafafa;
+        }
+
+        .tile.active {
+            border-color: var(--black);
+            background: #fff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .tile input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .tile-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tile-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .tile-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .tile .check-mark {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: transparent;
+        }
+
+        .tile.active .check-mark {
+            background: var(--black);
+            border-color: var(--black);
+            color: var(--white);
+        }
+
+        /* Inputs */
+        .input-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .input-wrapper label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .input-premium {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .input-premium:focus {
+            outline: none;
+            border-color: var(--black);
+        }
+
+        .btn-confirm {
+            width: 100%;
+            padding: 18px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-confirm:hover {
+            background: #222;
+            transform: translateY(-2px);
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #111;
+            color: var(--white);
+            padding: 80px 40px 30px;
+        }
+
+        .footer-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-col h4 {
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: #777;
+        }
+
+        .footer-col a {
+            font-size: 14px;
+            color: #aaa;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #222;
+            margin-top: 50px;
+            padding-top: 30px;
+            text-align: center;
+            color: #555;
+            font-size: 13px;
+        }
+
+        @media (max-width: 950px) {
+            .booking-grid { grid-template-columns: 1fr; }
+            .summary-card { position: static; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="/" class="logo">Atizay</a>
+        <div class="nav-links">
+            <a href="/client/recherche?prestation=Barber+Shop">Barber Shop</a>
+            <a href="/client/recherche?prestation=Salon+de+Beauté">Salon de Beauté</a>
+            <a href="/client/recherche?prestation=Salon+Mixte">Salon Mixte</a>
+            <a href="/client/reservations">Mes Réservations</a>
+            <a href="/client/favoris">Favoris</a>
+        </div>
+        <div class="nav-right">
+            <a href="/client/dashboard" style="text-decoration: none; color: var(--black); font-size: 14px; font-weight: 600;">
+                <i class="fa-regular fa-user" style="margin-right: 8px;"></i>
+                <span th:text="${client?.prenom}">Pierre</span>
+            </a>
+            <a href="/auth/deconnexion" class="btn-solid">Déconnexion</a>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <!-- Messages flash -->
+        <div th:if="${success}" style="background: #e6fffa; color: #234e52; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #b2f5ea;" th:text="${success}"></div>
+        <div th:if="${error}" style="background: #fff5f5; color: #9b2c2c; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #feb2b2;" th:text="${error}"></div>
+
+        <div class="booking-header">
+            <h1>Finalisez votre rendez-vous</h1>
+            <p>Quelques étapes pour confirmer votre moment de beauté.</p>
+        </div>
+
+        <div class="booking-grid">
+            <!-- GAUCHE : RÉCAPITULATIF -->
+            <aside class="summary-card">
+                <div class="salon-mini-info">
+                    <img th:src="${salon.listeMedias != null and !salon.listeMedias.isEmpty() ? salon.listeMedias[0].urlMedia : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=100'}" class="salon-mini-img" alt="Salon">
+                    <div class="salon-mini-text">
+                        <h4 th:text="${salon.nomSalon}">Nom du Salon</h4>
+                        <p th:text="${salon.villeSalon}">Ville</p>
+                    </div>
+                </div>
+
+                <div class="service-details">
+                    <h3 th:text="${prestation.nomPrestation}">Nom du service</h3>
+                    <div class="price-tag" th:text="${prestation.prix} + ' GDS'">1000 GDS</div>
+                    
+                    <div class="service-meta">
+                        <div class="meta-item">
+                            <i class="fa-regular fa-clock"></i>
+                            <span th:text="${prestation.dureeMinutes} + ' minutes'">30 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span th:text="${salon.adresseSalon}">Adresse complète</span>
+                        </div>
+                    </div>
+
+                    <div class="service-desc" th:text="${prestation.descriptionPrestation}">
+                        Description du soin pour préparer le client.
+                    </div>
+                </div>
+            </aside>
+
+            <!-- DROITE : FORMULAIRE -->
+            <main class="booking-form-card">
+                <form th:action="@{/client/rendez-vous/confirmer}" method="post">
+                    <input type="hidden" name="salonId" th:value="${salon.idSalon}">
+                    <input type="hidden" name="prestationId" th:value="${prestation.idPrestation}">
+
+                    <!-- Choix de l'employé -->
+                    <div class="form-section">
+                        <h3><i class="fa-solid fa-user-check"></i> Choix de l'expert</h3>
+                        <div class="option-tiles">
+                            <label class="tile active" onclick="updateTile(this, 'no')">
+                                <input type="radio" name="employeOption" value="no" checked>
+                                <div class="tile-content">
+                                    <span class="tile-title">N'importe qui</span>
+                                    <span class="tile-sub">L'expert disponible au moment voulu</span>
+                                </div>
+                                <div class="check-mark"><i class="fa-solid fa-check"></i></div>
+                            </label>
+                            <label class="tile" onclick="updateTile(this, 'yes')">
+                                <input type="radio" name="employeOption" value="yes">
+                                <div class="tile-content">
+                                    <span class="tile-title">Choisir expert</span>
+                                    <span class="tile-sub">Sélectionnez votre professionnel habituel</span>
+                                </div>
+                                <div class="check-mark"><i class="fa-solid fa-check"></i></div>
+                            </label>
+                        </div>
+
+                        <div id="employeSelect" style="display: none; margin-top: 20px;">
+                            <div class="input-wrapper">
+                                <label>Sélectionnez un professionnel</label>
+                                <select name="employeId" class="input-premium">
+                                    <option value="">-- Choisir un employé --</option>
+                                    <option th:each="employe : ${employes}" th:value="${employe.id}" th:text="${employe.prenom + ' ' + employe.nom}">Expert</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Date et Heure -->
+                    <div class="form-section">
+                        <h3><i class="fa-regular fa-calendar-days"></i> Date & Heure</h3>
+                        <div class="input-wrapper">
+                            <label>Date du rendez-vous</label>
+                            <input type="date" id="bookDate" name="date" class="input-premium" required onchange="loadHoraires()">
+                        </div>
+
+                        <div class="input-wrapper">
+                            <label>Heure du rendez-vous</label>
+                            <input type="time" id="bookTime" name="heure" class="input-premium" required>
+                            <p id="timeInfo" style="font-size: 12px; margin-top: 10px; color: #777;"></p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-confirm">Confirmer ma réservation</button>
+                    <p style="text-align: center; font-size: 12px; margin-top: 15px; color: #999;">Paiement sur place après la prestation.</p>
+                </form>
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">ATIZAY</div>
+                <p style="font-size: 13px; color: #666;">La référence beauté en Haïti.</p>
+            </div>
+            <div class="footer-col">
+                <h4>À propos</h4>
+                <a href="/concept">Concept</a>
+                <a href="/guide">Guide d'utilisation</a>
+            </div>
+            <div class="footer-col">
+                <h4>Top Prestations</h4>
+                <a href="/client/recherche?prestation=Coupe+homme">Coupe homme</a>
+                <a href="/client/recherche?prestation=Manucure">Manucure</a>
+            </div>
+            <div class="footer-col">
+                <h4>Villes</h4>
+                <a href="/client/recherche?lieu=Pétion-Ville">Pétion-Ville</a>
+                <a href="/client/recherche?lieu=Delmas">Delmas</a>
+            </div>
+        </div>
+        <div class="footer-bottom">© Atizay 2026. Tous droits réservés.</div>
+    </footer>
+
+    <script th:inline="javascript">
+        // Init Date
+        document.getElementById('bookDate').min = new Date().toISOString().split('T')[0];
+
+        function updateTile(el, val) {
+            document.querySelectorAll('.tile').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('employeSelect').style.display = (val === 'yes') ? 'block' : 'none';
+        }
+
+        function loadHoraires() {
+            const date = document.getElementById('bookDate').value;
+            const salonId = /*[[${salon.idSalon}]]*/ 0;
+            const timeInp = document.getElementById('bookTime');
+            const info = document.getElementById('timeInfo');
+
+            fetch(`/client/rendez-vous/horaires?salonId=${salonId}&date=${date}`)
+                .then(r => r.json())
+                .then(d => {
+                    if (d.ferme === 'true') {
+                        timeInp.value = '';
+                        info.textContent = '❌ Salon fermé ce jour.';
+                        info.style.color = '#e53e3e';
+                    } else if (d.ouverture) {
+                        timeInp.min = d.ouverture;
+                        timeInp.max = d.fermeture;
+                        info.textContent = `✅ Ouvert de ${d.ouverture} à ${d.fermeture}`;
+                        info.style.color = '#38a169';
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

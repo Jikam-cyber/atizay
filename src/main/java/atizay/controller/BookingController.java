@@ -71,7 +71,7 @@ public class BookingController {
             jakarta.servlet.http.HttpSession session,
             Model model) {
 
-        String type = (String) session.getAttribute("type");
+        String type = (String) session.getAttribute("userType");
         if (!"client".equals(type)) {
             // Require login before booking
             return "redirect:/auth/connexion";
@@ -109,12 +109,12 @@ public class BookingController {
             @RequestParam("time") String time,
             jakarta.servlet.http.HttpSession session) {
 
-        String type = (String) session.getAttribute("type");
+        String type = (String) session.getAttribute("userType");
         if (!"client".equals(type)) {
             return "redirect:/auth/connexion";
         }
 
-        atizay.model.Utilisateur client = (atizay.model.Utilisateur) session.getAttribute("client");
+        atizay.model.Client client = (atizay.model.Client) session.getAttribute("user");
         Prestation prestation = prestationRepository.findById(prestationId).orElse(null);
         if (prestation == null)
             return "redirect:/";

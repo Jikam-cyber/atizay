@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Réservations - Atizay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #fdfdfd;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e8e8e8;
+            --radius-card: 16px;
+            --radius-btn: 8px;
+            --status-bg: #f5f5f5;
+            --status-text: #666;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: #fafafa;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── NAVIGATION ── */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 72px;
+            border-bottom: 1px solid var(--border);
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--black);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--black);
+            transition: color .2s;
+        }
+
+        .nav-links a:hover {
+            color: #666;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn-solid {
+            background: var(--black);
+            color: var(--white);
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* ── MAIN CONTENT ── */
+        .container {
+            max-width: 900px;
+            margin: 60px auto 120px;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            margin-bottom: 50px;
+            text-align: left;
+        }
+
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        /* Appointment Cards */
+        .rdv-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 25px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .rdv-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+            border-color: var(--black);
+        }
+
+        .salon-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .rdv-main {
+            flex: 1;
+        }
+
+        .rdv-service {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .rdv-salon-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+        }
+
+        .rdv-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .meta-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .meta-tag i {
+            font-size: 11px;
+            width: 14px;
+            color: var(--black);
+        }
+
+        .rdv-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
+        .status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 50px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Status Variations */
+        .status-confirm { background: #e6fffa; color: #1d4044; }
+        .status-annule { background: #fff5f5; color: #9b2c2c; }
+        .status-attente { background: #fffaf0; color: #9c4221; }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: #dc3545;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background: #fff5f5;
+            border-color: #feb2b2;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 100px 40px;
+            background: var(--white);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border);
+        }
+
+        .empty-icon {
+            font-size: 50px;
+            color: #eee;
+            margin-bottom: 25px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #111;
+            color: var(--white);
+            padding: 80px 40px 30px;
+        }
+
+        .footer-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-col h4 {
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: #777;
+        }
+
+        .footer-col a {
+            font-size: 14px;
+            color: #aaa;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .modal-card {
+            background: white; width: 400px; padding: 40px; border-radius: 20px; text-align: center;
+        }
+        .modal-card h2 { font-size: 22px; margin-bottom: 10px; }
+        .modal-card p { font-size: 14px; color: #666; margin-bottom: 30px; }
+        .modal-btns { display: flex; gap: 15px; }
+        .modal-btns button { flex:1; padding: 14px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; }
+        .btn-no { background: #f5f5f5; }
+        .btn-yes { background: #000; color: #fff; }
+
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="/client/dashboard" class="logo">Atizay</a>
+        <div class="nav-links">
+            <a href="/client/recherche?prestation=Barber+Shop">Barber Shop</a>
+            <a href="/client/recherche?prestation=Salon+de+Beauté">Salon de Beauté</a>
+            <a href="/client/recherche?prestation=Salon+Mixte">Salon Mixte</a>
+            <a href="/client/reservations" style="font-weight: 700;">Mes Réservations</a>
+            <a href="/client/favoris">Favoris</a>
+        </div>
+        <div class="nav-right">
+            <a href="/client/dashboard" style="text-decoration: none; color: var(--black); font-size: 14px; font-weight: 600;">
+                <i class="fa-regular fa-user" style="margin-right: 8px;"></i>
+                <span th:text="${client?.prenom}">Pierre</span>
+            </a>
+            <a href="/auth/deconnexion" class="btn-solid">Déconnexion</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>Mes Réservations</h1>
+            <p>Historique et gestion de vos rendez-vous beauté.</p>
+        </header>
+
+        <!-- EMPTY STATE -->
+        <div th:if="${reservations == null || #lists.isEmpty(reservations)}" class="empty-state">
+            <div class="empty-icon"><i class="fa-regular fa-calendar-times"></i></div>
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px;">Aucun rendez-vous</h3>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Vous n'avez pas encore planifié de moment de bien-être.</p>
+            <a href="/client/recherche" class="btn-solid" style="padding: 15px 30px; border-radius: 10px;">Découvrir les salons</a>
+        </div>
+
+        <!-- LISTE -->
+        <div th:each="rdv : ${reservations}" class="rdv-card">
+            <img th:src="${rdv.salon != null and rdv.salon.listeMedias != null and !rdv.salon.listeMedias.isEmpty() ? rdv.salon.listeMedias[0].urlMedia : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=100'}" class="salon-thumb" alt="Salon">
+            
+            <div class="rdv-main">
+                <div class="rdv-service" th:text="${rdv.prestation?.nomPrestation}">Coiffure Homme</div>
+                <a th:href="@{/client/salon/{id}(id=${rdv.salon.idSalon})}" class="rdv-salon-name" th:text="${rdv.salon?.nomSalon}">Studio Beauté</a>
+                
+                <div class="rdv-meta">
+                    <div class="meta-tag">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span th:text="${#temporals.format(rdv.dateRendezVous, 'dd MMMM yyyy')}">15 Avril 2026</span>
+                    </div>
+                    <div class="meta-tag">
+                        <i class="fa-regular fa-clock"></i>
+                        <span th:text="${#temporals.format(rdv.dateRendezVous, 'HH:mm')}">14:30</span>
+                    </div>
+                    <div class="meta-tag" th:if="${rdv.employe != null}">
+                        <i class="fa-regular fa-user"></i>
+                        <span th:text="${rdv.employe.prenom + ' ' + rdv.employe.nom}">Expert</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rdv-actions">
+                <span class="status-badge" th:text="${rdv.statut}" 
+                      th:classappend="${rdv.statut == 'Confirmé' ? 'status-confirm' : (rdv.statut == 'Annulé' ? 'status-annule' : 'status-attente')}">
+                    Statut
+                </span>
+                
+                <button th:if="${rdv.statut != 'Confirmé' and rdv.statut != 'Annulé'}" 
+                        th:onclick="'openCancelModal(' + ${rdv.idRendezVous} + ')'"
+                        class="btn-cancel">
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">ATIZAY</div>
+                <p style="font-size: 13px; color: #666;">La référence beauté en Haïti.</p>
+            </div>
+            <div class="footer-col">
+                <h4>À propos</h4>
+                <a href="/concept">Concept</a>
+                <a href="/guide">Guide d'utilisation</a>
+            </div>
+            <div class="footer-col">
+                <h4>Top Prestations</h4>
+                <a href="/client/recherche?prestation=Coupe+homme">Coupe homme</a>
+                <a href="/client/recherche?prestation=Manucure">Manucure</a>
+            </div>
+            <div class="footer-col">
+                <h4>Villes</h4>
+                <a href="/client/recherche?lieu=Pétion-Ville">Pétion-Ville</a>
+                <a href="/client/recherche?lieu=Delmas">Delmas</a>
+            </div>
+        </div>
+        <div class="footer-bottom">© Atizay 2026. Tous droits réservés.</div>
+    </footer>
+
+    <div id="cancelModal" class="modal-overlay">
+        <div class="modal-card">
+            <i class="fa-solid fa-circle-exclamation" style="font-size: 40px; color: #dc3545; margin-bottom: 20px;"></i>
+            <h2>Annuler la réservation ?</h2>
+            <p>Cette action libérera votre créneau horaire pour d'autres clients.</p>
+            <div class="modal-btns">
+                <button class="btn-no" onclick="closeCancelModal()">Garder</button>
+                <form id="confirmCancelForm" method="post" style="flex: 1;">
+                    <button type="submit" class="btn-yes">Confirmer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function openCancelModal(id) {
+            document.getElementById('confirmCancelForm').action = '/client/reservations/annuler/' + id;
+            document.getElementById('cancelModal').style.display = 'flex';
+        }
+        function closeCancelModal() {
+            document.getElementById('cancelModal').style.display = 'none';
+        }
+        window.onclick = e => { if(e.target == document.getElementById('cancelModal')) closeCancelModal(); }
+    </script>
+</body>
+</html>

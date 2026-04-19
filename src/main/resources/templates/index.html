@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atizay – Réservez en beauté</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         *,
         *::before,
@@ -96,6 +97,120 @@
         .btn-outline:hover {
             background: var(--black);
             color: var(--white);
+        }
+
+        /* ── SALON CARDS ── */
+        .salons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .salon-card {
+            background: var(--white);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .salon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .salon-card-image-wrapper {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .salon-card-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .salon-card:hover .salon-card-image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .salon-card-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .salon-card-content h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--black);
+            margin: 0;
+        }
+
+        .salon-card-content .type {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .salon-card-content .address {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .salon-card-content .address i {
+            color: var(--black);
+            font-size: 14px;
+        }
+
+        .salon-card-content .rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--black);
+            margin-top: 4px;
+        }
+
+        .salon-card-content .rating i {
+            color: #ffc107;
+        }
+
+        .btn-card {
+            margin-top: auto;
+            width: 100%;
+            padding: 12px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .btn-card:hover {
+            background: #333;
         }
 
         .btn-solid {
@@ -437,15 +552,23 @@
     <nav>
         <a href="/" class="logo">Atizay</a>
         <div class="nav-links">
-            <a href="#">Barber Shop</a>
-            <a href="#">Salon de Beauté</a>
-            <a href="#">Salon Mixte</a>
-            <a href="#">Nails Bar</a>
-            <a href="#">Salon & Spa</a>
+            <a href="/recherche?prestation=Barber+Shop">Barber Shop</a>
+            <a href="/recherche?prestation=Salon+de+Beauté">Salon de Beauté</a>
+            <a href="/recherche?prestation=Salon+Mixte">Salon Mixte</a>
+            <a href="/recherche?prestation=Nails+Bar">Nails Bar</a>
+            <a href="/recherche?prestation=Salon+%26+Spa">Salon & Spa</a>
         </div>
         <div class="nav-right">
-            <a href="/auth/inscription?type=proprietaire" class="btn-outline">Vous êtes un professionnel ?</a>
-            <a href="/auth/connexion" class="btn-solid">Se connecter</a>
+            <th:block th:if="${session.user == null}">
+                <a href="/auth/inscription?type=proprietaire" class="btn-outline">Vous êtes un professionnel ?</a>
+                <a href="/auth/connexion" class="btn-solid">Se connecter</a>
+            </th:block>
+            <th:block th:if="${session.user != null}">
+                <a th:if="${session.userType == 'client'}" href="/client/dashboard" class="btn-outline">Mon Espace</a>
+                <a th:if="${session.userType == 'proprietaire'}" href="/proprietaire/dashboard" class="btn-outline">Mon
+                    Espace</a>
+                <a href="/auth/deconnexion" class="btn-solid">Déconnexion</a>
+            </th:block>
         </div>
     </nav>
 
@@ -453,16 +576,136 @@
         <div class="hero-content">
             <h1>Réservez en beauté</h1>
             <div class="search-bar">
-                <div class="search-field">
-                    <label>Quoi ?</label>
-                    <input type="text" placeholder="Salon, prestation...">
+                <form action="/recherche" method="get" style="display: flex; align-items: center; width: 100%;">
+                    <div class="search-field">
+                        <label>Quoi ?</label>
+                        <input type="text" name="prestation" th:value="${quoi}" placeholder="Prestation, salon..."
+                            list="prestations-suggestions" autocomplete="off">
+                        <datalist id="prestations-suggestions">
+                            <option value="Coiffure">
+                            <option value="Coupe">
+                            <option value="Coupe homme">
+                            <option value="Coupe femme">
+                            <option value="Barbe">
+                            <option value="Rasage">
+                            <option value="Coloration">
+                            <option value="Teinture">
+                            <option value="Mèche">
+                            <option value="Soins">
+                            <option value="Soin cheveux">
+                            <option value="Soin visage">
+                            <option value="Massage">
+                            <option value="Manucure">
+                            <option value="Pédicure">
+                            <option value="Ongles">
+                            <option value="Épilation">
+                            <option value="Maquillage">
+                            <option value="Brushing">
+                            <option value="Lissage">
+                            <option value="Permanente">
+                        </datalist>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="search-field">
+                        <label>Où ?</label>
+                        <input type="text" name="lieu" th:value="${ou}" placeholder="Adresse, ville..."
+                            list="villes-suggestions" autocomplete="off">
+                        <datalist id="villes-suggestions">
+                            <option value="Port-au-Prince">
+                            <option value="Pétion-Ville">
+                            <option value="Delmas">
+                            <option value="Carrefour">
+                            <option value="Tabarre">
+                            <option value="Croix-des-Bouquets">
+                            <option value="Gressier">
+                            <option value="Cap-Haïtien">
+                            <option value="Gonaïves">
+                            <option value="Saint-Marc">
+                            <option value="Jacmel">
+                            <option value="Les Cayes">
+                            <option value="Jérémie">
+                            <option value="Hinche">
+                            <option value="Miragoâne">
+                            <option value="Petit-Goâve">
+                            <option value="Grande-Rivière-du-Nord">
+                            <option value="Ouanaminthe">
+                        </datalist>
+                    </div>
+                    <button type="submit" class="search-btn">Rechercher</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Résultats de Recherche (visible uniquement si searchMode est vrai) -->
+    <section id="search-results" class="pros-section" th:if="${searchMode}"
+        style="padding-bottom: 50px; background: #fdfdfd; border-bottom: 1px solid var(--border);">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+                <div>
+                    <h2 style="margin: 0; text-align: left; font-size: 28px;">Résultats de votre recherche</h2>
+                    <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 14px;">
+                        Pour "<span th:text="${quoi != '' ? quoi : 'Tout'}"></span>"
+                        <span th:if="${ou != ''}">à "<span th:text="${ou}"></span>"</span>
+                    </p>
                 </div>
-                <div class="divider"></div>
-                <div class="search-field">
-                    <label>Où ?</label>
-                    <input type="text" placeholder="Adresse, ville...">
+                <a href="/"
+                    style="color: var(--black); font-size: 14px; font-weight: 600; text-decoration: underline;">Effacer
+                    la recherche</a>
+            </div>
+
+            <div th:if="${salons == null || #lists.isEmpty(salons)}" style="text-align: center; padding: 60px 20px;">
+                <div
+                    style="width: 80px; height: 80px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: #999;">
+                    <i class="fa-solid fa-magnifying-glass" style="font-size: 32px;"></i>
                 </div>
-                <button class="search-btn">Rechercher</button>
+                <h3 style="font-size: 20px; font-weight: 700; color: var(--black); margin-bottom: 10px;">Aucun salon
+                    trouvé</h3>
+                <p style="color: var(--text-muted); font-size: 15px;">Désolé, nous n'avons trouvé aucun résultat pour
+                    votre recherche.<br>Essayez avec d'autres critères ou une autre ville.</p>
+                <a href="/" class="btn-outline" style="display: inline-block; margin-top: 25px;">Voir tous les
+                    salons</a>
+            </div>
+
+            <div th:if="${salons != null && !#lists.isEmpty(salons)}" class="salons-grid">
+                <a th:href="@{/salon/{id}(id=${salon.idSalon})}" class="salon-card" th:each="salon : ${salons}">
+                    <div class="salon-card-image-wrapper">
+                        <img th:if="${salon.listeMedias != null and !salon.listeMedias.isEmpty()}"
+                            th:src="${salon.listeMedias[0].urlMedia.startsWith('/uploads/salons/') ? salon.listeMedias[0].urlMedia : '/uploads/salons/' + salon.listeMedias[0].urlMedia}"
+                            th:alt="${salon.nomSalon}">
+                        <img th:if="${salon.listeMedias == null or salon.listeMedias.isEmpty()}"
+                            src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop"
+                            th:alt="${salon.nomSalon}">
+                    </div>
+
+                    <div class="salon-card-content">
+                        <h3 th:text="${salon.nomSalon}">Nom du salon</h3>
+                        <div class="type" th:text="${salon.typeSalon != null ? salon.typeSalon : 'SALON DE BEAUTÉ'}">
+                            Type</div>
+
+                        <div class="address">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span
+                                th:text="${(salon.adresseSalon != null ? salon.adresseSalon + ', ' : '') + salon.villeSalon}">Ville</span>
+                        </div>
+
+                        <div class="rating">
+                            <i class="fa-solid fa-star"></i>
+                            <span
+                                th:text="${salon.noteMoyenne != null ? #numbers.formatDecimal(salon.noteMoyenne, 1, 1) : '0.0'}">0.0</span>
+                            <span
+                                th:text="${salon.listeAvis != null ? '(' + #lists.size(salon.listeAvis) + ' avis)' : '(0 avis)'}"
+                                style="color: var(--text-muted); font-weight: 400; font-size: 12px; margin-left: 4px;">(0
+                                avis)</span>
+                        </div>
+
+                        <div style="margin-top: auto; padding-top: 15px;">
+                            <div
+                                style="width: 100%; padding: 10px; border: 1.5px solid var(--black); color: var(--black); background: var(--white); border-radius: 8px; font-size: 13px; font-weight: 700; text-align: center; transition: all 0.2s;">
+                                Plus d'infos</div>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
@@ -473,36 +716,36 @@
             <div class="pro-item">
                 <div class="img-container" id="container-barber">
                     <img class="img-active"
-                        src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1000&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1000&auto=format&fit=crop"
                         alt="Barber Shop">
                     <img class="img-next fade-out" src="" alt="Barber Shop">
                 </div>
                 <h3>Barber Shop</h3>
                 <p>L'expertise masculine à l'état pur. Rasage traditionnel, taille de barbe et coupes modernes.</p>
-                <a href="#">Voir les barbiers</a>
+                <a href="/recherche?prestation=Barber+Shop">Voir les barbiers</a>
             </div>
             <div class="pro-item">
                 <div class="img-container" id="container-beaute">
                     <img class="img-active"
-                        src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1000&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1560750588-73207b1ef5b8?q=80&w=1000&auto=format&fit=crop"
                         alt="Salon de Beauté">
                     <img class="img-next fade-out" src="" alt="Salon de Beauté">
                 </div>
                 <h3>Salon de Beauté</h3>
                 <p>Une parenthèse bien-être. Soins du visage, épilations et maquillage professionnel.</p>
-                <a href="#">Voir les instituts</a>
+                <a href="/recherche?prestation=Salon+de+Beauté">Voir les instituts</a>
             </div>
             <div class="pro-item">
                 <div class="img-container" id="container-mixte">
                     <img class="img-active"
-                        src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=1200&auto=format&fit=crop"
                         alt="Salon Mixte">
                     <img class="img-next fade-out" src="" alt="Salon Mixte">
                 </div>
                 <h3>Salon Mixte</h3>
                 <p>Pour des coupes variées et des soins capillaires adaptés à tout le monde. Balayage, colorations,
                     lissages.</p>
-                <a href="#">Voir les salons mixtes</a>
+                <a href="/recherche?prestation=Salon+Mixte">Voir les salons mixtes</a>
             </div>
             <div class="pro-item">
                 <div class="img-container" id="container-nails">
@@ -513,7 +756,7 @@
                 </div>
                 <h3>Nails Bar</h3>
                 <p>Sublimez vos mains et vos pieds. Pose de vernis, extensions, manucure et pédicure soignées.</p>
-                <a href="#">Voir les bars à ongles</a>
+                <a href="/recherche?prestation=Nails+Bar">Voir les bars à ongles</a>
             </div>
             <div class="pro-item">
                 <div class="img-container" id="container-spa">
@@ -524,7 +767,7 @@
                 </div>
                 <h3>Salon & Spa</h3>
                 <p>Détente absolue pour le corps et l'esprit. Massages relaxants, gommages et relaxation profonde.</p>
-                <a href="#">Voir les spas</a>
+                <a href="/recherche?prestation=Salon+%26+Spa">Voir les spas</a>
             </div>
         </div>
     </section>
@@ -592,24 +835,21 @@
             </div>
             <div class="footer-col">
                 <h4>À propos</h4>
-                <a href="#">Concept</a>
-                <a href="#">FAQ</a>
-                <a href="#">Contact</a>
-                <a href="#">Mentions légales</a>
+                <a href="/concept">Concept</a>
+                <a href="/guide">Guide d'utilisation</a>
+                <a href="/technique">Document technique</a>
             </div>
             <div class="footer-col">
                 <h4>Prestations</h4>
-                <a href="#">Coiffeur</a>
-                <a href="#">Barbier</a>
-                <a href="#">Manucure</a>
-                <a href="#">Massage</a>
+                <a href="/recherche?prestation=Coupe+homme">Coupe homme</a>
+                <a href="/recherche?prestation=Coupe+femme">Coupe femme</a>
+                <a href="/recherche?prestation=Manucure">Manucure</a>
             </div>
             <div class="footer-col">
                 <h4>Villes</h4>
-                <a href="#">Port-au-Prince</a>
-                <a href="#">Pétion-Ville</a>
-                <a href="#">Delmas</a>
-                <a href="#">Cap-Haïtien</a>
+                <a href="/recherche?lieu=Pétion-Ville">Pétion-Ville</a>
+                <a href="/recherche?lieu=Delmas">Delmas</a>
+                <a href="/recherche?lieu=Cap-Haïtien">Cap-Haïtien</a>
             </div>
         </div>
         <div class="footer-bottom">© Copyright Atizay 2026. Tous droits réservés.</div>
@@ -633,71 +873,110 @@
             }
         }
 
-        // Dynamic images logic
+        // Dynamic images logic (Stable Stock images)
         const imgData = {
             'container-barber': [
-                'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1000&auto=format&fit=crop',
-                'https://images.unsplash.com/photo-1621605815987-8565b98cf0e3?q=80&w=1000&auto=format&fit=crop',
-                'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1000&auto=format&fit=crop'
+                'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1621605815987-8565b98cf0e3?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=1200&auto=format&fit=crop',
+                'https://plus.unsplash.com/premium_photo-1661715206240-f1cda9546059?q=80&w=1200&auto=format&fit=crop'
             ],
             'container-beaute': [
-                'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1000&auto=format&fit=crop',
-                'https://images.unsplash.com/photo-1590159763121-5c022634e062?q=80&w=1000&auto=format&fit=crop',
-                'https://images.unsplash.com/photo-1573461160327-b450ce3d8a4f?q=80&w=1000&auto=format&fit=crop'
+                'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1200&auto=format&fit=crop'
             ],
             'container-mixte': [
-                'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop',
-                'https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?q=80&w=1000&auto=format&fit=crop',
-                'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?q=80&w=1000&auto=format&fit=crop'
+                'https://images.unsplash.com/photo-1562322103-8ecbcad6d5bb?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1200&auto=format&fit=crop'
             ],
             'container-nails': [
-                'https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=1000&auto=format&fit=crop',
-                'https://images.unsplash.com/photo-1599849502967-dfdc72fc5bb9?q=80&w=1000&auto=format&fit=crop',
-                'https://images.unsplash.com/photo-1515377659633-40a233b2a59a?q=80&w=1000&auto=format&fit=crop'
+                'https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1607779097040-26e80aa78e66?q=80&w=1200&auto=format&fit=crop'
             ],
             'container-spa': [
-                'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1000&auto=format&fit=crop',
-                'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?q=80&w=1000&auto=format&fit=crop',
-                'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?q=80&w=1000&auto=format&fit=crop'
+                'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?q=80&w=1200&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?q=80&w=1200&auto=format&fit=crop'
             ]
         };
 
-        // Preload images to avoid delay
-        Object.values(imgData).forEach(urls => {
-            urls.forEach(url => {
-                const img = new Image();
-                img.src = url;
-            });
-        });
+        let currentIndices = {};
+        for (let key in imgData) currentIndices[key] = 0;
 
-        let indices = { 'container-barber': 0, 'container-beaute': 0, 'container-mixte': 0, 'container-nails': 0, 'container-spa': 0 };
+        function updateCategoryImages(id) {
+            let container = document.getElementById(id);
+            if (!container || imgData[id].length <= 1) return;
+
+            let imgActive = container.querySelector('.img-active');
+            let imgNext = container.querySelector('.img-next');
+
+            // Find next valid index
+            let nextIdx;
+            do {
+                nextIdx = Math.floor(Math.random() * imgData[id].length);
+            } while (nextIdx === currentIndices[id]);
+
+            currentIndices[id] = nextIdx;
+            
+            // Set source and handles potential errors
+            const nextImg = new Image();
+            nextImg.onload = () => {
+                imgNext.src = nextImg.src;
+                setTimeout(() => {
+                    imgNext.classList.remove('fade-out');
+                    imgActive.classList.add('fade-out');
+                    setTimeout(() => {
+                        imgNext.classList.remove('img-next');
+                        imgNext.classList.add('img-active');
+                        imgActive.classList.remove('img-active');
+                        imgActive.classList.add('img-next');
+                    }, 1500);
+                }, 100);
+            };
+            nextImg.onerror = () => {
+                console.warn(`Failed to load ${imgData[id][nextIdx]}, retrying...`);
+                updateCategoryImages(id); // Retry with another random image
+            };
+            nextImg.src = imgData[id][nextIdx];
+        }
 
         setInterval(() => {
             for (let id in imgData) {
-                let container = document.getElementById(id);
-                if (container) {
-                    let imgActive = container.querySelector('.img-active');
-                    let imgNext = container.querySelector('.img-next');
-
-                    indices[id] = (indices[id] + 1) % imgData[id].length;
-                    imgNext.src = imgData[id][indices[id]];
-
-                    // Allow browser to load src before fading
-                    setTimeout(() => {
-                        imgNext.classList.remove('fade-out');
-                        imgActive.classList.add('fade-out');
-
-                        // Swap classes after transition completes (1.5s CSS transition)
-                        setTimeout(() => {
-                            imgNext.classList.remove('img-next');
-                            imgNext.classList.add('img-active');
-                            imgActive.classList.remove('img-active');
-                            imgActive.classList.add('img-next');
-                        }, 1500);
-                    }, 50);
-                }
+                updateCategoryImages(id);
             }
-        }, 6000); // 6 seconds
+        }, 7000);
+
+        // Smooth scroll strategy
+        document.addEventListener('DOMContentLoaded', function () {
+            const resultsSection = document.getElementById('search-results');
+            if (resultsSection) {
+                // Check if we have a saved position
+                const savedScroll = localStorage.getItem('lastSearchScroll');
+                if (savedScroll && savedScroll !== 'null') {
+                    // Set position immediately without animation
+                    window.scrollTo(0, parseInt(savedScroll));
+                    localStorage.removeItem('lastSearchScroll');
+                }
+                
+                // Animate to results with a slightly longer delay for full rendering
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 400);
+            }
+        });
+
+        // Save position when clicking search links (header, static blocks, footer)
+        document.addEventListener('click', function (e) {
+            const link = e.target.closest('a');
+            if (link && (link.href.includes('/recherche') || link.getAttribute('href') === '/')) {
+                localStorage.setItem('lastSearchScroll', window.scrollY);
+            }
+        });
     </script>
 </body>
 

@@ -28,4 +28,13 @@ public interface SalonRepository extends JpaRepository<Salon, Long> {
      * Récupère les salons par nom ou ville
      */
     List<Salon> findByNomSalonContainingIgnoreCaseOrVilleSalonContainingIgnoreCase(String nomSalon, String villeSalon);
+
+    /**
+     * Recherche avancée de salons par nom/prestation et lieu
+     */
+    @org.springframework.data.jpa.repository.Query("SELECT DISTINCT s FROM Salon s LEFT JOIN s.listePrestations p WHERE " +
+           "(LOWER(s.nomSalon) LIKE LOWER(CONCAT('%', :quoi, '%')) OR LOWER(p.nomPrestation) LIKE LOWER(CONCAT('%', :quoi, '%')) OR LOWER(s.typeSalon) LIKE LOWER(CONCAT('%', :quoi, '%'))) AND " +
+           "(LOWER(s.villeSalon) LIKE LOWER(CONCAT('%', :ou, '%')) OR LOWER(s.adresseSalon) LIKE LOWER(CONCAT('%', :ou, '%'))) " +
+           "ORDER BY s.noteMoyenne DESC")
+    List<Salon> searchSalons(@org.springframework.data.repository.query.Param("quoi") String quoi, @org.springframework.data.repository.query.Param("ou") String ou);
 }
