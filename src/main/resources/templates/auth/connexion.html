@@ -278,7 +278,7 @@
 
             <div th:if="${error}" class="error-message" th:text="${error}"></div>
 
-            <form th:action="@{/auth/connexion}" method="post">
+            <form th:action="@{/auth/login}" method="post">
                 <div class="form-group">
                     <label class="form-label">Adresse e-mail</label>
                     <input type="email" name="email" class="form-input" placeholder="salon@email.com" required>
@@ -315,7 +315,7 @@
 
             <div class="auth-footer">
                 <p>Pas encore de compte ? <a href="/auth/inscription">S'inscrire</a></p>
-                <p>Vous êtes un professionnel ? <a href="/auth/inscription?type=proprietaire">Inscrivez votre salon</a></p>
+                <p>Vous êtes un professionnel ? <a href="/auth/inscription?type=proprietaire">Inscrivez vous</a></p>
             </div>
         </div>
             </div>

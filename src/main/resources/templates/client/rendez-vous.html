@@ -421,7 +421,9 @@
             <!-- GAUCHE : RÉCAPITULATIF -->
             <aside class="summary-card">
                 <div class="salon-mini-info">
-                    <img th:src="${salon.listeMedias != null and !salon.listeMedias.isEmpty() ? salon.listeMedias[0].urlMedia : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=100'}" class="salon-mini-img" alt="Salon">
+                    <img th:src="${salon.listeMedias != null and !salon.listeMedias.isEmpty() ? 
+                        (salon.listeMedias[0].urlMedia.startsWith('/uploads/') ? salon.listeMedias[0].urlMedia : '/uploads/salons/' + salon.listeMedias[0].urlMedia) : 
+                        'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=100'}" class="salon-mini-img" alt="Salon">
                     <div class="salon-mini-text">
                         <h4 th:text="${salon.nomSalon}">Nom du Salon</h4>
                         <p th:text="${salon.villeSalon}">Ville</p>
@@ -429,6 +431,10 @@
                 </div>
 
                 <div class="service-details">
+                    <div th:if="${prestation.medias != null and !prestation.medias.isEmpty()}" style="margin-bottom: 20px;">
+                        <img th:src="${prestation.medias[0].urlMedia.startsWith('/uploads/') ? prestation.medias[0].urlMedia : '/uploads/salons/' + prestation.medias[0].urlMedia}" 
+                             style="width: 100%; height: 180px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border);" alt="Prestation">
+                    </div>
                     <h3 th:text="${prestation.nomPrestation}">Nom du service</h3>
                     <div class="price-tag" th:text="${prestation.prix} + ' GDS'">1000 GDS</div>
                     

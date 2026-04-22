@@ -39,6 +39,7 @@ import atizay.model.MediaPrestation;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import atizay.repository.ClientRepository;
 import atizay.repository.ProprietaireRepository;
+import atizay.service.AbonnementService;
 
 @Controller
 @RequestMapping("/proprietaire")
@@ -46,6 +47,9 @@ public class ProprietaireController {
 
     @Autowired
     private SalonRepository salonRepository;
+
+    @Autowired
+    private AbonnementService abonnementService;
 
     @Autowired
     private PrestationRepository prestationRepository;
@@ -91,6 +95,15 @@ public class ProprietaireController {
             model.addAttribute("employesCount", 0);
             model.addAttribute("rdvCount", 0);
             model.addAttribute("revenus", "0 HTG");
+            
+            // Ajouter les informations de l'abonnement
+            var abonnementOpt = abonnementService.getAbonnementActif(proprietaire);
+            if (abonnementOpt.isPresent()) {
+                model.addAttribute("abonnement", abonnementOpt.get());
+                model.addAttribute("planActif", abonnementService.getPlanNom(proprietaire));
+            } else {
+                model.addAttribute("planActif", "Gratuit");
+            }
             
             return "proprietaire/dashboard-proprietaire";
         }
@@ -186,6 +199,15 @@ public class ProprietaireController {
         Proprietaire proprietaire = (Proprietaire) session.getAttribute("user");
 
         if ("proprietaire".equals(userType) && proprietaire != null) {
+            // Vérifier si le propriétaire peut créer un nouveau salon selon son plan
+            if (!abonnementService.peutCreerSalon(proprietaire)) {
+                String planActif = abonnementService.getPlanNom(proprietaire);
+                int maxSalons = abonnementService.getMaxSalons(planActif);
+                int currentSalons = salonRepository.findByProprietaire(proprietaire).size();
+                redirectAttributes.addFlashAttribute("errorMessage", "Vous avez atteint la limite de salons pour votre plan " + planActif + " (" + currentSalons + "/" + maxSalons + "). Veuillez mettre à jour votre abonnement.");
+                return "redirect:/proprietaire/dashboard";
+            }
+
             try {
                 Salon salon = new Salon();
                 salon.setTypeSalon(typeSalon);
@@ -296,7 +318,23 @@ public class ProprietaireController {
 
                 model.addAttribute("proprietaire", proprietaire);
                 model.addAttribute("salon", salon);
+                
+                // Ajouter les informations du plan d'abonnement et les limites
+                String planActif = abonnementService.getPlanNom(proprietaire);
+                int maxPhotos = abonnementService.getMaxPhotosParSalon(planActif);
+                int maxPrestations = abonnementService.getMaxPrestationsParSalon(planActif);
+                int maxEmployes = abonnementService.getMaxEmployesParSalon(planActif);
+                
+                model.addAttribute("planActif", planActif);
+                model.addAttribute("maxPhotos", maxPhotos);
+                model.addAttribute("maxPrestations", maxPrestations);
+                model.addAttribute("maxEmployes", maxEmployes);
+                model.addAttribute("currentPhotos", medias.size());
+                model.addAttribute("currentPrestations", prestations.size());
+                model.addAttribute("currentEmployes", employes.size());
+                
                 System.out.println("Salon chargé: " + salon.getNomSalon() + " avec " + medias.size() + " photos, " + horaires.size() + " horaires, " + prestations.size() + " prestations et " + rendezVous.size() + " rendez-vous");
+                System.out.println("Plan: " + planActif + " - Max photos: " + maxPhotos + ", Max prestations: " + maxPrestations + ", Max employés: " + maxEmployes);
                 return "proprietaire/salon/gestion-salon";
             }
         }
@@ -659,10 +697,17 @@ public class ProprietaireController {
                     salon.setDescriptionSalon(description);
                     salonRepository.save(salon);
 
-                    // Gérer les photos (max 15)
+                    // Gérer les photos selon le plan
                     if (photos != null && photos.length > 0) {
                         int currentPhotos = salon.getListeMedias() != null ? salon.getListeMedias().size() : 0;
-                        int photosToAdd = Math.min(photos.length, 15 - currentPhotos);
+                        String planActif = abonnementService.getPlanNom(proprietaire);
+                        int maxPhotos = abonnementService.getMaxPhotosParSalon(planActif);
+                        int photosToAdd = Math.min(photos.length, maxPhotos - currentPhotos);
+                        
+                        if (currentPhotos >= maxPhotos) {
+                            redirectAttributes.addFlashAttribute("errorMessage", "Vous avez atteint la limite de photos pour votre plan " + planActif + " (" + currentPhotos + "/" + maxPhotos + "). Veuillez mettre à jour votre abonnement.");
+                            return "redirect:/proprietaire/salon/" + id + "/gestion";
+                        }
                         int photosSaved = 0;
 
                         for (int i = 0; i < photosToAdd; i++) {
@@ -825,7 +870,12 @@ public class ProprietaireController {
             Salon salon = salonRepository.findById(id).orElse(null);
             if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
                 List<Prestation> existantes = prestationRepository.findBySalon(salon);
-                if (existantes.size() >= 50) {
+                
+                // Vérifier si le propriétaire peut ajouter une prestation selon son plan
+                if (!abonnementService.peutAjouterPrestation(proprietaire, existantes.size())) {
+                    String planActif = abonnementService.getPlanNom(proprietaire);
+                    int maxPrestations = abonnementService.getMaxPrestationsParSalon(planActif);
+                    redirectAttributes.addFlashAttribute("errorMessage", "Vous avez atteint la limite de prestations pour votre plan " + planActif + " (" + existantes.size() + "/" + maxPrestations + "). Veuillez mettre à jour votre abonnement.");
                     return "redirect:/proprietaire/salon/" + id + "/gestion#prestation";
                 }
 
@@ -1037,6 +1087,15 @@ public class ProprietaireController {
         if ("proprietaire".equals(userType) && proprietaire != null) {
             Salon salon = salonRepository.findById(id).orElse(null);
             if (salon != null && salon.getProprietaire().getId().equals(proprietaire.getId())) {
+                // Vérifier si le propriétaire peut ajouter un employé selon son plan
+                int currentEmployes = employeRepository.findBySalon(salon).size();
+                if (!abonnementService.peutAjouterEmploye(proprietaire, currentEmployes)) {
+                    String planActif = abonnementService.getPlanNom(proprietaire);
+                    int maxEmployes = abonnementService.getMaxEmployesParSalon(planActif);
+                    redirectAttributes.addFlashAttribute("errorMessage", "Vous avez atteint la limite d'employés pour votre plan " + planActif + " (" + currentEmployes + "/" + maxEmployes + "). Veuillez mettre à jour votre abonnement.");
+                    return "redirect:/proprietaire/salon/" + id + "/gestion#employes";
+                }
+
                 // Vérifier l'unicité de l'email dans tous les types d'utilisateurs
                 if (clientRepository.findByEmail(email) != null || 
                     proprietaireRepository.findByEmail(email) != null || 

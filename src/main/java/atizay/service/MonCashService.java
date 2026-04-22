@@ -1,90 +1,53 @@
 package atizay.service;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class MonCashService {
 
-    // === SANDBOX CREDENTIALS ===
-    private static final String CLIENT_ID     = "115c98eac1fe339e5ade88d01ef18720";
-    private static final String CLIENT_SECRET = "smHHGmemIK9HZeECX8ZnRJWzq4mIhiy1bSY_KU29mxOKPjsYBzkZY9wnzBEdvEkO";
+    @Value("${moncash.client.id:115c98eac1fe339e5ade88d01ef18720}")
+    private String clientId;
 
-    // === API ENDPOINTS (SANDBOX) ===
-    private static final String API_BASE              = "https://sandbox.moncashbutton.digicelgroup.com/Api";
-    private static final String OAUTH_URL             = API_BASE + "/oauth/token";
-    private static final String CREATE_URL            = API_BASE + "/v1/CreatePayment";
-    private static final String GATEWAY_URL           = "https://sandbox.moncashbutton.digicelgroup.com/Moncash-middleware";
+    @Value("${moncash.client.secret:smHHGmemIK9HZeECX8ZnRJWzq4mIhiy1bSY_KU29mxOKPjsYBzkZY9wnzBEdvEkO}")
+    private String clientSecret;
 
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private static final String GATEWAY_URL = "https://sandbox.moncashbutton.digicelgroup.com/Moncash-middleware";
 
-    /**
-     * 1) Obtenir un token d'accès OAuth2
-     */
-    public String getAccessToken() throws Exception {
-        String basicAuth = Base64.getEncoder().encodeToString((CLIENT_ID + ":" + CLIENT_SECRET).getBytes(StandardCharsets.UTF_8));
+    private MonCashClient monCashClient;
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(OAUTH_URL))
-                .header("Authorization", "Basic " + basicAuth)
-                .header("Accept", "application/json")
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .POST(HttpRequest.BodyPublishers.ofString("grant_type=client_credentials&scope=read,write"))
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        
-        if (response.statusCode() != 200) {
-            throw new RuntimeException("Échec de l'authentification MonCash : " + response.body());
-        }
-
-        JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-        return json.get("access_token").getAsString();
+    @PostConstruct
+    public void init() {
+        this.monCashClient = new MonCashClient(clientId, clientSecret);
     }
 
     /**
-     * 2) Créer un paiement et obtenir l'URL de redirection
+     * Initialiser un paiement et obtenir l'URL de redirection
      */
     public String initiatePayment(String orderId, double amount) throws Exception {
-        String accessToken = getAccessToken();
-
-        JsonObject payload = new JsonObject();
-        payload.addProperty("orderId", orderId);
-        payload.addProperty("amount", amount);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(CREATE_URL))
-                .header("Authorization", "Bearer " + accessToken)
-                .header("Accept", "application/json")
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() != 200) {
-            throw new RuntimeException("Échec de la création du paiement MonCash : " + response.body());
-        }
-
-        JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-        JsonObject paymentToken = json.getAsJsonObject("payment_token");
-        
-        if (paymentToken == null || paymentToken.get("token") == null) {
-            throw new RuntimeException("Token de paiement manquant dans la réponse MonCash");
-        }
-
-        String token = paymentToken.get("token").getAsString();
-        
-        // URL de redirection finale vers la passerelle Digicel
+        String accessToken = monCashClient.getAccessToken();
+        String token = monCashClient.createPayment(accessToken, orderId, amount);
         return GATEWAY_URL + "/Payment/Redirect?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Vérifier le statut d'un paiement par orderId
+     */
+    public JsonObject verifyPaymentByOrder(String orderId) throws Exception {
+        String accessToken = monCashClient.getAccessToken();
+        return monCashClient.retrieveByOrder(accessToken, orderId);
+    }
+
+    /**
+     * Vérifier le statut d'un paiement par transactionId
+     */
+    public JsonObject verifyPaymentByTransaction(String transactionId) throws Exception {
+        String accessToken = monCashClient.getAccessToken();
+        return monCashClient.retrieveByTransaction(accessToken, transactionId);
     }
 }

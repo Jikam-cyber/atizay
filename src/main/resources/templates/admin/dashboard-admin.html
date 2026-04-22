@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Atizay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #111111;
+            --white: #ffffff;
+            --bg-light: #f9f9f9;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+            --primary-color: #111111;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-light);
+            display: flex;
+            min-height: 100vh;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 280px;
+            background-color: var(--white);
+            display: flex;
+            flex-direction: column;
+            padding: 40px 24px;
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .brand { margin-bottom: 40px; }
+        .brand h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: var(--black); text-transform: uppercase; }
+        .brand p { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+        .nav-group { margin-bottom: 32px; }
+        .nav-label { 
+            font-size: 11px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            color: var(--text-muted); 
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+            padding-left: 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+
+        .nav-link i { width: 20px; text-align: center; font-size: 16px; }
+        .nav-link:hover { color: var(--black); background: var(--bg-light); }
+        .nav-link.active { background-color: var(--black); color: var(--white); box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: 600; }
+
+        .logout-link {
+            margin-top: auto;
+            color: #d93025;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .logout-link:hover { background: #fce8e6; }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px 60px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+        .page-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .page-header p { color: var(--text-muted); font-size: 14px; }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--white);
+        }
+
+        .stat-icon.blue { background: #3b82f6; }
+        .stat-icon.green { background: #10b981; }
+        .stat-icon.purple { background: #8b5cf6; }
+        .stat-icon.orange { background: #f59e0b; }
+        .stat-icon.red { background: #ef4444; }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--black);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Content Sections */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .content-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .subscription-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .sub-stat {
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .sub-stat.gratuit { background: #f3f4f6; }
+        .sub-stat.pro { background: #dbeafe; }
+        .sub-stat.premium { background: #fef3c7; }
+
+        .sub-stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--black);
+        }
+
+        .sub-stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 4px;
+            color: var(--text-muted);
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 12px 16px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-gratuit { background: #f3f4f6; color: var(--black); }
+        .badge-pro { background: #dbeafe; color: #1d4ed8; }
+        .badge-premium { background: #fef3c7; color: #b45309; }
+
+        @media (max-width: 1024px) {
+            aside { width: 80px; padding: 20px 10px; }
+            .brand span, .nav-label, .nav-link span, .logout-link span { display: none; }
+            main { margin-left: 80px; padding: 30px 40px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<aside>
+    <div class="brand">
+        <h1>ATIZAY</h1>
+        <p>Admin Dashboard</p>
+    </div>
+
+    <div class="nav-group">
+        <div class="nav-label">Principal</div>
+        <a href="/admin/dashboard" class="nav-link active">
+            <i class="fa-solid fa-chart-line"></i> <span>Dashboard</span>
+        </a>
+    </div>
+
+    <a href="/auth/deconnexion" class="logout-link">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Se déconnecter</span>
+    </a>
+</aside>
+
+<main>
+    <div class="page-header">
+        <h1>Dashboard Admin</h1>
+        <p>Vue d'ensemble de la plateforme Atizay</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-store"></i>
+            </div>
+            <div class="stat-value" th:text="${totalSalons}">0</div>
+            <div class="stat-label">Salons</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="stat-value" th:text="${totalClients}">0</div>
+            <div class="stat-label">Clients</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <div class="stat-value" th:text="${totalProprietaires}">0</div>
+            <div class="stat-label">Propriétaires</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div class="stat-value" th:text="${totalRendezVous}">0</div>
+            <div class="stat-label">Rendez-vous</div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Abonnements -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3>Abonnements par plan</h3>
+            </div>
+            <div class="subscription-stats">
+                <div class="sub-stat gratuit">
+                    <div class="sub-stat-value" th:text="${abonnementsParPlan.get('gratuit')}">0</div>
+                    <div class="sub-stat-label">Gratuit</div>
+                </div>
+                <div class="sub-stat pro">
+                    <div class="sub-stat-value" th:text="${abonnementsParPlan.get('pro')}">0</div>
+                    <div class="sub-stat-label">Pro</div>
+                </div>
+                <div class="sub-stat premium">
+                    <div class="sub-stat-value" th:text="${abonnementsParPlan.get('premium')}">0</div>
+                    <div class="sub-stat-label">Premium</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employés -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3>Total Employés</h3>
+            </div>
+            <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 48px; font-weight: 800; color: var(--black);" th:text="${totalEmployes}">0</div>
+                <div style="font-size: 14px; color: var(--text-muted); margin-top: 8px;">Employés actifs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Salons Récents -->
+    <div class="content-card" style="margin-bottom: 40px;">
+        <div class="card-header">
+            <h3>Salons Récents</h3>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Type</th>
+                        <th>Ville</th>
+                        <th>Propriétaire</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="salon : ${salonsRecents}">
+                        <td th:text="${salon.nomSalon}">Nom</td>
+                        <td th:text="${salon.typeSalon}">Type</td>
+                        <td th:text="${salon.villeSalon}">Ville</td>
+                        <td th:text="${salon.proprietaire != null ? salon.proprietaire.prenom + ' ' + salon.proprietaire.nom : 'N/A'}">Propriétaire</td>
+                    </tr>
+                    <tr th:if="${salonsRecents == null || salonsRecents.isEmpty()}">
+                        <td colspan="4" style="text-align: center; color: var(--text-muted);">Aucun salon pour le moment</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Rendez-vous Récents -->
+    <div class="content-card">
+        <div class="card-header">
+            <h3>Rendez-vous Récents</h3>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Client</th>
+                        <th>Salon</th>
+                        <th>Prestation</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="rdv : ${rendezVousRecents}">
+                        <td th:text="${rdv.dateRendezVous != null ? rdv.dateRendezVous.toString() : 'N/A'}">Date</td>
+                        <td th:text="${rdv.client != null ? rdv.client.prenom + ' ' + rdv.client.nom : 'N/A'}">Client</td>
+                        <td th:text="${rdv.salon != null ? rdv.salon.nomSalon : 'N/A'}">Salon</td>
+                        <td th:text="${rdv.prestation != null ? rdv.prestation.nomPrestation : 'N/A'}">Prestation</td>
+                        <td>
+                            <span class="badge" 
+                                  th:class="'badge-' + (${rdv.statut != null ? rdv.statut.toLowerCase() : 'gratuit'})"
+                                  th:text="${rdv.statut != null ? rdv.statut : 'N/A'}">Statut</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${rendezVousRecents == null || rendezVousRecents.isEmpty()}">
+                        <td colspan="5" style="text-align: center; color: var(--text-muted);">Aucun rendez-vous pour le moment</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

@@ -14,6 +14,7 @@ import atizay.repository.HoraireSalonRepository;
 import atizay.repository.EmployeRepository;
 import atizay.repository.AvisEmployeRepository;
 import atizay.model.AvisEmploye;
+import atizay.repository.MediaPrestationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -57,6 +58,9 @@ public class ClientController {
 
     @Autowired
     private AvisEmployeRepository avisEmployeRepository;
+
+    @Autowired
+    private MediaPrestationRepository mediaPrestationRepository;
 
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
@@ -299,10 +303,14 @@ public class ClientController {
                 model.addAttribute("favoriIds", favoriIds);
             }
 
-            // Récupérer les employés actifs du salon
-            List<atizay.model.Employe> employes = employeRepository.findBySalon(salon).stream()
-                .filter(atizay.model.Employe::isActifEmploye)
-                .collect(Collectors.toList());
+            // Récupérer tous les employés du salon
+            List<atizay.model.Employe> employes = employeRepository.findBySalon(salon);
+
+            // Avis de l'utilisateur connecté
+            if (user instanceof Client) {
+                java.util.Optional<atizay.model.AvisSalon> userAvis = avisSalonRepository.findBySalonIdSalonAndClient(idSalon, (Client) user);
+                userAvis.ifPresent(avisObj -> model.addAttribute("userAvis", avisObj));
+            }
 
             model.addAttribute("salon", salon);
             model.addAttribute("prestationsParCategorie", prestationsParCategorie);
@@ -314,6 +322,7 @@ public class ClientController {
     }
 
     @PostMapping("/salon/{id}/avis")
+    @Transactional
     public String donnerAvis(@PathVariable("id") Long idSalon,
                             @RequestParam("note") Integer note,
                             @RequestParam(value = "commentaire", required = false, defaultValue = "Note sans commentaire") String commentaire,
@@ -350,14 +359,47 @@ public class ClientController {
             } else {
                 return "redirect:/auth/connexion";
             }
-            
+            // Forcer l'enregistrement en base pour que le calcul de moyenne soit juste
+            avisSalonRepository.flush();
+
             // Recalculer la note moyenne
             List<atizay.model.AvisSalon> tousLesAvis = avisSalonRepository.findBySalonIdSalon(idSalon);
-            double moyenne = tousLesAvis.stream().mapToInt(atizay.model.AvisSalon::getNote).average().orElse(0.0);
+            double moyenne = tousLesAvis.stream().mapToInt(atizay.model.AvisSalon::getNote).average().orElse(5.0);
             salon.setNoteMoyenne(moyenne);
-            // Ne pas sauvegarder le salon pour éviter les problèmes de lazy loading
+            salonRepository.save(salon);
         }
         
+        return "redirect:/client/salon/" + idSalon;
+    }
+
+    @PostMapping("/salon/{id}/avis/supprimer/{idAvis}")
+    @Transactional
+    public String supprimerAvis(@PathVariable("id") Long idSalon,
+                               @PathVariable("idAvis") Long idAvis,
+                               HttpSession session, RedirectAttributes redirectAttributes) {
+        Object userObj = session.getAttribute("user");
+        if (userObj == null || !(userObj instanceof Client)) return "redirect:/auth/connexion";
+        Client user = (Client) userObj;
+
+        atizay.model.AvisSalon avis = avisSalonRepository.findById(idAvis).orElse(null);
+        if (avis != null && avis.getClient().getId().equals(user.getId()) && avis.getSalon().getIdSalon().equals(idSalon)) {
+            avisSalonRepository.delete(avis);
+            
+            // Recalculer la note moyenne
+            Salon salon = salonRepository.findById(idSalon).orElse(null);
+            if (salon != null) {
+                avisSalonRepository.flush(); // Crucial pour que le calcul ignore l'avis supprimé
+                List<atizay.model.AvisSalon> avisList = avisSalonRepository.findBySalonIdSalon(idSalon);
+                double moyenne = avisList.stream().mapToInt(atizay.model.AvisSalon::getNote).average().orElse(5.0);
+                salon.setNoteMoyenne(moyenne);
+                salonRepository.save(salon);
+            }
+            
+            redirectAttributes.addFlashAttribute("success", "Votre avis a été supprimé !");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Vous ne pouvez pas supprimer cet avis.");
+        }
+
         return "redirect:/client/salon/" + idSalon;
     }
 
@@ -409,6 +451,10 @@ public class ClientController {
             return "redirect:/client/dashboard";
         }
 
+        // Charger les médias pour l'affichage des photos
+        salon.setListeMedias(mediaSalonRepository.findBySalon(salon));
+        prestation.setMedias(mediaPrestationRepository.findByPrestationIdPrestationOrderByOrdreAffichage(prestation.getIdPrestation()));
+        
         // Récupérer les employés du salon
         List<atizay.model.Employe> tousEmployes = employeRepository.findBySalon(salon);
         List<atizay.model.Employe> employes = tousEmployes.stream()

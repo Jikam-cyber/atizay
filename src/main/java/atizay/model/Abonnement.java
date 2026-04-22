@@ -30,7 +30,7 @@ public class Abonnement {
     private boolean autoRenouvellement = false;
 
     @ManyToOne
-    @JoinColumn(name = "id_salon", nullable = false)
+    @JoinColumn(name = "id_salon", nullable = true)
     private Salon salon;
 
     @ManyToOne

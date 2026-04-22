@@ -858,59 +858,139 @@
             <div class="top-bar">
                 <div class="page-title">
                     <h2>Abonnement</h2>
-                    <p>Gérez vos abonnements par salon</p>
+                    <p>Gérez votre abonnement et vos fonctionnalités</p>
                 </div>
             </div>
 
-            <div class="subscription-card">
-                <div class="subscription-header">
-                    <h3>Abonnement actuel</h3>
-                    <span class="subscription-badge">Gratuit</span>
+            <!-- Affichage de l'abonnement actuel -->
+            <div th:if="${abonnement != null}" class="card" style="padding: 32px; margin-bottom: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;">
+                    <div>
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Votre abonnement actuel</div>
+                        <h3 style="font-size: 32px; font-weight: 800; margin: 0;" th:text="${abonnement.typeAbonnement}">Plan Premium</h3>
+                    </div>
+                    <div style="display: flex; gap: 48px; flex-wrap: wrap;">
+                        <div>
+                            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Date de début</div>
+                            <div style="font-size: 16px; font-weight: 600;" th:text="${#temporals.format(abonnement.dateDebut, 'dd/MM/yyyy')}">01/01/2026</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Date de fin</div>
+                            <div style="font-size: 16px; font-weight: 600;" th:text="${#temporals.format(abonnement.dateFin, 'dd/MM/yyyy')}">01/02/2026</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Statut</div>
+                            <div style="font-size: 16px; font-weight: 600;" th:text="${abonnement.statut}">Actif</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Prix mensuel</div>
+                            <div style="font-size: 16px; font-weight: 600;" th:text="${abonnement.prixMensuel + ' HTG'}">5000 HTG</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="subscription-plan">Plan Starter</div>
-                <div class="subscription-period">0 HTG / mois</div>
-                <div class="subscription-features">
-                    <div class="feature-item">
-                        <i class="fa-solid fa-check"></i>
-                        <span>1 Salon inclus</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fa-solid fa-check"></i>
-                        <span>Prise de RDV en ligne</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fa-solid fa-check"></i>
-                        <span>Gestion des employés</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fa-solid fa-check"></i>
-                        <span>Notifications SMS</span>
-                    </div>
-                </div>
-                <button class="btn-upgrade">Passer au plan Pro</button>
             </div>
 
-            <div class="list-card">
-                <div class="list-header">
-                    <h3>Abonnements par salon</h3>
-                </div>
-
-                <div th:if="${salons}">
-                    <div th:each="salon : ${salons}" class="salon-subscription-item">
-                        <div class="salon-subscription-info">
-                            <div class="salon-name" th:text="${salon.nomSalon}">Nom du salon</div>
-                            <div class="subscription-status">
-                                <span class="status-badge">Plan Starter</span>
-                                <span class="status-date">Actif depuis le 01/01/2026</span>
-                            </div>
-                        </div>
-                        <div class="salon-subscription-actions">
-                            <button class="btn-upgrade-small">Changer de plan</button>
-                        </div>
+            <!-- Message si pas d'abonnement -->
+            <div th:unless="${abonnement != null}" class="card" style="padding: 32px; margin-bottom: 32px; background: #f3f4f6; border: 2px dashed #d1d5db;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <i class="fa-solid fa-info-circle" style="font-size: 24px; color: #6b7280;"></i>
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 8px 0; color: #374151;">Plan Gratuit</h3>
+                        <p style="margin: 0; color: #6b7280;">Vous utilisez actuellement le plan gratuit. Passez à un plan payant pour débloquer plus de fonctionnalités.</p>
                     </div>
                 </div>
-                <div th:unless="${salons}" class="empty-state">
-                    <p>Aucun salon avec abonnement</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px;">
+                <!-- Plan Gratuit -->
+                <div class="card" style="padding: 40px; border: 2px solid var(--border);">
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Plan Gratuit</h3>
+                        <div style="font-size: 36px; font-weight: 800; color: var(--black);">0 HTG</div>
+                        <div style="font-size: 14px; color: var(--text-muted);">/ mois</div>
+                    </div>
+                    <div style="margin-bottom: 32px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">1 salon maximum</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">10 prestations par salon</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">2 employés par salon</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">5 photos salon</span>
+                        </div>
+                    </div>
+                    <button class="btn-action" style="width: 100%; background: var(--bg-light); color: var(--text-main);">Plan actuel</button>
+                </div>
+
+                <!-- Plan Pro -->
+                <div class="card" style="padding: 40px; border: 2px solid var(--black); position: relative;">
+                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--black); color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">Populaire</div>
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Plan Pro</h3>
+                        <div style="font-size: 36px; font-weight: 800; color: var(--black);">1000 HTG</div>
+                        <div style="font-size: 14px; color: var(--text-muted);">/ mois</div>
+                    </div>
+                    <div style="margin-bottom: 32px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">3 salons maximum</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">30 prestations par salon</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">5 employés par salon</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">15 photos par salon</span>
+                        </div>
+                    </div>
+                    <form th:action="@{/payment/subscription/initiate}" method="post" style="margin: 0;">
+                        <input type="hidden" name="plan" value="pro">
+                        <button type="submit" class="btn-action" style="width: 100%;">Choisir ce plan</button>
+                    </form>
+                </div>
+
+                <!-- Plan Premium -->
+                <div class="card" style="padding: 40px; border: 2px solid var(--border);">
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Plan Premium</h3>
+                        <div style="font-size: 36px; font-weight: 800; color: var(--black);">5000 HTG</div>
+                        <div style="font-size: 14px; color: var(--text-muted);">/ mois</div>
+                    </div>
+                    <div style="margin-bottom: 32px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">Salons illimités</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">Prestations illimitées par salon</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">Employés illimités par salon</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fa-solid fa-check" style="color: #4ade80;"></i>
+                            <span style="font-size: 14px;">Photos illimitées par salon</span>
+                        </div>
+                    </div>
+                    <form th:action="@{/payment/subscription/initiate}" method="post" style="margin: 0;">
+                        <input type="hidden" name="plan" value="premium">
+                        <button type="submit" class="btn-action" style="width: 100%;">Choisir ce plan</button>
+                    </form>
                 </div>
             </div>
         </section>

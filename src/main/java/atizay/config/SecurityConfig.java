@@ -1,5 +1,6 @@
 package atizay.config;
 
+import atizay.controller.PaymentController;
 import atizay.model.Client;
 import atizay.model.Proprietaire;
 import atizay.repository.ClientRepository;
@@ -35,6 +36,12 @@ public class SecurityConfig {
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
 
+    @Autowired
+    private PaymentController paymentController;
+
+    @Autowired
+    private atizay.repository.AdminRepository adminRepository;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,7 +49,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/home", "/recherche", "/salon/**", "/concept", "/guide", "/technique", "/auth/**", "/static/**", "/css/**", "/js/**", "/images/**", "/uploads/**")
                         .permitAll()
-                        .requestMatchers("/client/**", "/proprietaire/**", "/employe/**")
+                        .requestMatchers("/client/**", "/proprietaire/**", "/employe/**", "/payment/**", "/admin/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
@@ -79,6 +86,9 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler customSuccessHandler() {
         return (request, response, authentication) -> {
+            System.out.println("=== DEBUG: customSuccessHandler appelé ===");
+            System.out.println("Authentication: " + (authentication != null ? authentication.getClass().getName() : "null"));
+            
             HttpSession session = request.getSession();
             String email;
 
@@ -88,17 +98,37 @@ public class SecurityConfig {
             } else {
                 email = authentication.getName();
             }
+            
+            System.out.println("Email: " + email);
+
+            // Vérifier si c'est un admin
+            atizay.model.Admin admin = adminRepository.findByEmail(email);
+            System.out.println("Admin trouvé: " + (admin != null ? "oui" : "non"));
+            
+            if (admin != null) {
+                session.setAttribute("user", admin);
+                session.setAttribute("userType", "admin");
+                response.sendRedirect("/admin/dashboard");
+                return;
+            }
 
             // Un utilisateur connecté via OAuth2 est toujours un Client initialement dans notre système
             Client client = clientRepository.findByEmail(email);
+            System.out.println("Client trouvé: " + (client != null ? "oui" : "non"));
+            
             if (client != null) {
                 // On vérifie s'il est aussi propriétaire ou employé (cas rare mais possible)
                 Proprietaire proprietaire = proprietaireRepository.findByEmail(email);
                 atizay.model.Employe employe = employeRepository.findByEmail(email);
+                
+                System.out.println("Propriétaire trouvé: " + (proprietaire != null ? "oui" : "non"));
+                System.out.println("Employé trouvé: " + (employe != null ? "oui" : "non"));
 
                 if (proprietaire != null && !(authentication instanceof OAuth2AuthenticationToken)) {
                     session.setAttribute("user", proprietaire);
                     session.setAttribute("userType", "proprietaire");
+                    // Créer l'abonnement s'il y a un paiement en attente
+                    paymentController.createSubscriptionAfterLogin(proprietaire, session);
                     response.sendRedirect("/proprietaire/dashboard");
                 } else if (employe != null && !(authentication instanceof OAuth2AuthenticationToken)) {
                     session.setAttribute("user", employe);
@@ -112,14 +142,20 @@ public class SecurityConfig {
             } else {
                 // Cas d'un propriétaire qui se connecte via formulaire
                 Proprietaire proprietaire = proprietaireRepository.findByEmail(email);
+                System.out.println("Propriétaire (sans client) trouvé: " + (proprietaire != null ? "oui" : "non"));
+                
                 if (proprietaire != null) {
                     session.setAttribute("user", proprietaire);
                     session.setAttribute("userType", "proprietaire");
+                    // Créer l'abonnement s'il y a un paiement en attente
+                    paymentController.createSubscriptionAfterLogin(proprietaire, session);
                     response.sendRedirect("/proprietaire/dashboard");
                     return;
                 }
                 
                 atizay.model.Employe employe = employeRepository.findByEmail(email);
+                System.out.println("Employé (sans client) trouvé: " + (employe != null ? "oui" : "non"));
+                
                 if (employe != null) {
                     session.setAttribute("user", employe);
                     session.setAttribute("userType", "employe");
@@ -127,6 +163,7 @@ public class SecurityConfig {
                     return;
                 }
 
+                System.out.println("Aucun utilisateur trouvé, redirection vers login avec erreur");
                 response.sendRedirect("/auth/connexion?error=true");
             }
         };

@@ -324,7 +324,13 @@
 
         <!-- LISTE -->
         <div th:each="rdv : ${reservations}" class="rdv-card">
-            <img th:src="${rdv.salon != null and rdv.salon.listeMedias != null and !rdv.salon.listeMedias.isEmpty() ? rdv.salon.listeMedias[0].urlMedia : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=100'}" class="salon-thumb" alt="Salon">
+            <img th:if="${rdv.salon != null and rdv.salon.listeMedias != null and !rdv.salon.listeMedias.isEmpty()}"
+                 th:src="${rdv.salon.listeMedias[0].urlMedia.startsWith('/uploads/salons/') ? rdv.salon.listeMedias[0].urlMedia : '/uploads/salons/' + rdv.salon.listeMedias[0].urlMedia}"
+                 class="salon-thumb" alt="Salon"
+                 onerror="this.src='https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=100'">
+            <img th:if="${rdv.salon == null or rdv.salon.listeMedias == null or rdv.salon.listeMedias.isEmpty()}"
+                 src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=100"
+                 class="salon-thumb" alt="Salon">
             
             <div class="rdv-main">
                 <div class="rdv-service" th:text="${rdv.prestation?.nomPrestation}">Coiffure Homme</div>
