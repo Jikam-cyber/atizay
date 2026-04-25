@@ -5,6 +5,8 @@ import atizay.model.Client;
 import atizay.model.Proprietaire;
 import atizay.repository.ClientRepository;
 import atizay.repository.ProprietaireRepository;
+import atizay.repository.EmployeRepository;
+import atizay.repository.AdminRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -28,25 +29,33 @@ public class SecurityConfig {
     private ProprietaireRepository proprietaireRepository;
 
     @Autowired
-    private atizay.repository.EmployeRepository employeRepository;
+    private EmployeRepository employeRepository;
+
+    @Autowired
+    private AdminRepository adminRepository;
 
     @Autowired
     private PaymentController paymentController;
-
-    @Autowired
-    private atizay.repository.AdminRepository adminRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/home", "/recherche", "/salon/**", "/concept", "/guide", "/technique",
-                                "/auth/**", "/static/**", "/css/**", "/js/**", "/images/**", "/uploads/**")
-                        .permitAll()
-                        .requestMatchers("/client/**", "/proprietaire/**", "/employe/**", "/payment/**", "/admin/**")
-                        .permitAll()
+                        .requestMatchers(
+                                "/", "/home", "/recherche", "/salon/**",
+                                "/concept", "/guide", "/technique",
+                                "/auth/**", "/static/**", "/css/**",
+                                "/js/**", "/images/**", "/uploads/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/client/**", "/proprietaire/**",
+                                "/employe/**", "/payment/**", "/admin/**"
+                        ).permitAll()
+
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
                         .loginPage("/auth/connexion")
                         .loginProcessingUrl("/auth/login")
@@ -55,6 +64,10 @@ public class SecurityConfig {
                         .failureUrl("/auth/connexion?error=true")
                         .permitAll()
                 )
+
+                // ❌ OAuth2 supprimé pour éviter l’erreur
+                //.oauth2Login(...)
+
                 .logout(logout -> logout
                         .logoutUrl("/auth/deconnexion")
                         .logoutSuccessUrl("/auth/connexion?logout=true")
@@ -62,6 +75,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
+
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
@@ -78,16 +92,9 @@ public class SecurityConfig {
         return (request, response, authentication) -> {
 
             HttpSession session = request.getSession();
-            String email;
+            String email = authentication.getName();
 
-            // Support OAuth (même si désactivé, ça ne casse rien)
-            if (authentication instanceof OAuth2AuthenticationToken oauthToken) {
-                email = oauthToken.getPrincipal().getAttribute("email");
-            } else {
-                email = authentication.getName();
-            }
-
-            // ADMIN
+            // 🔍 ADMIN
             atizay.model.Admin admin = adminRepository.findByEmail(email);
             if (admin != null) {
                 session.setAttribute("user", admin);
@@ -96,8 +103,9 @@ public class SecurityConfig {
                 return;
             }
 
-            // CLIENT
+            // 🔍 CLIENT
             Client client = clientRepository.findByEmail(email);
+
             if (client != null) {
 
                 Proprietaire proprietaire = proprietaireRepository.findByEmail(email);
@@ -106,41 +114,52 @@ public class SecurityConfig {
                 if (proprietaire != null) {
                     session.setAttribute("user", proprietaire);
                     session.setAttribute("userType", "proprietaire");
+
+                    // abonnement après login
                     paymentController.createSubscriptionAfterLogin(proprietaire, session);
+
                     response.sendRedirect("/proprietaire/dashboard");
+
                 } else if (employe != null) {
                     session.setAttribute("user", employe);
                     session.setAttribute("userType", "employe");
+
                     response.sendRedirect("/employe/dashboard");
+
                 } else {
                     session.setAttribute("user", client);
                     session.setAttribute("userType", "client");
+
                     response.sendRedirect("/client/dashboard");
                 }
-                return;
-            }
 
-            // PROPRIETAIRE seul
-            Proprietaire proprietaire = proprietaireRepository.findByEmail(email);
-            if (proprietaire != null) {
-                session.setAttribute("user", proprietaire);
-                session.setAttribute("userType", "proprietaire");
-                paymentController.createSubscriptionAfterLogin(proprietaire, session);
-                response.sendRedirect("/proprietaire/dashboard");
-                return;
-            }
+            } else {
 
-            // EMPLOYE seul
-            atizay.model.Employe employe = employeRepository.findByEmail(email);
-            if (employe != null) {
-                session.setAttribute("user", employe);
-                session.setAttribute("userType", "employe");
-                response.sendRedirect("/employe/dashboard");
-                return;
-            }
+                // 🔍 PROPRIETAIRE sans client
+                Proprietaire proprietaire = proprietaireRepository.findByEmail(email);
+                if (proprietaire != null) {
+                    session.setAttribute("user", proprietaire);
+                    session.setAttribute("userType", "proprietaire");
 
-            // RIEN TROUVÉ
-            response.sendRedirect("/auth/connexion?error=true");
+                    paymentController.createSubscriptionAfterLogin(proprietaire, session);
+
+                    response.sendRedirect("/proprietaire/dashboard");
+                    return;
+                }
+
+                // 🔍 EMPLOYE
+                atizay.model.Employe employe = employeRepository.findByEmail(email);
+                if (employe != null) {
+                    session.setAttribute("user", employe);
+                    session.setAttribute("userType", "employe");
+
+                    response.sendRedirect("/employe/dashboard");
+                    return;
+                }
+
+                // ❌ aucun utilisateur
+                response.sendRedirect("/auth/connexion?error=true");
+            }
         };
     }
 }
